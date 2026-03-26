@@ -21,6 +21,30 @@ type Metadata struct {
 	// Type is the optional subtype within the Kind (for example: Microsoft Word Document (DOCX)).
 	// Use TypeNone when there is no meaningful subtype.
 	Type TypeID
+
+	// Confidence indicates how certain the detector is about this match.
+	Confidence Confidence
+}
+
+type Confidence uint8
+
+const (
+	ConfidenceHigh Confidence = iota
+	ConfidenceMedium
+	ConfidenceLow
+)
+
+func (c Confidence) String() string {
+	switch c {
+	case ConfidenceHigh:
+		return "High"
+	case ConfidenceMedium:
+		return "Medium"
+	case ConfidenceLow:
+		return "Low"
+	default:
+		return "Unknown"
+	}
 }
 
 var ErrUnknownFormat = errors.New("unknown file format")

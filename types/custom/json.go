@@ -17,7 +17,7 @@ func DetectJSON(b types.Buffer) *types.Metadata {
 
 	if trimmed[0] == '{' || trimmed[0] == '[' {
 		if bytes.Contains(trimmed, []byte(`":`)) || bytes.Contains(trimmed, []byte(`": `)) {
-			return &types.Metadata{Kind: types.KindJSONDocument}
+			return &types.Metadata{Kind: types.KindJSONDocument, Confidence: types.ConfidenceMedium}
 		}
 	}
 

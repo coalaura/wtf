@@ -42,6 +42,7 @@ func DetectLZMA(b types.Buffer) *types.Metadata {
 	}
 
 	return &types.Metadata{
-		Kind: types.KindLZMAData,
+		Kind:       types.KindLZMAData,
+		Confidence: types.ConfidenceMedium,
 	}
 }

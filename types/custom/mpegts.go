@@ -4,11 +4,11 @@ import "github.com/coalaura/onda/types"
 
 func DetectMPEGTransport(b types.Buffer) *types.Metadata {
 	if b.Len() >= 3*188 && b[0] == 0x47 && b[188] == 0x47 && b[376] == 0x47 {
-		return &types.Metadata{Kind: types.KindMPEGTransportStream, Type: types.TypeTS}
+		return &types.Metadata{Kind: types.KindMPEGTransportStream, Type: types.TypeTS, Confidence: types.ConfidenceMedium}
 	}
 
 	if b.Len() >= 4+3*192 && b[4] == 0x47 && b[196] == 0x47 && b[388] == 0x47 {
-		return &types.Metadata{Kind: types.KindMPEG2TransportStream, Type: types.TypeM2TSBDAV}
+		return &types.Metadata{Kind: types.KindMPEG2TransportStream, Type: types.TypeM2TSBDAV, Confidence: types.ConfidenceMedium}
 	}
 
 	return nil

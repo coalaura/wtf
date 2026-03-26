@@ -4888,17 +4888,17 @@ func detectOptimizedWeak(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x0a:
 					if len(b) >= 8 && string(b[:8]) == "1\n00:00:" {
-						return &Metadata{Kind: KindSubRipText}
+						return &Metadata{Kind: KindSubRipText, Confidence: ConfidenceMedium}
 					}
 				case 0x0d:
 					if len(b) >= 9 && string(b[:9]) == "1\r\n00:00:" {
-						return &Metadata{Kind: KindSubRipText}
+						return &Metadata{Kind: KindSubRipText, Confidence: ConfidenceMedium}
 					}
 				}
 			}
 		case 0x46:
 			if len(b) >= 5 && string(b[:5]) == "From " {
-				return &Metadata{Kind: KindMBOXEmailFolder}
+				return &Metadata{Kind: KindMBOXEmailFolder, Confidence: ConfidenceMedium}
 			}
 		}
 	}

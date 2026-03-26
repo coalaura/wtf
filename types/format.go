@@ -3,11 +3,14 @@ package types
 import "bytes"
 
 const (
-	ansiReset = "\x1b[0m"
-	ansiFile  = "\x1b[1;92m"
-	ansiName  = "\x1b[1;97m"
-	ansiLabel = "\x1b[90m"
-	ansiValue = "\x1b[3m"
+	ansiReset  = "\x1b[0m"
+	ansiFile   = "\x1b[1;92m"
+	ansiName   = "\x1b[1;97m"
+	ansiLabel  = "\x1b[90m"
+	ansiValue  = "\x1b[3m"
+	ansiHigh   = "\x1b[32m"
+	ansiMedium = "\x1b[33m"
+	ansiLow    = "\x1b[31m"
 )
 
 func (m *Metadata) Format() string {
@@ -36,6 +39,27 @@ func (m *Metadata) Format() string {
 		b.WriteString(ansiReset)
 		b.WriteString(ansiName)
 		b.WriteString(kind)
+		b.WriteString(ansiReset)
+
+		b.WriteString(" ")
+		b.WriteString(ansiLabel)
+		b.WriteString("[")
+		b.WriteString(ansiReset)
+
+		switch m.Confidence {
+		case ConfidenceHigh:
+			b.WriteString(ansiHigh)
+		case ConfidenceMedium:
+			b.WriteString(ansiMedium)
+		case ConfidenceLow:
+			b.WriteString(ansiLow)
+		}
+
+		b.WriteString(m.Confidence.String())
+		b.WriteString(ansiReset)
+
+		b.WriteString(ansiLabel)
+		b.WriteString("]")
 		b.WriteString(ansiReset)
 	}
 

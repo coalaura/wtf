@@ -341,7 +341,7 @@ func DetectJSON(b Buffer) *Metadata {
 
 	if trimmed[0] == '{' || trimmed[0] == '[' {
 		if bytes.Contains(trimmed, []byte(`":`)) || bytes.Contains(trimmed, []byte(`": `)) {
-			return &Metadata{Kind: KindJSONDocument}
+			return &Metadata{Kind: KindJSONDocument, Confidence: ConfidenceMedium}
 		}
 	}
 
@@ -382,7 +382,8 @@ func DetectLZMA(b Buffer) *Metadata {
 	}
 
 	return &Metadata{
-		Kind: KindLZMAData,
+		Kind:       KindLZMAData,
+		Confidence: ConfidenceMedium,
 	}
 }
 
@@ -535,11 +536,11 @@ func DetectMP3(b Buffer) *Metadata {
 	}
 
 	if layer == 2 {
-		return &Metadata{Kind: KindMPEGAudio, Type: TypeMPEGLayer2}
+		return &Metadata{Kind: KindMPEGAudio, Type: TypeMPEGLayer2, Confidence: ConfidenceMedium}
 	}
 
 	if layer == 1 {
-		return &Metadata{Kind: KindMPEGAudio, Type: TypeMP3}
+		return &Metadata{Kind: KindMPEGAudio, Type: TypeMP3, Confidence: ConfidenceMedium}
 	}
 
 	return nil
@@ -547,11 +548,11 @@ func DetectMP3(b Buffer) *Metadata {
 
 func DetectMPEGTransport(b Buffer) *Metadata {
 	if b.Len() >= 3*188 && b[0] == 0x47 && b[188] == 0x47 && b[376] == 0x47 {
-		return &Metadata{Kind: KindMPEGTransportStream, Type: TypeTS}
+		return &Metadata{Kind: KindMPEGTransportStream, Type: TypeTS, Confidence: ConfidenceMedium}
 	}
 
 	if b.Len() >= 4+3*192 && b[4] == 0x47 && b[196] == 0x47 && b[388] == 0x47 {
-		return &Metadata{Kind: KindMPEG2TransportStream, Type: TypeM2TSBDAV}
+		return &Metadata{Kind: KindMPEG2TransportStream, Type: TypeM2TSBDAV, Confidence: ConfidenceMedium}
 	}
 
 	return nil
@@ -756,7 +757,8 @@ func DetectPCX(b Buffer) *Metadata {
 	}
 
 	return &Metadata{
-		Kind: KindPCXImage,
+		Kind:       KindPCXImage,
+		Confidence: ConfidenceMedium,
 	}
 }
 
@@ -1002,16 +1004,16 @@ func DetectText(b Buffer) *Metadata {
 
 	if b.Has(0, []byte{0xef, 0xbb, 0xbf}) {
 		if isLikelyTextUTF8(b[3:]) {
-			return &Metadata{Kind: KindTextFile, Type: TypeUTF8Text}
+			return &Metadata{Kind: KindTextFile, Type: TypeUTF8Text, Confidence: ConfidenceLow}
 		}
 	}
 
 	if isLikelyASCIIText(b) {
-		return &Metadata{Kind: KindTextFile, Type: TypeASCIIText}
+		return &Metadata{Kind: KindTextFile, Type: TypeASCIIText, Confidence: ConfidenceLow}
 	}
 
 	if isLikelyTextUTF8(b) {
-		return &Metadata{Kind: KindTextFile, Type: TypeUTF8Text}
+		return &Metadata{Kind: KindTextFile, Type: TypeUTF8Text, Confidence: ConfidenceLow}
 	}
 
 	return nil
@@ -1153,36 +1155,36 @@ func DetectXMLSubtypes(b Buffer) *Metadata {
 
 	if isXML || bytes.HasPrefix(trimmed, []byte("<svg")) {
 		if bytes.Contains(data, []byte("<svg")) {
-			return &Metadata{Kind: KindSVGImage}
+			return &Metadata{Kind: KindSVGImage, Confidence: ConfidenceMedium}
 		}
 	}
 
 	if isXML {
 		if bytes.Contains(data, []byte("<plist")) || bytes.Contains(data, []byte("<!DOCTYPE plist")) {
-			return &Metadata{Kind: KindAppleXMLPropertyList}
+			return &Metadata{Kind: KindAppleXMLPropertyList, Confidence: ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<kml")) {
-			return &Metadata{Kind: KindKeyholeMarkupLanguage}
+			return &Metadata{Kind: KindKeyholeMarkupLanguage, Confidence: ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<gpx")) {
-			return &Metadata{Kind: KindGPSExchangeFormat}
+			return &Metadata{Kind: KindGPSExchangeFormat, Confidence: ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<rss")) {
-			return &Metadata{Kind: KindRSSFeed}
+			return &Metadata{Kind: KindRSSFeed, Confidence: ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<feed")) {
-			return &Metadata{Kind: KindAtomFeed}
+			return &Metadata{Kind: KindAtomFeed, Confidence: ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<soap:Envelope")) {
-			return &Metadata{Kind: KindSOAPMessage}
+			return &Metadata{Kind: KindSOAPMessage, Confidence: ConfidenceMedium}
 		}
 
-		return &Metadata{Kind: KindXMLDocument}
+		return &Metadata{Kind: KindXMLDocument, Confidence: ConfidenceMedium}
 	}
 
 	return nil
@@ -1545,6 +1547,7 @@ func DetectZlib(b Buffer) *Metadata {
 	}
 
 	return &Metadata{
-		Kind: KindZlibData,
+		Kind:       KindZlibData,
+		Confidence: ConfidenceMedium,
 	}
 }

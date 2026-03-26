@@ -18,16 +18,16 @@ func DetectText(b types.Buffer) *types.Metadata {
 
 	if b.Has(0, []byte{0xef, 0xbb, 0xbf}) {
 		if isLikelyTextUTF8(b[3:]) {
-			return &types.Metadata{Kind: types.KindTextFile, Type: types.TypeUTF8Text}
+			return &types.Metadata{Kind: types.KindTextFile, Type: types.TypeUTF8Text, Confidence: types.ConfidenceLow}
 		}
 	}
 
 	if isLikelyASCIIText(b) {
-		return &types.Metadata{Kind: types.KindTextFile, Type: types.TypeASCIIText}
+		return &types.Metadata{Kind: types.KindTextFile, Type: types.TypeASCIIText, Confidence: types.ConfidenceLow}
 	}
 
 	if isLikelyTextUTF8(b) {
-		return &types.Metadata{Kind: types.KindTextFile, Type: types.TypeUTF8Text}
+		return &types.Metadata{Kind: types.KindTextFile, Type: types.TypeUTF8Text, Confidence: types.ConfidenceLow}
 	}
 
 	return nil

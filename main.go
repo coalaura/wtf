@@ -118,7 +118,7 @@ func main() {
 
 func printMeta(meta *types.Metadata, porcelain bool) {
 	if porcelain {
-		fmt.Printf("%s\t%s\n", meta.Kind.String(), meta.Type.String())
+		fmt.Printf("%s\t%s\t%s\n", meta.Kind.String(), meta.Type.String(), meta.Confidence.String())
 	} else {
 		log.Println(meta.Format())
 	}

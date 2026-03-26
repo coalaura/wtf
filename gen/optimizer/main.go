@@ -478,12 +478,19 @@ func emitIfHas(c Sig, buf *strings.Builder, indent string) {
 		}
 	}
 
-	if c.Type == "TypeNone" || c.Type == "" {
-		fmt.Fprintf(buf, "%s\treturn &Metadata{Kind: %s}\n", indent, c.Kind)
-	} else {
-		fmt.Fprintf(buf, "%s\treturn &Metadata{Kind: %s, Type: %s}\n", indent, c.Kind, c.Type)
+	var fields []string
+
+	fields = append(fields, "Kind: "+c.Kind)
+
+	if c.Type != "TypeNone" && c.Type != "" {
+		fields = append(fields, "Type: "+c.Type)
 	}
 
+	if c.IsWeak {
+		fields = append(fields, "Confidence: ConfidenceMedium")
+	}
+
+	fmt.Fprintf(buf, "%s\treturn &Metadata{%s}\n", indent, strings.Join(fields, ", "))
 	fmt.Fprintf(buf, "%s}\n", indent)
 }
 

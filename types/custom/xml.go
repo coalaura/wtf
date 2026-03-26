@@ -19,36 +19,36 @@ func DetectXMLSubtypes(b types.Buffer) *types.Metadata {
 
 	if isXML || bytes.HasPrefix(trimmed, []byte("<svg")) {
 		if bytes.Contains(data, []byte("<svg")) {
-			return &types.Metadata{Kind: types.KindSVGImage}
+			return &types.Metadata{Kind: types.KindSVGImage, Confidence: types.ConfidenceMedium}
 		}
 	}
 
 	if isXML {
 		if bytes.Contains(data, []byte("<plist")) || bytes.Contains(data, []byte("<!DOCTYPE plist")) {
-			return &types.Metadata{Kind: types.KindAppleXMLPropertyList}
+			return &types.Metadata{Kind: types.KindAppleXMLPropertyList, Confidence: types.ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<kml")) {
-			return &types.Metadata{Kind: types.KindKeyholeMarkupLanguage}
+			return &types.Metadata{Kind: types.KindKeyholeMarkupLanguage, Confidence: types.ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<gpx")) {
-			return &types.Metadata{Kind: types.KindGPSExchangeFormat}
+			return &types.Metadata{Kind: types.KindGPSExchangeFormat, Confidence: types.ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<rss")) {
-			return &types.Metadata{Kind: types.KindRSSFeed}
+			return &types.Metadata{Kind: types.KindRSSFeed, Confidence: types.ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<feed")) {
-			return &types.Metadata{Kind: types.KindAtomFeed}
+			return &types.Metadata{Kind: types.KindAtomFeed, Confidence: types.ConfidenceMedium}
 		}
 
 		if bytes.Contains(data, []byte("<soap:Envelope")) {
-			return &types.Metadata{Kind: types.KindSOAPMessage}
+			return &types.Metadata{Kind: types.KindSOAPMessage, Confidence: types.ConfidenceMedium}
 		}
 
-		return &types.Metadata{Kind: types.KindXMLDocument}
+		return &types.Metadata{Kind: types.KindXMLDocument, Confidence: types.ConfidenceMedium}
 	}
 
 	return nil

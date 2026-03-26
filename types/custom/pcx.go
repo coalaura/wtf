@@ -57,7 +57,8 @@ func DetectPCX(b types.Buffer) *types.Metadata {
 	}
 
 	return &types.Metadata{
-		Kind: types.KindPCXImage,
+		Kind:       types.KindPCXImage,
+		Confidence: types.ConfidenceMedium,
 	}
 }
 

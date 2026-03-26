@@ -23,6 +23,7 @@ func DetectZlib(b types.Buffer) *types.Metadata {
 	}
 
 	return &types.Metadata{
-		Kind: types.KindZlibData,
+		Kind:       types.KindZlibData,
+		Confidence: types.ConfidenceMedium,
 	}
 }
