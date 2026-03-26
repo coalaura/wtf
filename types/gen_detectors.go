@@ -949,26 +949,6 @@ func DetectSQLiteSHM(b Buffer) *Metadata {
 	}
 }
 
-func DetectSVG(b Buffer) *Metadata {
-	if b.Len() < 4 {
-		return nil
-	}
-
-	limit := min(b.Len(), 4096)
-	data := b[:limit]
-
-	if !bytes.Contains(data, []byte("<svg")) {
-		return nil
-	}
-
-	trimmed := bytes.TrimSpace(data)
-	if len(trimmed) > 0 && trimmed[0] == '<' {
-		return &Metadata{Kind: KindSVGImage}
-	}
-
-	return nil
-}
-
 func DetectTar(b Buffer) *Metadata {
 	var isTar bool
 
@@ -1169,7 +1149,15 @@ func DetectXMLSubtypes(b Buffer) *Metadata {
 		return nil
 	}
 
-	if bytes.HasPrefix(trimmed, []byte("<?xml")) || bytes.HasPrefix(trimmed, []byte("<!DOCTYPE")) {
+	isXML := bytes.HasPrefix(trimmed, []byte("<?xml")) || bytes.HasPrefix(trimmed, []byte("<!DOCTYPE"))
+
+	if isXML || bytes.HasPrefix(trimmed, []byte("<svg")) {
+		if bytes.Contains(data, []byte("<svg")) {
+			return &Metadata{Kind: KindSVGImage}
+		}
+	}
+
+	if isXML {
 		if bytes.Contains(data, []byte("<plist")) || bytes.Contains(data, []byte("<!DOCTYPE plist")) {
 			return &Metadata{Kind: KindAppleXMLPropertyList}
 		}
@@ -1193,6 +1181,8 @@ func DetectXMLSubtypes(b Buffer) *Metadata {
 		if bytes.Contains(data, []byte("<soap:Envelope")) {
 			return &Metadata{Kind: KindSOAPMessage}
 		}
+
+		return &Metadata{Kind: KindXMLDocument}
 	}
 
 	return nil

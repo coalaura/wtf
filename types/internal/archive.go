@@ -64,6 +64,7 @@ func init() {
 	types.RegisterSignature(types.KindLZXArchive, types.TypeNone, 0, []byte("LZX"))
 	types.RegisterSignature(types.KindMArArchive, types.TypeNone, 0, []byte("MAr0\x00"))
 	types.RegisterSignature(types.KindMicrosoftCompress, types.TypeNone, 0, []byte("KWAJ\x88\xf0\x27\x33"))
+	types.RegisterSignature(types.KindMicrosoftCompress, types.TypeNone, 0, []byte("KWAJ\x88\xf0\x27\xd1"))
 	types.RegisterSignature(types.KindMicrosoftCompress, types.TypeNone, 0, []byte("SZDD\x88\xf0\x27\x33"))
 	types.RegisterSignature(types.KindMicrosoftCompress, types.TypeSZ, 0, []byte("SZ \x88\xf0'3\xd1"))
 	types.RegisterSignature(types.KindMozillaArchive, types.TypeNone, 0, []byte("MAR1"))

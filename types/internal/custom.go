@@ -21,18 +21,16 @@ func init() {
 	types.Register(types.DetectFunc(custom.DetectPKCS12))
 	types.Register(types.DetectFunc(custom.DetectPYC))
 	types.Register(types.DetectFunc(custom.DetectSQLiteSHM))
-	types.Register(types.DetectFunc(custom.DetectSVG))
 	types.Register(types.DetectFunc(custom.DetectTar))
 	types.Register(types.DetectFunc(custom.DetectTIFFSubtypes))
 	types.Register(types.DetectFunc(custom.DetectTorrent))
 	types.Register(types.DetectFunc(custom.DetectZIPContainer))
 
+	types.RegisterWeak(types.DetectFunc(custom.DetectJSON))
 	types.RegisterWeak(types.DetectFunc(custom.DetectLZMA))
 	types.RegisterWeak(types.DetectFunc(custom.DetectMP3))
 	types.RegisterWeak(types.DetectFunc(custom.DetectMPEGTransport))
 	types.RegisterWeak(types.DetectFunc(custom.DetectPCX))
 	types.RegisterWeak(types.DetectFunc(custom.DetectXMLSubtypes))
 	types.RegisterWeak(types.DetectFunc(custom.DetectZlib))
-
-	types.RegisterFallback(types.DetectFunc(custom.DetectJSON))
 }

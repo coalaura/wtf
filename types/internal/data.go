@@ -51,7 +51,6 @@ func init() {
 	types.RegisterSignature(types.KindHadoopSequenceFile, types.TypeNone, 0, []byte("SEQ6"))
 	types.RegisterSignature(types.KindHDF4Data, types.TypeNone, 0, []byte{0x0e, 0x03, 0x13, 0x01})
 	types.RegisterSignature(types.KindKyotoCabinetDatabase, types.TypeNone, 0, []byte("KCDB"))
-	types.RegisterSignature(types.KindLevelDB, types.TypeNone, 0, []byte{0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb})
 	types.RegisterSignature(types.KindLidarData, types.TypeNone, 0, []byte("LASF"))
 	types.RegisterSignature(types.KindLotusNotesDatabase, types.TypeNone, 0, []byte{0x1a, 0x00, 0x00, 0x04, 0x00, 0x00})
 	types.RegisterSignature(types.KindLotusNotesDatabaseTemplate, types.TypeNone, 0, []byte{0x1a, 0x00, 0x00})

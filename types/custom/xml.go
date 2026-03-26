@@ -15,7 +15,15 @@ func DetectXMLSubtypes(b types.Buffer) *types.Metadata {
 		return nil
 	}
 
-	if bytes.HasPrefix(trimmed, []byte("<?xml")) || bytes.HasPrefix(trimmed, []byte("<!DOCTYPE")) {
+	isXML := bytes.HasPrefix(trimmed, []byte("<?xml")) || bytes.HasPrefix(trimmed, []byte("<!DOCTYPE"))
+
+	if isXML || bytes.HasPrefix(trimmed, []byte("<svg")) {
+		if bytes.Contains(data, []byte("<svg")) {
+			return &types.Metadata{Kind: types.KindSVGImage}
+		}
+	}
+
+	if isXML {
 		if bytes.Contains(data, []byte("<plist")) || bytes.Contains(data, []byte("<!DOCTYPE plist")) {
 			return &types.Metadata{Kind: types.KindAppleXMLPropertyList}
 		}
@@ -39,6 +47,8 @@ func DetectXMLSubtypes(b types.Buffer) *types.Metadata {
 		if bytes.Contains(data, []byte("<soap:Envelope")) {
 			return &types.Metadata{Kind: types.KindSOAPMessage}
 		}
+
+		return &types.Metadata{Kind: types.KindXMLDocument}
 	}
 
 	return nil

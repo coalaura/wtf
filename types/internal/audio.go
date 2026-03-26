@@ -3,7 +3,9 @@ package internal
 import "github.com/coalaura/onda/types"
 
 func init() {
+	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf0})
 	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf1})
+	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf8})
 	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf9})
 	types.RegisterSignature(types.KindAmigaOctaMED, types.TypeNone, 0, []byte("MMD0"))
 	types.RegisterSignature(types.KindAmigaOctaMED, types.TypeNone, 0, []byte("MMD1"))

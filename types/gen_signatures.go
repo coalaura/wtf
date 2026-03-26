@@ -1014,6 +1014,10 @@ func detectOptimized(b Buffer) *Metadata {
 					if b.HasMask(0, "<!DOCTYPE HTML", "\xff\xff\xdf\xdf\xdf\xdf\xdf\xdf\xdf\xff\xdf\xdf\xdf\xdf") {
 						return &Metadata{Kind: KindHTMLDocument}
 					}
+				case 0x3c:
+					if len(b) >= 40 && string(b[:40]) == "<<< Oracle VM VirtualBox Disk Image >>>\n" {
+						return &Metadata{Kind: KindVirtualBoxDiskImage}
+					}
 				case 0x43:
 					if len(b) > 2 {
 						switch b[2] {
@@ -2020,8 +2024,17 @@ func detectOptimized(b Buffer) *Metadata {
 					if len(b) > 3 {
 						switch b[3] {
 						case 0x4a:
-							if len(b) >= 8 && string(b[:8]) == "KWAJ\x88\xf0'3" {
-								return &Metadata{Kind: KindMicrosoftCompress}
+							if len(b) > 7 {
+								switch b[7] {
+								case 0x33:
+									if len(b) >= 8 && string(b[:8]) == "KWAJ\x88\xf0'3" {
+										return &Metadata{Kind: KindMicrosoftCompress}
+									}
+								case 0xd1:
+									if len(b) >= 8 && string(b[:8]) == "KWAJ\x88\xf0'\xd1" {
+										return &Metadata{Kind: KindMicrosoftCompress}
+									}
+								}
 							}
 						case 0x4c:
 							if len(b) >= 12 && string(b[:12]) == "KWALLET\n\r\x00\r\n" {
@@ -2627,11 +2640,21 @@ func detectOptimized(b Buffer) *Metadata {
 						}
 					}
 				case 0x46:
-					if len(b) >= 8 && string(b[:8]) == "QFI\xfb\x00\x00\x00\x01" {
-						return &Metadata{Kind: KindQCOWDiskImage, Type: TypeQCOW1}
-					}
-					if len(b) >= 4 && string(b[:4]) == "QFI\xfb" {
-						return &Metadata{Kind: KindQCOWDiskImage, Type: TypeQCOW2}
+					if len(b) > 7 {
+						switch b[7] {
+						case 0x01:
+							if len(b) >= 8 && string(b[:8]) == "QFI\xfb\x00\x00\x00\x01" {
+								return &Metadata{Kind: KindQCOWDiskImage, Type: TypeQCOW1}
+							}
+						case 0x02:
+							if len(b) >= 8 && string(b[:8]) == "QFI\xfb\x00\x00\x00\x02" {
+								return &Metadata{Kind: KindQCOWDiskImage, Type: TypeQCOW2}
+							}
+						case 0x03:
+							if len(b) >= 8 && string(b[:8]) == "QFI\xfb\x00\x00\x00\x03" {
+								return &Metadata{Kind: KindQCOWDiskImage, Type: TypeQCOW2}
+							}
+						}
 					}
 				case 0x57:
 					if len(b) >= 8 && string(b[:8]) == "QW Ver. " {
@@ -3211,10 +3234,6 @@ func detectOptimized(b Buffer) *Metadata {
 				case 0x6f:
 					if len(b) >= 7 && string(b[:7]) == "WordPro" {
 						return &Metadata{Kind: KindLotusWordPro}
-					}
-				case 0xfb:
-					if len(b) >= 8 && string(b[:8]) == "W\xfb\x80\x8b$uG\xdb" {
-						return &Metadata{Kind: KindLevelDB}
 					}
 				}
 			}
@@ -4391,8 +4410,16 @@ func detectOptimized(b Buffer) *Metadata {
 					if len(b) >= 3 && string(b[:3]) == "\xff\xd8\xff" {
 						return &Metadata{Kind: KindJPEGImage}
 					}
+				case 0xf0:
+					if len(b) >= 2 && string(b[:2]) == "\xff\xf0" {
+						return &Metadata{Kind: KindAACAudio, Type: TypeADTS}
+					}
 				case 0xf1:
 					if len(b) >= 2 && string(b[:2]) == "\xff\xf1" {
+						return &Metadata{Kind: KindAACAudio, Type: TypeADTS}
+					}
+				case 0xf8:
+					if len(b) >= 2 && string(b[:2]) == "\xff\xf8" {
 						return &Metadata{Kind: KindAACAudio, Type: TypeADTS}
 					}
 				case 0xf9:
@@ -4686,10 +4713,6 @@ func detectOptimized(b Buffer) *Metadata {
 		}
 	}
 
-	if len(b) >= 104 && string(b[64:104]) == "<<< Oracle VM VirtualBox Disk Image >>>\n" {
-		return &Metadata{Kind: KindVirtualBoxDiskImage}
-	}
-
 	if len(b) >= 106 && string(b[102:106]) == "mBIN" {
 		return &Metadata{Kind: KindMacBinary}
 	}
@@ -4873,10 +4896,6 @@ func detectOptimizedWeak(b Buffer) *Metadata {
 					}
 				}
 			}
-		case 0x3c:
-			if len(b) >= 5 && string(b[:5]) == "<?xml" {
-				return &Metadata{Kind: KindXMLDocument}
-			}
 		case 0x46:
 			if len(b) >= 5 && string(b[:5]) == "From " {
 				return &Metadata{Kind: KindMBOXEmailFolder}
@@ -4903,18 +4922,17 @@ var detectors = [...]Detector{
 	DetectFunc(DetectPKCS12),
 	DetectFunc(DetectPYC),
 	DetectFunc(DetectSQLiteSHM),
-	DetectFunc(DetectSVG),
 	DetectFunc(DetectTIFFSubtypes),
 	DetectFunc(DetectTar),
 	DetectFunc(DetectTorrent),
 	DetectFunc(DetectZIPContainer),
 	DetectFunc(detectOptimizedWeak),
+	DetectFunc(DetectJSON),
 	DetectFunc(DetectLZMA),
 	DetectFunc(DetectMP3),
 	DetectFunc(DetectMPEGTransport),
 	DetectFunc(DetectPCX),
 	DetectFunc(DetectXMLSubtypes),
 	DetectFunc(DetectZlib),
-	DetectFunc(DetectJSON),
 	DetectFunc(DetectText),
 }
