@@ -24,7 +24,9 @@ sys 	0m0.002s
 
 - **Hardware-Accelerated Hot Path**: $O(1)$ magic-byte detection via AOT-compiled jump tables.
 - **Zero-Cost Abstraction**: Static signatures are stripped from the runtime binary, saving memory and `init()` overhead.
-- **Smart Fallbacks**: Includes custom structural parsers for complex formats (SVG, ZIP, XML, Text) that lack fixed headers.
+- **Order-Independent Detection**: Formats are designed to detect cleanly without depending on registration order. Specific signatures and structural detectors are preferred so formats do not fight each other.
+- **Smart Structural Detection**: Custom detectors are reserved for formats that cannot be represented cleanly with fixed signatures alone.
+- **Wide Format Coverage**: Covers archives, media, documents, executables, filesystems, disk images, forensic artifacts, fonts, source/text formats and more.
 - **Versatile**: Works as both a standalone CLI and a lightweight Go package.
 
 ## Installation
@@ -48,7 +50,7 @@ onda [flags] <file>
 ```
 
 **Flags:**
-- `-p`, `--porcelain`: Print easily parseable output (tab-separated: `Kind\tType`)
+- `-p`, `--porcelain`: Print easily parseable output (tab-separated: `Kind\tType\tConfidence`)
 - `-v`, `--version`: Print version information
 - `-h`, `--help`: Print this help message
 
@@ -82,15 +84,8 @@ func main() {
 }
 ```
 
-## Supported types
+## Coverage
 
-onda currently detects over **970+ file formats** across various categories. Instead of listing every single format, we maintain a robust, ever-growing library of signatures and custom detectors.
+onda detects over **970+ file formats** across a broad set of categories, including archives, packages, filesystems, disk images, documents, databases, audio, video, images, fonts, executables, forensic artifacts and text/source files.
 
-- **Archive/package/filesystem:** 7-Zip, APFS, APK, Btrfs, Bzip2, CAB, Debian, exFAT, ext2/3/4, Gzip, HFS+, JAR, LUKS, LZ4, NTFS, RAR, RPM, SquashFS, TAR, XFS, XZ, ZIP, Zstandard and many more.
-- **Audio/tracker:** AAC, AIFF, FLAC, MIDI, MP3, Ogg, Opus, Vorbis, WAV, WavPack and more.
-- **Image/textuinternalre/icon:** AVIF, BMP, DDS, GIF, HEIF, ICO, JPEG, JPEG XL, PNG, PSD, SVG, TIFF, WebP and more.
-- **Video/container:** AVI, FLV, Matroska (MKV), MP4, MPEG, QuickTime, WebM and more.
-- **Document/data:** Apache Arrow/Parquet, DICOM, EPUB, HDF5, Microsoft Office (DOCX, XLSX, PPTX), PDF, RTF, SQLite, XML and more.
-- **Font:** EOT, OpenType, TrueType, WOFF, WOFF2.
-- **Executable/system/disk:** AppImage, Dalvik (DEX), ELF, Java Class, LLVM, Mach-O, Nintendo ROMs, PE, PCAP, QCOW, VHD, VMDK, WebAssembly and more.
-- **Text fallback:** ASCII and UTF-8 text detection.
+The project intentionally does **not** maintain a giant hand-written format list in the README. Coverage changes frequently and the detector set keeps growing. The goal is broad, precise detection with minimal false positives, using fixed signatures wherever possible and custom structural detection only when a format cannot be represented cleanly otherwise.
