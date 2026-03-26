@@ -765,6 +765,7 @@ const (
 	TypeAVIFImageSequence
 	TypeAVIVideo
 	TypeB4
+	TypeBashScript
 	TypeBGZF
 	TypeBigEndian
 	TypeBigTIFF
@@ -773,6 +774,7 @@ const (
 	TypeBlackmagicRAW
 	TypeBlockDevice
 	TypeByteSwapped
+	TypeC
 	TypeCanonRAW3CR3
 	TypeCanonRAWHE
 	TypeCAT
@@ -788,8 +790,10 @@ const (
 	TypeContainer
 	TypeCorelDRAWDocumentCDR
 	TypeCOWD
+	TypeCPP
 	TypeCRXVersion2
 	TypeCRXVersion3
+	TypeCSS
 	TypeCubaseProjectCPR
 	TypeDEX035
 	TypeDEX036
@@ -799,6 +803,7 @@ const (
 	TypeDEX040
 	TypeDEX041
 	TypeDirectory
+	TypeDocker
 	TypeDownloadableSounds
 	TypeDSAPrivateKey
 	TypeEAC3
@@ -826,14 +831,18 @@ const (
 	TypeForgeMod
 	TypeGIF87a
 	TypeGIF89a
+	TypeGo
 	TypeHE
 	TypeHEIFImage
 	TypeILBMImage
 	TypeIMMM
+	TypeINI
 	TypeIOSApplicationArchiveIPA
 	TypeIWAD
+	TypeJava
 	TypeJavaArchiveJAR
 	TypeJavaEnterpriseArchiveEAR
+	TypeJavaScript
 	TypeJavaWebArchiveWAR
 	TypeJMOD
 	TypeKDB
@@ -853,6 +862,8 @@ const (
 	TypeM2TS
 	TypeM2TSBDAV
 	TypeM4VVideo
+	TypeMakefile
+	TypeMarkdown
 	TypeMatroska
 	TypeMicrosoftExcelAddInXLAM
 	TypeMicrosoftExcelMacroEnabledTemplateXLTM
@@ -924,14 +935,17 @@ const (
 	TypePE32X8664
 	TypePEC
 	TypePentaxRAWPEF
+	TypePerl
 	TypePES
 	TypePGMASCII
 	TypePGMBinary
+	TypePHP
 	TypePPMASCII
 	TypePPMBinary
 	TypePSB
 	TypePSD
 	TypePWAD
+	TypePython
 	TypePythonSourceDistributionSDist
 	TypePythonWheelWHL
 	TypePyTorchModel
@@ -945,6 +959,8 @@ const (
 	TypeRIFFMIDI
 	TypeRIFFPalette
 	TypeRSAPrivateKey
+	TypeRuby
+	TypeRust
 	TypeSketchDocument
 	TypeSlackwarePackage
 	TypeSocket
@@ -954,11 +970,13 @@ const (
 	TypeSpanned
 	TypeSpecial
 	TypeSpeexAudio
+	TypeSQL
 	TypeStreamVersion7
 	TypeStreamVersion8
 	TypeSymbolicLink
 	TypeSZ
 	TypeTheoraVideo
+	TypeTOML
 	TypeTrue
 	TypeTS
 	TypeUncompressed
@@ -980,6 +998,7 @@ const (
 	TypeWindowsNE
 	TypeWrapper
 	TypeXMLPaperSpecificationXPS
+	TypeYAML
 	TypeZlibCompressed
 	TypeZstandardSkinnableFrame
 )
@@ -1746,6 +1765,7 @@ var typeNames = [...]string{
 	TypeAVIFImageSequence:        "AVIF Image Sequence",
 	TypeAVIVideo:                 "AVI Video",
 	TypeB4:                       "B4",
+	TypeBashScript:               "Bash Script",
 	TypeBGZF:                     "BGZF",
 	TypeBigEndian:                "Big-Endian",
 	TypeBigTIFF:                  "BigTIFF",
@@ -1754,6 +1774,7 @@ var typeNames = [...]string{
 	TypeBlackmagicRAW:            "Blackmagic RAW",
 	TypeBlockDevice:              "Block Device",
 	TypeByteSwapped:              "Byte-Swapped",
+	TypeC:                        "C Source",
 	TypeCanonRAW3CR3:             "Canon RAW 3 (CR3)",
 	TypeCanonRAWHE:               "Canon RAW HE",
 	TypeCAT:                      "CAT",
@@ -1769,8 +1790,10 @@ var typeNames = [...]string{
 	TypeContainer:                "Container",
 	TypeCorelDRAWDocumentCDR:     "CorelDRAW Document (CDR)",
 	TypeCOWD:                     "COWD",
+	TypeCPP:                      "C++ Source",
 	TypeCRXVersion2:              "Version 2",
 	TypeCRXVersion3:              "Version 3",
+	TypeCSS:                      "Cascading Style Sheets (CSS)",
 	TypeCubaseProjectCPR:         "Cubase Project (CPR)",
 	TypeDEX035:                   "DEX 035",
 	TypeDEX036:                   "DEX 036",
@@ -1780,6 +1803,7 @@ var typeNames = [...]string{
 	TypeDEX040:                   "DEX 040",
 	TypeDEX041:                   "DEX 041",
 	TypeDirectory:                "Directory",
+	TypeDocker:                   "Dockerfile",
 	TypeDownloadableSounds:       "Downloadable Sounds",
 	TypeDSAPrivateKey:            "DSA Private Key",
 	TypeEAC3:                     "E-AC-3",
@@ -1807,14 +1831,18 @@ var typeNames = [...]string{
 	TypeForgeMod:                 "Forge Mod",
 	TypeGIF87a:                   "GIF87a",
 	TypeGIF89a:                   "GIF89a",
+	TypeGo:                       "Go Source",
 	TypeHE:                       "HE",
 	TypeHEIFImage:                "HEIF Image",
 	TypeILBMImage:                "ILBM Image",
 	TypeIMMM:                     "IMMM",
+	TypeINI:                      "INI Configuration",
 	TypeIOSApplicationArchiveIPA: "iOS Application Archive (IPA)",
 	TypeIWAD:                     "IWAD",
+	TypeJava:                     "Java Source",
 	TypeJavaArchiveJAR:           "Java Archive (JAR)",
 	TypeJavaEnterpriseArchiveEAR: "Java Enterprise Archive (EAR)",
+	TypeJavaScript:               "JavaScript Source",
 	TypeJavaWebArchiveWAR:        "Java Web Archive (WAR)",
 	TypeJMOD:                     "JMOD",
 	TypeKDB:                      "KDB",
@@ -1834,6 +1862,8 @@ var typeNames = [...]string{
 	TypeM2TS:                     "M2TS",
 	TypeM2TSBDAV:                 "M2TS/BDAV",
 	TypeM4VVideo:                 "M4V Video",
+	TypeMakefile:                 "Makefile",
+	TypeMarkdown:                 "Markdown Document",
 	TypeMatroska:                 "Matroska",
 	TypeMicrosoftExcelAddInXLAM:  "Microsoft Excel Add-In (XLAM)",
 	TypeMicrosoftExcelMacroEnabledTemplateXLTM:          "Microsoft Excel Macro-Enabled Template (XLTM)",
@@ -1905,14 +1935,17 @@ var typeNames = [...]string{
 	TypePE32X8664:                                       "PE32 x86-64",
 	TypePEC:                                             "PEC",
 	TypePentaxRAWPEF:                                    "Pentax RAW (PEF)",
+	TypePerl:                                            "Perl Script",
 	TypePES:                                             "PES",
 	TypePGMASCII:                                        "PGM ASCII",
 	TypePGMBinary:                                       "PGM binary",
+	TypePHP:                                             "PHP Script",
 	TypePPMASCII:                                        "PPM ASCII",
 	TypePPMBinary:                                       "PPM binary",
 	TypePSB:                                             "PSB",
 	TypePSD:                                             "PSD",
 	TypePWAD:                                            "PWAD",
+	TypePython:                                          "Python Script",
 	TypePythonSourceDistributionSDist:                   "Python Source Distribution (sdist)",
 	TypePythonWheelWHL:                                  "Python Wheel (WHL)",
 	TypePyTorchModel:                                    "PyTorch Model",
@@ -1926,6 +1959,8 @@ var typeNames = [...]string{
 	TypeRIFFMIDI:                                        "MIDI",
 	TypeRIFFPalette:                                     "Palette",
 	TypeRSAPrivateKey:                                   "RSA Private Key",
+	TypeRuby:                                            "Ruby Script",
+	TypeRust:                                            "Rust Source",
 	TypeSketchDocument:                                  "Sketch Document",
 	TypeSlackwarePackage:                                "Slackware Package",
 	TypeSocket:                                          "Socket",
@@ -1935,11 +1970,13 @@ var typeNames = [...]string{
 	TypeSpanned:                                         "Spanned",
 	TypeSpecial:                                         "Special",
 	TypeSpeexAudio:                                      "Speex Audio",
+	TypeSQL:                                             "SQL Script",
 	TypeStreamVersion7:                                  "Stream Version 7",
 	TypeStreamVersion8:                                  "Stream Version 8",
 	TypeSymbolicLink:                                    "Symbolic Link",
 	TypeSZ:                                              "SZ",
 	TypeTheoraVideo:                                     "Theora Video",
+	TypeTOML:                                            "TOML Configuration",
 	TypeTrue:                                            "True",
 	TypeTS:                                              "TS",
 	TypeUncompressed:                                    "Uncompressed",
@@ -1961,6 +1998,7 @@ var typeNames = [...]string{
 	TypeWindowsNE:                                       "16-bit New Executable (NE)",
 	TypeWrapper:                                         "Wrapper",
 	TypeXMLPaperSpecificationXPS:                        "XML Paper Specification (XPS)",
+	TypeYAML:                                            "YAML Configuration",
 	TypeZlibCompressed:                                  "Zlib Compressed",
 	TypeZstandardSkinnableFrame:                         "Zstandard Skinnable Frame",
 }

@@ -1002,21 +1002,191 @@ func DetectText(b Buffer) *Metadata {
 		return nil
 	}
 
+	var (
+		isASCII  bool
+		isUTF8   bool
+		textData []byte
+	)
+
 	if b.Has(0, []byte{0xef, 0xbb, 0xbf}) {
-		if isLikelyTextUTF8(b[3:]) {
-			return &Metadata{Kind: KindTextFile, Type: TypeUTF8Text, Confidence: ConfidenceLow}
+		textData = b[3:]
+
+		isUTF8 = isLikelyTextUTF8(textData)
+	} else {
+		textData = b
+
+		isASCII = isLikelyASCIIText(textData)
+		if !isASCII {
+			isUTF8 = isLikelyTextUTF8(textData)
 		}
 	}
 
-	if isLikelyASCIIText(b) {
-		return &Metadata{Kind: KindTextFile, Type: TypeASCIIText, Confidence: ConfidenceLow}
+	if !isASCII && !isUTF8 {
+		return nil
 	}
 
-	if isLikelyTextUTF8(b) {
-		return &Metadata{Kind: KindTextFile, Type: TypeUTF8Text, Confidence: ConfidenceLow}
+	limit := min(len(textData), 4096)
+	subtype := detectTextSubtype(textData[:limit])
+
+	if subtype != TypeNone {
+		return &Metadata{
+			Kind:       KindTextFile,
+			Type:       subtype,
+			Confidence: ConfidenceMedium,
+		}
 	}
 
-	return nil
+	fallbackType := TypeUTF8Text
+	if isASCII {
+		fallbackType = TypeASCIIText
+	}
+
+	return &Metadata{
+		Kind:       KindTextFile,
+		Type:       fallbackType,
+		Confidence: ConfidenceLow,
+	}
+}
+
+func detectTextSubtype(data []byte) TypeID {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) == 0 {
+		return TypeNone
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("#!")) {
+		lineEnd := bytes.IndexByte(trimmed, '\n')
+		if lineEnd == -1 {
+			lineEnd = len(trimmed)
+		}
+
+		shebang := trimmed[:lineEnd]
+
+		if bytes.Contains(shebang, []byte("bash")) || bytes.Contains(shebang, []byte("sh")) {
+			return TypeBashScript
+		}
+
+		if bytes.Contains(shebang, []byte("python")) {
+			return TypePython
+		}
+
+		if bytes.Contains(shebang, []byte("node")) {
+			return TypeJavaScript
+		}
+
+		if bytes.Contains(shebang, []byte("perl")) {
+			return TypePerl
+		}
+
+		if bytes.Contains(shebang, []byte("ruby")) {
+			return TypeRuby
+		}
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("<?php")) {
+		return TypePHP
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("FROM ")) || bytes.HasPrefix(trimmed, []byte("# syntax=")) {
+		return TypeDocker
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("# ")) || bytes.HasPrefix(trimmed, []byte("## ")) {
+		return TypeMarkdown
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("---\n")) || bytes.HasPrefix(trimmed, []byte("---\r\n")) {
+		if bytes.Contains(trimmed, []byte("title:")) || bytes.Contains(trimmed, []byte("layout:")) {
+			return TypeMarkdown
+		}
+
+		return TypeYAML
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("CREATE TABLE")) || bytes.HasPrefix(trimmed, []byte("SELECT ")) || bytes.HasPrefix(trimmed, []byte("INSERT INTO")) || bytes.HasPrefix(trimmed, []byte("-- SQL")) {
+		return TypeSQL
+	}
+
+	code := skipCStyleComments(trimmed)
+	if len(code) == 0 {
+		return TypeNone
+	}
+
+	if bytes.HasPrefix(code, []byte("package ")) {
+		if bytes.Contains(code, []byte("import (")) || bytes.Contains(code, []byte("import \"")) || bytes.Contains(code, []byte("func ")) {
+			return TypeGo
+		}
+
+		if bytes.Contains(code, []byte("import java")) || bytes.Contains(code, []byte("public class ")) {
+			return TypeJava
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("#include <")) || bytes.HasPrefix(code, []byte("#include \"")) {
+		if bytes.Contains(code, []byte("std::")) || bytes.Contains(code, []byte("class ")) || bytes.Contains(code, []byte("template <")) {
+			return TypeCPP
+		}
+
+		return TypeC
+	}
+
+	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) {
+		return TypeRust
+	}
+
+	if bytes.HasPrefix(code, []byte("import ")) || bytes.HasPrefix(code, []byte("def ")) || bytes.HasPrefix(code, []byte("class ")) {
+		if bytes.Contains(code, []byte("def ")) && bytes.Contains(code, []byte(":")) {
+			return TypePython
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("const ")) || bytes.HasPrefix(code, []byte("let ")) || bytes.HasPrefix(code, []byte("var ")) {
+		if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) {
+			return TypeJavaScript
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("[")) {
+		lineEnd := bytes.IndexByte(code, '\n')
+		if lineEnd != -1 && bytes.Contains(code[:lineEnd], []byte("]")) {
+			if bytes.Contains(code, []byte("=\"")) || bytes.Contains(code, []byte("= \"")) || bytes.Contains(code, []byte("['")) {
+				return TypeTOML
+			}
+
+			return TypeINI
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("CFLAGS")) || bytes.HasPrefix(code, []byte("TARGET")) || bytes.HasPrefix(code, []byte("all:")) || bytes.HasPrefix(code, []byte(".PHONY:")) {
+		return TypeMakefile
+	}
+
+	return TypeNone
+}
+
+func skipCStyleComments(b []byte) []byte {
+	for len(b) > 0 {
+		b = bytes.TrimSpace(b)
+		if bytes.HasPrefix(b, []byte("//")) {
+			idx := bytes.IndexByte(b, '\n')
+			if idx == -1 {
+				return nil
+			}
+
+			b = b[idx:]
+		} else if bytes.HasPrefix(b, []byte("/*")) {
+			idx := bytes.Index(b, []byte("*/"))
+			if idx == -1 {
+				return nil
+			}
+
+			b = b[idx+2:]
+		} else {
+			break
+		}
+	}
+
+	return b
 }
 
 func passesTextLengthGate(b Buffer) bool {
