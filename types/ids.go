@@ -5,6 +5,7 @@ type TypeID uint16
 
 const (
 	KindUnknown KindID = iota
+	Kind1PasswordCloudKeychain
 	Kind1PasswordKeychain
 	Kind7ZipArchive
 	KindAACAudio
@@ -12,6 +13,7 @@ const (
 	KindACEArchive
 	KindAcrobatFormsDataFormat
 	KindAcronisTrueImage
+	KindAdobeFrameMaker
 	KindAdobeInDesignDocument
 	KindAdvancedForensicFormat
 	KindAINArchive
@@ -35,8 +37,11 @@ const (
 	KindAndroidODEX
 	KindAndroidSparseImage
 	KindAndroidVDEX
+	KindAntennaData
 	KindAOLARTImage
 	KindAOLData
+	KindAOLHistory
+	KindAOLParameterInfo
 	KindApacheArrowFile
 	KindApacheParquet
 	KindAPFSFilesystem
@@ -48,6 +53,7 @@ const (
 	KindAppleDesktopServicesStore
 	KindAppleDiskImage
 	KindAppleDouble
+	KindAppleISOHybridCDImage
 	KindAppleiWorkDocument
 	KindAppleKeychain
 	KindAppleSingle
@@ -79,6 +85,7 @@ const (
 	KindBinHex
 	KindBinkVideo
 	KindBitcoinBlock
+	KindBitcoinWallet
 	KindBitLockerDiskEncryption
 	KindBlackBerryBackup
 	KindBlenderFile
@@ -134,6 +141,7 @@ const (
 	KindDesignTools2D
 	KindDeskMateDocument
 	KindDeskMateWorksheet
+	KindDialUpNetworking
 	KindDICOMMedicalImage
 	KindDigitalSpeechStandard
 	KindDigitalWatchdogAudio
@@ -147,6 +155,7 @@ const (
 	KindDSFAudio
 	KindDSTCompression
 	KindDTSAudio
+	KindDVDInfoFile
 	KindDVRMSVideo
 	KindDVRStudioStream
 	KindEasyRecoverySavedState
@@ -157,6 +166,7 @@ const (
 	KindElitePlusCommander
 	KindEncapsulatedPostScript
 	KindEnCaseCaseFile
+	KindEnCaseEvidenceV2
 	KindEnCaseImage
 	KindEndNoteLibrary
 	KindEOTFont
@@ -187,6 +197,7 @@ const (
 	KindFLVVideo
 	KindFreeArcArchive
 	KindFujifilmRAWImage
+	KindFuzzyBitmap
 	KindGameBoyAdvanceROM
 	KindGameBoyROM
 	KindGameBoySound
@@ -217,6 +228,7 @@ const (
 	KindGoogleChromeDictionary
 	KindGoogleDriveDrawing
 	KindGoogleEarthETA
+	KindGoogleEarthPlacemark
 	KindGPGPublicKeyring
 	KindGPSExchangeFormat
 	KindGRIBData
@@ -229,6 +241,7 @@ const (
 	KindHarvardGraphics
 	KindHDF4Data
 	KindHDF5Data
+	KindHealthLevel7
 	KindHFSPlusFilesystem
 	KindHTMLDocument
 	KindHuskygramPoem
@@ -239,7 +252,9 @@ const (
 	KindICOCURImage
 	KindIEHistory
 	KindIETPL
+	KindIETrackingProtectionList
 	KindIFFContainer
+	KindImgSoftwareBitmap
 	KindImpulseTrackerInstrument
 	KindImpulseTrackerModule
 	KindImpulseTrackerSample
@@ -249,6 +264,7 @@ const (
 	KindISO9660Image
 	KindISOBaseMedia
 	KindIVFVideo
+	KindJarArchive
 	KindJARCSArchive
 	KindJavaClass
 	KindJavaCryptographyExtensionKeyStore
@@ -270,6 +286,7 @@ const (
 	KindKeePassDatabase
 	KindKeyboardDriver
 	KindKeyholeMarkupLanguage
+	KindKeyholeMarkupLanguageOverlay
 	KindKGBArchive
 	KindKorgAudio
 	KindKTXTexture
@@ -284,6 +301,8 @@ const (
 	KindLottieAnimation
 	KindLotus123
 	KindLotusAMIDocument
+	KindLotusNotesDatabase
+	KindLotusNotesDatabaseTemplate
 	KindLotusWordPro
 	KindLrzipArchive
 	KindLuaBytecode
@@ -309,11 +328,13 @@ const (
 	KindMAMECHD
 	KindMapInfoInterchange
 	KindMapInfoSeaChart
+	KindMArArchive
 	KindMaterialExchangeFormat
 	KindMATLABData
 	KindMayaASCII
 	KindMayaBinary
 	KindMBOXEmailFolder
+	KindMBOXTableOfContents
 	KindMCAPCapture
 	KindMeasurementDataFormat
 	KindMediaDescriptor
@@ -326,6 +347,7 @@ const (
 	KindMicrosoftCodePageTranslation
 	KindMicrosoftCompress
 	KindMicrosoftCPlusPlusSymbols
+	KindMicrosoftDeveloperStudioProject
 	KindMicrosoftExchangeConfig
 	KindMicrosoftFaxCover
 	KindMicrosoftInfo
@@ -333,6 +355,7 @@ const (
 	KindMicrosoftMoney
 	KindMicrosoftNetworkMonitor
 	KindMicrosoftOneNote
+	KindMicrosoftOneNoteNote
 	KindMicrosoftOutlookEmailFolder
 	KindMicrosoftProgramDatabase
 	KindMicrosoftReader
@@ -348,6 +371,7 @@ const (
 	KindMNGImage
 	KindMOBIDocument
 	KindMonkeysAudio
+	KindMonochromePictureTIFF
 	KindMoPaQArchive
 	KindMozillaArchive
 	KindMPEG2TransportStream
@@ -372,6 +396,7 @@ const (
 	KindNESSoundFormat
 	KindNetCDFData
 	KindNetpbmImage
+	KindNetscapeMailFolder
 	KindNIfTIMedicalImage
 	KindNILFS2Filesystem
 	KindNintendo3DSROM
@@ -386,6 +411,7 @@ const (
 	KindNintendoSwitchNSO
 	KindNintendoSwitchPackage
 	KindNintendoSwitchROM
+	KindNintendoTPL
 	KindNintendoU8Archive
 	KindNintendoWiiUExecutable
 	KindNintendoYay0
@@ -393,6 +419,8 @@ const (
 	KindNISTSPHEREAudio
 	KindNOAARasterChart
 	KindNokiaPhoneBackup
+	KindNortonDiskDoctorUndo
+	KindNovellLANalyzerCapture
 	KindNTFSFilesystem
 	KindNullsoftVideo
 	KindNumPyArray
@@ -408,10 +436,15 @@ const (
 	KindOptimFROGAudio
 	KindORCColumnarData
 	KindOutlookAddressBook
+	KindOutlookAddressFile
+	KindOutlookExpressAddressBook
 	KindOutlookExpressDatabase
+	KindPacketSnifferXCP
 	KindPaintShopProImage
 	KindPalmData
+	KindPalmOSSuperMemo
 	KindParallelsDiskImage
+	KindParrotVideoEncapsulation
 	KindPathWayMap
 	KindPAXBitmap
 	KindPCAPCapture
@@ -437,6 +470,8 @@ const (
 	KindPico8Cartridge
 	KindPIMArchive
 	KindPKCS12
+	KindPKLITEArchive
+	KindPKSFXArchive
 	KindPlaylistFile
 	KindPlayStation1Executable
 	KindPlayStation2MemoryCard
@@ -477,6 +512,7 @@ const (
 	KindRARArchive
 	KindRData
 	KindRealMedia
+	KindRealMediaMetafile
 	KindRealPlayerVideo
 	KindRedisDatabase
 	KindREDRAWImage
@@ -506,6 +542,7 @@ const (
 	KindSegaNaomiROM
 	KindSegaSaturnROM
 	KindSGIImage
+	KindShareazaThumbnail
 	KindShebangScript
 	KindShockwaveFlash
 	KindShortenAudio
@@ -518,6 +555,7 @@ const (
 	KindSketchUpModel
 	KindSkinCrafterSkin
 	KindSkypeData
+	KindSkypeLocalization
 	KindSmackerVideo
 	KindSmartDrawDrawing
 	KindSnappyFramedData
@@ -525,6 +563,7 @@ const (
 	KindSnoopCapture
 	KindSOAPMessage
 	KindSonicFoundryAcid
+	KindSonyCompressedVoice
 	KindSonyOpenMG
 	KindSonyWave64Audio
 	KindSourceEngineBSP
@@ -551,6 +590,7 @@ const (
 	KindSurfplanProject
 	KindSVGImage
 	KindSymantecGhostImage
+	KindSymantecWiseInstallerLog
 	KindSymbianExecutable
 	KindSymbianInstallationFormat
 	KindSystemdJournal
@@ -579,6 +619,7 @@ const (
 	KindUFAArchive
 	KindUFOCaptureMap
 	KindUHAArchive
+	KindUndergroundAudio
 	KindUnicodeExtensions
 	KindUnityWebData
 	KindUniversalDiskFormat
@@ -589,6 +630,7 @@ const (
 	KindValvePak
 	KindValveTextureFormat
 	KindVBScript
+	KindVBScriptEncoded
 	KindVCard
 	KindVeeamBackup
 	KindVHDDiskImage
@@ -622,11 +664,13 @@ const (
 	KindWebVTT
 	KindWhereIsItCatalog
 	KindWiiBackupFileSystem
+	KindWiiGameCubeTHP
 	KindWiiROM
 	KindWiiUArchive
 	KindWin95Password
 	KindWin9xPassword
 	KindWin9xPrinterSpool
+	KindWin9xRegistryHive
 	KindWindowsApplicationLog
 	KindWindowsCalendar
 	KindWindowsEventLog
@@ -639,10 +683,15 @@ const (
 	KindWindowsMinidump
 	KindWindowsPrecompiledHeader
 	KindWindowsPrefetch
+	KindWindowsProgramManagerGroup
 	KindWindowsRegistryHive
 	KindWindowsResourceFile
 	KindWindowsShortcut
+	KindWindowsThumbnailCache
 	KindWindowsTypeLibrary
+	KindWindowsUserStateMigration
+	KindWinNTNetmonCapture
+	KindWinNTRegistryUndo
 	KindWinPharoahCapture
 	KindWinPharoahFilter
 	KindWiredTigerDatabase
@@ -652,6 +701,7 @@ const (
 	KindWordPerfectDictionary
 	KindWordPerfectGraphics
 	KindWordPerfectText
+	KindWordStarDocument
 	KindWordStarWindows
 	KindWTVVideo
 	KindXARArchive
@@ -695,6 +745,8 @@ const (
 	Type64BitBigEndian
 	Type64BitLittleEndian
 	TypeAC3
+	TypeAcronisB4
+	TypeAcronisCE
 	TypeAdobeDNGDNG
 	TypeADTS
 	TypeAfterEffectsProjectAEP
@@ -712,24 +764,30 @@ const (
 	TypeAVIFImage
 	TypeAVIFImageSequence
 	TypeAVIVideo
+	TypeB4
 	TypeBGZF
 	TypeBigEndian
+	TypeBigTIFF
 	TypeBinaryBigEndian
 	TypeBinaryLittleEndian
 	TypeBlackmagicRAW
 	TypeBlockDevice
 	TypeByteSwapped
 	TypeCanonRAW3CR3
+	TypeCanonRAWHE
+	TypeCAT
 	TypeCB7
 	TypeCBR
 	TypeCBT
 	TypeCBZ
 	TypeCDAAudio
+	TypeCE
 	TypeCharacterDevice
 	TypeCodestream
 	TypeCondaPackage
 	TypeContainer
 	TypeCorelDRAWDocumentCDR
+	TypeCOWD
 	TypeCRXVersion2
 	TypeCRXVersion3
 	TypeCubaseProjectCPR
@@ -768,8 +826,10 @@ const (
 	TypeForgeMod
 	TypeGIF87a
 	TypeGIF89a
+	TypeHE
 	TypeHEIFImage
 	TypeILBMImage
+	TypeIMMM
 	TypeIOSApplicationArchiveIPA
 	TypeIWAD
 	TypeJavaArchiveJAR
@@ -778,12 +838,15 @@ const (
 	TypeJMOD
 	TypeKDB
 	TypeKDBX
+	TypeKDM
 	TypeKerasModel
 	TypeKMZArchive
 	TypeKritaDocumentKRA
 	TypeKTX
 	TypeKTX2
+	TypeLIST
 	TypeLittleEndian
+	TypeLN
 	TypeLOVEGame
 	TypeLZ4Legacy
 	TypeLZMACompressed
@@ -827,6 +890,7 @@ const (
 	TypeNamedPipe
 	TypeNanosecondBigEndian
 	TypeNanosecondLittleEndian
+	TypeNB
 	TypeNewASCII
 	TypeNewASCIIWithCRC
 	TypeNikonRAWNEF
@@ -858,7 +922,9 @@ const (
 	TypePE32Unknown
 	TypePE32X86
 	TypePE32X8664
+	TypePEC
 	TypePentaxRAWPEF
+	TypePES
 	TypePGMASCII
 	TypePGMBinary
 	TypePPMASCII
@@ -875,6 +941,7 @@ const (
 	TypeQuickTimeMovie
 	TypeRAR4
 	TypeRAR5
+	TypeReturnPath
 	TypeRIFFMIDI
 	TypeRIFFPalette
 	TypeRSAPrivateKey
@@ -890,13 +957,16 @@ const (
 	TypeStreamVersion7
 	TypeStreamVersion8
 	TypeSymbolicLink
+	TypeSZ
 	TypeTheoraVideo
+	TypeTrue
 	TypeTS
 	TypeUncompressed
 	TypeUTF8Text
 	TypeVagrantBox
 	TypeVisualStudioExtensionVSIX
 	TypeVMDK
+	TypeVMDKDescription
 	TypeVorbisAudio
 	TypeWAVAudio
 	TypeWebM
@@ -916,6 +986,7 @@ const (
 
 var kindNames = [...]string{
 	KindUnknown:                             "Unknown",
+	Kind1PasswordCloudKeychain:              "1Password Cloud Keychain",
 	Kind1PasswordKeychain:                   "1Password Keychain",
 	Kind7ZipArchive:                         "7-Zip Archive",
 	KindAACAudio:                            "AAC Audio",
@@ -923,6 +994,7 @@ var kindNames = [...]string{
 	KindACEArchive:                          "ACE Archive",
 	KindAcrobatFormsDataFormat:              "Acrobat Forms Data Format",
 	KindAcronisTrueImage:                    "Acronis True Image",
+	KindAdobeFrameMaker:                     "Adobe FrameMaker",
 	KindAdobeInDesignDocument:               "Adobe InDesign Document",
 	KindAdvancedForensicFormat:              "Advanced Forensic Format",
 	KindAINArchive:                          "AIN Archive",
@@ -946,8 +1018,11 @@ var kindNames = [...]string{
 	KindAndroidODEX:                         "Android ODEX",
 	KindAndroidSparseImage:                  "Android Sparse Image",
 	KindAndroidVDEX:                         "Android VDEX",
+	KindAntennaData:                         "Antenna Data",
 	KindAOLARTImage:                         "AOL ART Image",
 	KindAOLData:                             "AOL Data",
+	KindAOLHistory:                          "AOL History",
+	KindAOLParameterInfo:                    "AOL Parameter Info",
 	KindApacheArrowFile:                     "Apache Arrow File",
 	KindApacheParquet:                       "Apache Parquet",
 	KindAPFSFilesystem:                      "APFS Filesystem",
@@ -959,6 +1034,7 @@ var kindNames = [...]string{
 	KindAppleDesktopServicesStore:           "Apple Desktop Services Store",
 	KindAppleDiskImage:                      "Apple Disk Image",
 	KindAppleDouble:                         "AppleDouble File",
+	KindAppleISOHybridCDImage:               "Apple ISO Hybrid CD Image",
 	KindAppleiWorkDocument:                  "Apple iWork Document",
 	KindAppleKeychain:                       "Apple Keychain",
 	KindAppleSingle:                         "AppleSingle File",
@@ -990,6 +1066,7 @@ var kindNames = [...]string{
 	KindBinHex:                              "BinHex Archive",
 	KindBinkVideo:                           "Bink Video",
 	KindBitcoinBlock:                        "Bitcoin Block Data",
+	KindBitcoinWallet:                       "Bitcoin Wallet",
 	KindBitLockerDiskEncryption:             "BitLocker Disk Encryption",
 	KindBlackBerryBackup:                    "BlackBerry Backup",
 	KindBlenderFile:                         "Blender File",
@@ -1045,6 +1122,7 @@ var kindNames = [...]string{
 	KindDesignTools2D:                       "DesignTools 2D",
 	KindDeskMateDocument:                    "DeskMate Document",
 	KindDeskMateWorksheet:                   "DeskMate Worksheet",
+	KindDialUpNetworking:                    "Dial-up Networking",
 	KindDICOMMedicalImage:                   "DICOM Medical Image",
 	KindDigitalSpeechStandard:               "Digital Speech Standard",
 	KindDigitalWatchdogAudio:                "Digital Watchdog Audio",
@@ -1058,6 +1136,7 @@ var kindNames = [...]string{
 	KindDSFAudio:                            "DSF Audio",
 	KindDSTCompression:                      "DST Compression",
 	KindDTSAudio:                            "DTS Audio",
+	KindDVDInfoFile:                         "DVD Info File",
 	KindDVRMSVideo:                          "DVR-MS Video",
 	KindDVRStudioStream:                     "DVR-Studio Stream",
 	KindEasyRecoverySavedState:              "EasyRecovery Saved State",
@@ -1068,6 +1147,7 @@ var kindNames = [...]string{
 	KindElitePlusCommander:                  "Elite Plus Commander",
 	KindEncapsulatedPostScript:              "Encapsulated PostScript",
 	KindEnCaseCaseFile:                      "EnCase Case File",
+	KindEnCaseEvidenceV2:                    "EnCase Evidence V2",
 	KindEnCaseImage:                         "EnCase Image",
 	KindEndNoteLibrary:                      "EndNote Library",
 	KindEOTFont:                             "EOT Font",
@@ -1098,6 +1178,7 @@ var kindNames = [...]string{
 	KindFLVVideo:                            "FLV Video",
 	KindFreeArcArchive:                      "FreeArc Archive",
 	KindFujifilmRAWImage:                    "Fujifilm RAW Image",
+	KindFuzzyBitmap:                         "Fuzzy Bitmap",
 	KindGameBoyAdvanceROM:                   "Game Boy Advance ROM",
 	KindGameBoyROM:                          "Game Boy ROM",
 	KindGameBoySound:                        "Game Boy Sound",
@@ -1128,6 +1209,7 @@ var kindNames = [...]string{
 	KindGoogleChromeDictionary:              "Google Chrome Dictionary",
 	KindGoogleDriveDrawing:                  "Google Drive Drawing",
 	KindGoogleEarthETA:                      "Google Earth ETA",
+	KindGoogleEarthPlacemark:                "Google Earth Placemark",
 	KindGPGPublicKeyring:                    "GPG Public Keyring",
 	KindGPSExchangeFormat:                   "GPS Exchange Format",
 	KindGRIBData:                            "GRIB Data",
@@ -1140,6 +1222,7 @@ var kindNames = [...]string{
 	KindHarvardGraphics:                     "Harvard Graphics",
 	KindHDF4Data:                            "HDF4 Data",
 	KindHDF5Data:                            "HDF5 Data",
+	KindHealthLevel7:                        "Health Level-7 Data",
 	KindHFSPlusFilesystem:                   "HFS+ Filesystem",
 	KindHTMLDocument:                        "HTML Document",
 	KindHuskygramPoem:                       "Huskygram Poem",
@@ -1150,7 +1233,9 @@ var kindNames = [...]string{
 	KindICOCURImage:                         "ICO/CUR Image",
 	KindIEHistory:                           "IE History",
 	KindIETPL:                               "IE TPL",
+	KindIETrackingProtectionList:            "IE Tracking Protection List",
 	KindIFFContainer:                        "IFF Container",
+	KindImgSoftwareBitmap:                   "Img Software Bitmap",
 	KindImpulseTrackerInstrument:            "Impulse Tracker Instrument",
 	KindImpulseTrackerModule:                "Impulse Tracker Module",
 	KindImpulseTrackerSample:                "Impulse Tracker Sample",
@@ -1160,6 +1245,7 @@ var kindNames = [...]string{
 	KindISO9660Image:                        "ISO 9660 Image",
 	KindISOBaseMedia:                        "ISO Base Media",
 	KindIVFVideo:                            "IVF Video",
+	KindJarArchive:                          "JAR Archive",
 	KindJARCSArchive:                        "JARCS Archive",
 	KindJavaClass:                           "Java Class",
 	KindJavaCryptographyExtensionKeyStore:   "JCE KeyStore",
@@ -1181,6 +1267,7 @@ var kindNames = [...]string{
 	KindKeePassDatabase:                     "KeePass Database",
 	KindKeyboardDriver:                      "Keyboard Driver",
 	KindKeyholeMarkupLanguage:               "Keyhole Markup Language",
+	KindKeyholeMarkupLanguageOverlay:        "Keyhole Markup Language Overlay",
 	KindKGBArchive:                          "KGB Archive",
 	KindKorgAudio:                           "Korg Audio",
 	KindKTXTexture:                          "KTX Texture",
@@ -1195,6 +1282,8 @@ var kindNames = [...]string{
 	KindLottieAnimation:                     "Lottie Animation",
 	KindLotus123:                            "Lotus 1-2-3",
 	KindLotusAMIDocument:                    "Lotus AMI Document",
+	KindLotusNotesDatabase:                  "Lotus Notes Database",
+	KindLotusNotesDatabaseTemplate:          "Lotus Notes Database Template",
 	KindLotusWordPro:                        "Lotus WordPro",
 	KindLrzipArchive:                        "Long Range ZIP Archive",
 	KindLuaBytecode:                         "Lua Bytecode",
@@ -1220,11 +1309,13 @@ var kindNames = [...]string{
 	KindMAMECHD:                             "MAME Compressed Hunks of Data",
 	KindMapInfoInterchange:                  "MapInfo Interchange",
 	KindMapInfoSeaChart:                     "MapInfo Sea Chart",
+	KindMArArchive:                          "MAr Archive",
 	KindMaterialExchangeFormat:              "Material Exchange Format",
 	KindMATLABData:                          "MATLAB Data",
 	KindMayaASCII:                           "Maya ASCII",
 	KindMayaBinary:                          "Maya Binary",
 	KindMBOXEmailFolder:                     "MBOX Email Folder",
+	KindMBOXTableOfContents:                 "MBOX Table of Contents",
 	KindMCAPCapture:                         "MCAP Capture",
 	KindMeasurementDataFormat:               "Measurement Data Format",
 	KindMediaDescriptor:                     "Media Descriptor",
@@ -1237,6 +1328,7 @@ var kindNames = [...]string{
 	KindMicrosoftCodePageTranslation:        "Microsoft Code Page Translation",
 	KindMicrosoftCompress:                   "Microsoft Compress Archive",
 	KindMicrosoftCPlusPlusSymbols:           "Microsoft C++ Symbols",
+	KindMicrosoftDeveloperStudioProject:     "Microsoft Developer Studio Project",
 	KindMicrosoftExchangeConfig:             "Microsoft Exchange Config",
 	KindMicrosoftFaxCover:                   "Microsoft Fax Cover",
 	KindMicrosoftInfo:                       "Microsoft Info",
@@ -1244,6 +1336,7 @@ var kindNames = [...]string{
 	KindMicrosoftMoney:                      "Microsoft Money",
 	KindMicrosoftNetworkMonitor:             "Microsoft Network Monitor Capture",
 	KindMicrosoftOneNote:                    "Microsoft OneNote",
+	KindMicrosoftOneNoteNote:                "Microsoft OneNote Note",
 	KindMicrosoftOutlookEmailFolder:         "Microsoft Outlook Email Folder",
 	KindMicrosoftProgramDatabase:            "Microsoft Program Database (PDB)",
 	KindMicrosoftReader:                     "Microsoft Reader eBook",
@@ -1259,6 +1352,7 @@ var kindNames = [...]string{
 	KindMNGImage:                            "MNG Image",
 	KindMOBIDocument:                        "MOBI Document",
 	KindMonkeysAudio:                        "Monkey's Audio",
+	KindMonochromePictureTIFF:               "Monochrome Picture TIFF",
 	KindMoPaQArchive:                        "MoPaQ Archive",
 	KindMozillaArchive:                      "Mozilla Archive (MAR)",
 	KindMPEG2TransportStream:                "MPEG Transport Stream",
@@ -1283,6 +1377,7 @@ var kindNames = [...]string{
 	KindNESSoundFormat:                      "NES Sound Format",
 	KindNetCDFData:                          "NetCDF Data",
 	KindNetpbmImage:                         "Netpbm Image",
+	KindNetscapeMailFolder:                  "Netscape Mail Folder",
 	KindNIfTIMedicalImage:                   "NIfTI Medical Image",
 	KindNILFS2Filesystem:                    "NILFS2 Filesystem",
 	KindNintendo3DSROM:                      "Nintendo 3DS ROM",
@@ -1297,6 +1392,7 @@ var kindNames = [...]string{
 	KindNintendoSwitchNSO:                   "Nintendo Switch NSO",
 	KindNintendoSwitchPackage:               "Nintendo Switch Package",
 	KindNintendoSwitchROM:                   "Nintendo Switch ROM",
+	KindNintendoTPL:                         "Nintendo TPL Image",
 	KindNintendoU8Archive:                   "Nintendo U8 Archive",
 	KindNintendoWiiUExecutable:              "Nintendo Wii U Executable",
 	KindNintendoYay0:                        "Nintendo Yay0 Compressed",
@@ -1304,6 +1400,8 @@ var kindNames = [...]string{
 	KindNISTSPHEREAudio:                     "NIST SPHERE Audio",
 	KindNOAARasterChart:                     "NOAA Raster Chart",
 	KindNokiaPhoneBackup:                    "Nokia Phone Backup",
+	KindNortonDiskDoctorUndo:                "Norton Disk Doctor Undo",
+	KindNovellLANalyzerCapture:              "Novell LANalyzer Capture",
 	KindNTFSFilesystem:                      "NTFS Filesystem",
 	KindNullsoftVideo:                       "Nullsoft Video",
 	KindNumPyArray:                          "NumPy Array",
@@ -1319,10 +1417,15 @@ var kindNames = [...]string{
 	KindOptimFROGAudio:                      "OptimFROG Audio",
 	KindORCColumnarData:                     "ORC Columnar Data",
 	KindOutlookAddressBook:                  "Outlook Address Book",
+	KindOutlookAddressFile:                  "Outlook Address File",
+	KindOutlookExpressAddressBook:           "Outlook Express Address Book",
 	KindOutlookExpressDatabase:              "Outlook Express Database",
+	KindPacketSnifferXCP:                    "Packet Sniffer XCP",
 	KindPaintShopProImage:                   "PaintShop Pro Image",
 	KindPalmData:                            "Palm Data",
+	KindPalmOSSuperMemo:                     "PalmOS SuperMemo",
 	KindParallelsDiskImage:                  "Parallels Disk Image",
+	KindParrotVideoEncapsulation:            "Parrot Video Encapsulation",
 	KindPathWayMap:                          "PathWay Map",
 	KindPAXBitmap:                           "PAX Bitmap",
 	KindPCAPCapture:                         "PCAP Capture",
@@ -1348,6 +1451,8 @@ var kindNames = [...]string{
 	KindPico8Cartridge:                      "Pico-8 Cartridge",
 	KindPIMArchive:                          "PIM Archive",
 	KindPKCS12:                              "PKCS#12",
+	KindPKLITEArchive:                       "PKLITE Archive",
+	KindPKSFXArchive:                        "PKSFX Archive",
 	KindPlaylistFile:                        "Playlist File",
 	KindPlayStation1Executable:              "PlayStation 1 Executable",
 	KindPlayStation2MemoryCard:              "PlayStation 2 Memory Card",
@@ -1388,6 +1493,7 @@ var kindNames = [...]string{
 	KindRARArchive:                          "RAR Archive",
 	KindRData:                               "RData",
 	KindRealMedia:                           "RealMedia",
+	KindRealMediaMetafile:                   "RealMedia Metafile",
 	KindRealPlayerVideo:                     "RealPlayer Video",
 	KindRedisDatabase:                       "Redis Database",
 	KindREDRAWImage:                         "RED RAW Image",
@@ -1417,6 +1523,7 @@ var kindNames = [...]string{
 	KindSegaNaomiROM:                        "Sega NAOMI ROM",
 	KindSegaSaturnROM:                       "Sega Saturn ROM",
 	KindSGIImage:                            "SGI Image",
+	KindShareazaThumbnail:                   "Shareaza Thumbnail",
 	KindShebangScript:                       "Shebang Script",
 	KindShockwaveFlash:                      "Shockwave Flash",
 	KindShortenAudio:                        "Shorten Audio",
@@ -1429,6 +1536,7 @@ var kindNames = [...]string{
 	KindSketchUpModel:                       "SketchUp Model",
 	KindSkinCrafterSkin:                     "SkinCrafter Skin",
 	KindSkypeData:                           "Skype Data",
+	KindSkypeLocalization:                   "Skype Localization",
 	KindSmackerVideo:                        "Smacker Video",
 	KindSmartDrawDrawing:                    "SmartDraw Drawing",
 	KindSnappyFramedData:                    "Snappy Framed Data",
@@ -1436,6 +1544,7 @@ var kindNames = [...]string{
 	KindSnoopCapture:                        "Snoop Capture",
 	KindSOAPMessage:                         "SOAP Message",
 	KindSonicFoundryAcid:                    "Sonic Foundry Acid",
+	KindSonyCompressedVoice:                 "Sony Compressed Voice",
 	KindSonyOpenMG:                          "Sony OpenMG Audio",
 	KindSonyWave64Audio:                     "Sony Wave64 Audio",
 	KindSourceEngineBSP:                     "Source Engine BSP",
@@ -1462,6 +1571,7 @@ var kindNames = [...]string{
 	KindSurfplanProject:                     "Surfplan Project",
 	KindSVGImage:                            "SVG Image",
 	KindSymantecGhostImage:                  "Symantec Ghost Image",
+	KindSymantecWiseInstallerLog:            "Symantec Wise Installer Log",
 	KindSymbianExecutable:                   "Symbian Executable",
 	KindSymbianInstallationFormat:           "Symbian Installation Format",
 	KindSystemdJournal:                      "Systemd Journal",
@@ -1490,6 +1600,7 @@ var kindNames = [...]string{
 	KindUFAArchive:                          "UFA Archive",
 	KindUFOCaptureMap:                       "UFO Capture Map",
 	KindUHAArchive:                          "UHA Archive",
+	KindUndergroundAudio:                    "Underground Audio",
 	KindUnicodeExtensions:                   "Unicode Extensions",
 	KindUnityWebData:                        "Unity Web Data",
 	KindUniversalDiskFormat:                 "Universal Disk Format",
@@ -1500,6 +1611,7 @@ var kindNames = [...]string{
 	KindValvePak:                            "Valve Pak",
 	KindValveTextureFormat:                  "Valve Texture Format",
 	KindVBScript:                            "VBScript",
+	KindVBScriptEncoded:                     "VBScript Encoded",
 	KindVCard:                               "vCard",
 	KindVeeamBackup:                         "Veeam Backup",
 	KindVHDDiskImage:                        "VHD Disk Image",
@@ -1533,11 +1645,13 @@ var kindNames = [...]string{
 	KindWebVTT:                              "WebVTT",
 	KindWhereIsItCatalog:                    "WhereIsIt Catalog",
 	KindWiiBackupFileSystem:                 "Wii Backup File System",
+	KindWiiGameCubeTHP:                      "Wii GameCube THP",
 	KindWiiROM:                              "Wii ROM",
 	KindWiiUArchive:                         "Wii U Archive",
 	KindWin95Password:                       "Windows 95 Password",
 	KindWin9xPassword:                       "Win9x Password",
 	KindWin9xPrinterSpool:                   "Win9x Printer Spool",
+	KindWin9xRegistryHive:                   "Win9x Registry Hive",
 	KindWindowsApplicationLog:               "Windows Application Log",
 	KindWindowsCalendar:                     "Windows Calendar",
 	KindWindowsEventLog:                     "Windows Event Log",
@@ -1550,10 +1664,15 @@ var kindNames = [...]string{
 	KindWindowsMinidump:                     "Windows Minidump",
 	KindWindowsPrecompiledHeader:            "Windows Precompiled Header",
 	KindWindowsPrefetch:                     "Windows Prefetch",
+	KindWindowsProgramManagerGroup:          "Windows Program Manager Group",
 	KindWindowsRegistryHive:                 "Windows Registry Hive",
 	KindWindowsResourceFile:                 "Windows Resource File",
 	KindWindowsShortcut:                     "Windows Shortcut",
+	KindWindowsThumbnailCache:               "Windows Thumbnail Cache",
 	KindWindowsTypeLibrary:                  "Windows Type Library (TLB)",
+	KindWindowsUserStateMigration:           "Windows User State Migration",
+	KindWinNTNetmonCapture:                  "WinNT Netmon Capture",
+	KindWinNTRegistryUndo:                   "WinNT Registry Undo",
 	KindWinPharoahCapture:                   "WinPharoah Capture",
 	KindWinPharoahFilter:                    "WinPharoah Filter",
 	KindWiredTigerDatabase:                  "WiredTiger Database",
@@ -1563,6 +1682,7 @@ var kindNames = [...]string{
 	KindWordPerfectDictionary:               "WordPerfect Dictionary",
 	KindWordPerfectGraphics:                 "WordPerfect Graphics",
 	KindWordPerfectText:                     "WordPerfect Text",
+	KindWordStarDocument:                    "WordStar Document",
 	KindWordStarWindows:                     "WordStar Windows",
 	KindWTVVideo:                            "WTV Video",
 	KindXARArchive:                          "XAR Archive",
@@ -1606,6 +1726,8 @@ var typeNames = [...]string{
 	Type64BitBigEndian:           "64-bit Big-Endian",
 	Type64BitLittleEndian:        "64-bit Little-Endian",
 	TypeAC3:                      "AC-3",
+	TypeAcronisB4:                "Acronis B4",
+	TypeAcronisCE:                "Acronis CE",
 	TypeAdobeDNGDNG:              "Adobe DNG (DNG)",
 	TypeADTS:                     "ADTS",
 	TypeAfterEffectsProjectAEP:   "After Effects Project (AEP)",
@@ -1623,24 +1745,30 @@ var typeNames = [...]string{
 	TypeAVIFImage:                "AVIF Image",
 	TypeAVIFImageSequence:        "AVIF Image Sequence",
 	TypeAVIVideo:                 "AVI Video",
+	TypeB4:                       "B4",
 	TypeBGZF:                     "BGZF",
 	TypeBigEndian:                "Big-Endian",
+	TypeBigTIFF:                  "BigTIFF",
 	TypeBinaryBigEndian:          "Binary Big-Endian",
 	TypeBinaryLittleEndian:       "Binary Little-Endian",
 	TypeBlackmagicRAW:            "Blackmagic RAW",
 	TypeBlockDevice:              "Block Device",
 	TypeByteSwapped:              "Byte-Swapped",
 	TypeCanonRAW3CR3:             "Canon RAW 3 (CR3)",
+	TypeCanonRAWHE:               "Canon RAW HE",
+	TypeCAT:                      "CAT",
 	TypeCB7:                      "CB7",
 	TypeCBR:                      "CBR",
 	TypeCBT:                      "CBT",
 	TypeCBZ:                      "CBZ",
 	TypeCDAAudio:                 "CD Audio",
+	TypeCE:                       "CE",
 	TypeCharacterDevice:          "Character Device",
 	TypeCodestream:               "Codestream",
 	TypeCondaPackage:             "Conda Package",
 	TypeContainer:                "Container",
 	TypeCorelDRAWDocumentCDR:     "CorelDRAW Document (CDR)",
+	TypeCOWD:                     "COWD",
 	TypeCRXVersion2:              "Version 2",
 	TypeCRXVersion3:              "Version 3",
 	TypeCubaseProjectCPR:         "Cubase Project (CPR)",
@@ -1679,8 +1807,10 @@ var typeNames = [...]string{
 	TypeForgeMod:                 "Forge Mod",
 	TypeGIF87a:                   "GIF87a",
 	TypeGIF89a:                   "GIF89a",
+	TypeHE:                       "HE",
 	TypeHEIFImage:                "HEIF Image",
 	TypeILBMImage:                "ILBM Image",
+	TypeIMMM:                     "IMMM",
 	TypeIOSApplicationArchiveIPA: "iOS Application Archive (IPA)",
 	TypeIWAD:                     "IWAD",
 	TypeJavaArchiveJAR:           "Java Archive (JAR)",
@@ -1689,12 +1819,15 @@ var typeNames = [...]string{
 	TypeJMOD:                     "JMOD",
 	TypeKDB:                      "KDB",
 	TypeKDBX:                     "KDBX",
+	TypeKDM:                      "KDM",
 	TypeKerasModel:               "Keras Model",
 	TypeKMZArchive:               "KMZ Archive",
 	TypeKritaDocumentKRA:         "Krita Document (KRA)",
 	TypeKTX:                      "KTX",
 	TypeKTX2:                     "KTX2",
+	TypeLIST:                     "LIST",
 	TypeLittleEndian:             "Little-Endian",
+	TypeLN:                       "LN",
 	TypeLOVEGame:                 "LÖVE Game",
 	TypeLZ4Legacy:                "LZ4 Legacy",
 	TypeLZMACompressed:           "LZMA Compressed",
@@ -1738,6 +1871,7 @@ var typeNames = [...]string{
 	TypeNamedPipe:                                       "Named Pipe",
 	TypeNanosecondBigEndian:                             "Nanosecond Big-Endian",
 	TypeNanosecondLittleEndian:                          "Nanosecond Little-Endian",
+	TypeNB:                                              "NB",
 	TypeNewASCII:                                        "New ASCII",
 	TypeNewASCIIWithCRC:                                 "New ASCII with CRC",
 	TypeNikonRAWNEF:                                     "Nikon RAW (NEF)",
@@ -1769,7 +1903,9 @@ var typeNames = [...]string{
 	TypePE32Unknown:                                     "PE32 Unknown",
 	TypePE32X86:                                         "PE32 x86",
 	TypePE32X8664:                                       "PE32 x86-64",
+	TypePEC:                                             "PEC",
 	TypePentaxRAWPEF:                                    "Pentax RAW (PEF)",
+	TypePES:                                             "PES",
 	TypePGMASCII:                                        "PGM ASCII",
 	TypePGMBinary:                                       "PGM binary",
 	TypePPMASCII:                                        "PPM ASCII",
@@ -1786,6 +1922,7 @@ var typeNames = [...]string{
 	TypeQuickTimeMovie:                                  "QuickTime Movie",
 	TypeRAR4:                                            "RAR4",
 	TypeRAR5:                                            "RAR5",
+	TypeReturnPath:                                      "Return Path",
 	TypeRIFFMIDI:                                        "MIDI",
 	TypeRIFFPalette:                                     "Palette",
 	TypeRSAPrivateKey:                                   "RSA Private Key",
@@ -1801,13 +1938,16 @@ var typeNames = [...]string{
 	TypeStreamVersion7:                                  "Stream Version 7",
 	TypeStreamVersion8:                                  "Stream Version 8",
 	TypeSymbolicLink:                                    "Symbolic Link",
+	TypeSZ:                                              "SZ",
 	TypeTheoraVideo:                                     "Theora Video",
+	TypeTrue:                                            "True",
 	TypeTS:                                              "TS",
 	TypeUncompressed:                                    "Uncompressed",
 	TypeUTF8Text:                                        "UTF-8 Text",
 	TypeVagrantBox:                                      "Vagrant Box",
 	TypeVisualStudioExtensionVSIX:                       "Visual Studio Extension (VSIX)",
 	TypeVMDK:                                            "VMDK",
+	TypeVMDKDescription:                                 "VMDK Description",
 	TypeVorbisAudio:                                     "Vorbis Audio",
 	TypeWAVAudio:                                        "WAV Audio",
 	TypeWebM:                                            "WebM",
