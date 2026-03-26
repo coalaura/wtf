@@ -766,6 +766,7 @@ const (
 	TypeAVIVideo
 	TypeB4
 	TypeBashScript
+	TypeBatch
 	TypeBGZF
 	TypeBigEndian
 	TypeBigTIFF
@@ -785,6 +786,7 @@ const (
 	TypeCDAAudio
 	TypeCE
 	TypeCharacterDevice
+	TypeCMake
 	TypeCodestream
 	TypeCondaPackage
 	TypeContainer
@@ -793,8 +795,10 @@ const (
 	TypeCPP
 	TypeCRXVersion2
 	TypeCRXVersion3
+	TypeCSharp
 	TypeCSS
 	TypeCubaseProjectCPR
+	TypeDart
 	TypeDEX035
 	TypeDEX036
 	TypeDEX037
@@ -832,6 +836,7 @@ const (
 	TypeGIF87a
 	TypeGIF89a
 	TypeGo
+	TypeGraphQL
 	TypeHE
 	TypeHEIFImage
 	TypeILBMImage
@@ -850,6 +855,7 @@ const (
 	TypeKDM
 	TypeKerasModel
 	TypeKMZArchive
+	TypeKotlin
 	TypeKritaDocumentKRA
 	TypeKTX
 	TypeKTX2
@@ -857,6 +863,7 @@ const (
 	TypeLittleEndian
 	TypeLN
 	TypeLOVEGame
+	TypeLua
 	TypeLZ4Legacy
 	TypeLZMACompressed
 	TypeM2TS
@@ -907,6 +914,7 @@ const (
 	TypeNikonRAWNEF
 	TypeNpmPackageTarball
 	TypeNuGetPackageNUPKG
+	TypeObjectiveC
 	TypeOCIImageLayoutTar
 	TypeOldASCII
 	TypeOpenDocumentChartODC
@@ -940,6 +948,7 @@ const (
 	TypePGMASCII
 	TypePGMBinary
 	TypePHP
+	TypePowerShell
 	TypePPMASCII
 	TypePPMBinary
 	TypePSB
@@ -953,6 +962,7 @@ const (
 	TypeQCOW2
 	TypeQCPAudio
 	TypeQuickTimeMovie
+	TypeR
 	TypeRAR4
 	TypeRAR5
 	TypeReturnPath
@@ -961,6 +971,7 @@ const (
 	TypeRSAPrivateKey
 	TypeRuby
 	TypeRust
+	TypeScala
 	TypeSketchDocument
 	TypeSlackwarePackage
 	TypeSocket
@@ -973,12 +984,15 @@ const (
 	TypeSQL
 	TypeStreamVersion7
 	TypeStreamVersion8
+	TypeSwift
 	TypeSymbolicLink
 	TypeSZ
+	TypeTerraform
 	TypeTheoraVideo
 	TypeTOML
 	TypeTrue
 	TypeTS
+	TypeTypeScript
 	TypeUncompressed
 	TypeUTF8Text
 	TypeVagrantBox
@@ -1766,6 +1780,7 @@ var typeNames = [...]string{
 	TypeAVIVideo:                 "AVI Video",
 	TypeB4:                       "B4",
 	TypeBashScript:               "Bash Script",
+	TypeBatch:                    "Batch Script",
 	TypeBGZF:                     "BGZF",
 	TypeBigEndian:                "Big-Endian",
 	TypeBigTIFF:                  "BigTIFF",
@@ -1785,6 +1800,7 @@ var typeNames = [...]string{
 	TypeCDAAudio:                 "CD Audio",
 	TypeCE:                       "CE",
 	TypeCharacterDevice:          "Character Device",
+	TypeCMake:                    "CMake Script",
 	TypeCodestream:               "Codestream",
 	TypeCondaPackage:             "Conda Package",
 	TypeContainer:                "Container",
@@ -1793,8 +1809,10 @@ var typeNames = [...]string{
 	TypeCPP:                      "C++ Source",
 	TypeCRXVersion2:              "Version 2",
 	TypeCRXVersion3:              "Version 3",
+	TypeCSharp:                   "C# Source",
 	TypeCSS:                      "Cascading Style Sheets (CSS)",
 	TypeCubaseProjectCPR:         "Cubase Project (CPR)",
+	TypeDart:                     "Dart Source",
 	TypeDEX035:                   "DEX 035",
 	TypeDEX036:                   "DEX 036",
 	TypeDEX037:                   "DEX 037",
@@ -1832,6 +1850,7 @@ var typeNames = [...]string{
 	TypeGIF87a:                   "GIF87a",
 	TypeGIF89a:                   "GIF89a",
 	TypeGo:                       "Go Source",
+	TypeGraphQL:                  "GraphQL",
 	TypeHE:                       "HE",
 	TypeHEIFImage:                "HEIF Image",
 	TypeILBMImage:                "ILBM Image",
@@ -1850,6 +1869,7 @@ var typeNames = [...]string{
 	TypeKDM:                      "KDM",
 	TypeKerasModel:               "Keras Model",
 	TypeKMZArchive:               "KMZ Archive",
+	TypeKotlin:                   "Kotlin Source",
 	TypeKritaDocumentKRA:         "Krita Document (KRA)",
 	TypeKTX:                      "KTX",
 	TypeKTX2:                     "KTX2",
@@ -1857,6 +1877,7 @@ var typeNames = [...]string{
 	TypeLittleEndian:             "Little-Endian",
 	TypeLN:                       "LN",
 	TypeLOVEGame:                 "LÖVE Game",
+	TypeLua:                      "Lua Script",
 	TypeLZ4Legacy:                "LZ4 Legacy",
 	TypeLZMACompressed:           "LZMA Compressed",
 	TypeM2TS:                     "M2TS",
@@ -1907,6 +1928,7 @@ var typeNames = [...]string{
 	TypeNikonRAWNEF:                                     "Nikon RAW (NEF)",
 	TypeNpmPackageTarball:                               "npm Package Tarball",
 	TypeNuGetPackageNUPKG:                               "NuGet Package (NUPKG)",
+	TypeObjectiveC:                                      "Objective-C Source",
 	TypeOCIImageLayoutTar:                               "OCI Image Layout (TAR)",
 	TypeOldASCII:                                        "Old ASCII",
 	TypeOpenDocumentChartODC:                            "OpenDocument Chart (ODC)",
@@ -1940,6 +1962,7 @@ var typeNames = [...]string{
 	TypePGMASCII:                                        "PGM ASCII",
 	TypePGMBinary:                                       "PGM binary",
 	TypePHP:                                             "PHP Script",
+	TypePowerShell:                                      "PowerShell Script",
 	TypePPMASCII:                                        "PPM ASCII",
 	TypePPMBinary:                                       "PPM binary",
 	TypePSB:                                             "PSB",
@@ -1953,6 +1976,7 @@ var typeNames = [...]string{
 	TypeQCOW2:                                           "QCOW2",
 	TypeQCPAudio:                                        "QCP Audio",
 	TypeQuickTimeMovie:                                  "QuickTime Movie",
+	TypeR:                                               "R Script",
 	TypeRAR4:                                            "RAR4",
 	TypeRAR5:                                            "RAR5",
 	TypeReturnPath:                                      "Return Path",
@@ -1961,6 +1985,7 @@ var typeNames = [...]string{
 	TypeRSAPrivateKey:                                   "RSA Private Key",
 	TypeRuby:                                            "Ruby Script",
 	TypeRust:                                            "Rust Source",
+	TypeScala:                                           "Scala Source",
 	TypeSketchDocument:                                  "Sketch Document",
 	TypeSlackwarePackage:                                "Slackware Package",
 	TypeSocket:                                          "Socket",
@@ -1973,12 +1998,15 @@ var typeNames = [...]string{
 	TypeSQL:                                             "SQL Script",
 	TypeStreamVersion7:                                  "Stream Version 7",
 	TypeStreamVersion8:                                  "Stream Version 8",
+	TypeSwift:                                           "Swift Source",
 	TypeSymbolicLink:                                    "Symbolic Link",
 	TypeSZ:                                              "SZ",
+	TypeTerraform:                                       "Terraform Configuration",
 	TypeTheoraVideo:                                     "Theora Video",
 	TypeTOML:                                            "TOML Configuration",
 	TypeTrue:                                            "True",
 	TypeTS:                                              "TS",
+	TypeTypeScript:                                      "TypeScript Source",
 	TypeUncompressed:                                    "Uncompressed",
 	TypeUTF8Text:                                        "UTF-8 Text",
 	TypeVagrantBox:                                      "Vagrant Box",
