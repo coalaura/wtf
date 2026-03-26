@@ -3,7 +3,7 @@ package custom
 import (
 	"bytes"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 )
 
 func DetectTar(b types.Buffer) *types.Metadata {
@@ -27,7 +27,7 @@ func DetectTar(b types.Buffer) *types.Metadata {
 				case "PKG-INFO", "setup.py", "pyproject.toml":
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypePythonSourceDistributionSDist}
 				case "info/index.json":
-					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeCondaPackage}
+					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeCwtfPackage}
 				case ".PKGINFO":
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeArchLinuxPackage}
 				case "Vagrantfile":

@@ -67,7 +67,7 @@ jobs:
             EXT=""
           fi
 
-          OUT="build/onda_${{ github.ref_name }}_${GOOS}_${GOARCH}${EXT}"
+          OUT="build/wtf_${{ github.ref_name }}_${GOOS}_${GOARCH}${EXT}"
 
           go build \
             -trimpath \
@@ -78,7 +78,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: onda_${{ matrix.goos }}_${{ matrix.goarch }}
+          name: wtf_${{ matrix.goos }}_${{ matrix.goarch }}
           path: build/*
 
   release:

@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func init() {
 	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf0})

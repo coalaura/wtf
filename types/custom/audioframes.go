@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func DetectMPEGAudioFrames(b types.Buffer) *types.Metadata {
 	if b.Len() >= 6 && b[0] == 0x0b && b[1] == 0x77 {

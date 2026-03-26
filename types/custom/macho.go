@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func DetectMachO(b types.Buffer) *types.Metadata {
 	if b.Has(0, []byte{0xfe, 0xed, 0xfa, 0xce}) {

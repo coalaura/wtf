@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 var pycMagic = map[uint16]struct{}{
 	20121: {}, 50428: {}, 50823: {}, 60202: {}, 60717: {}, 62011: {},

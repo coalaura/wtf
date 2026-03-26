@@ -489,7 +489,7 @@ const (
 	KindPowerISODAA
 	KindPRTGDatabase
 	KindPSFFont
-	KindPsionDatabase
+	KindPsiwtftabase
 	KindPufferArchive
 	KindPuttyPrivateKey
 	KindPVRTexture
@@ -788,7 +788,7 @@ const (
 	TypeCharacterDevice
 	TypeCMake
 	TypeCodestream
-	TypeCondaPackage
+	TypeCwtfPackage
 	TypeContainer
 	TypeCorelDRAWDocumentCDR
 	TypeCOWD
@@ -1503,7 +1503,7 @@ var kindNames = [...]string{
 	KindPowerISODAA:                         "PowerISO DAA",
 	KindPRTGDatabase:                        "PRTG Database",
 	KindPSFFont:                             "PC Screen Font",
-	KindPsionDatabase:                       "Psion Database",
+	KindPsiwtftabase:                       "Psion Database",
 	KindPufferArchive:                       "Puffer Archive",
 	KindPuttyPrivateKey:                     "PuTTY Private Key",
 	KindPVRTexture:                          "PVR Texture",
@@ -1802,7 +1802,7 @@ var typeNames = [...]string{
 	TypeCharacterDevice:          "Character Device",
 	TypeCMake:                    "CMake Script",
 	TypeCodestream:               "Codestream",
-	TypeCondaPackage:             "Conda Package",
+	TypeCwtfPackage:             "Cwtf Package",
 	TypeContainer:                "Container",
 	TypeCorelDRAWDocumentCDR:     "CorelDRAW Document (CDR)",
 	TypeCOWD:                     "COWD",

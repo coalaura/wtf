@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func init() {
 	types.RegisterSignature(types.KindAcronisTrueImage, types.TypeB4, 0, []byte{0xb4, 0x6e, 0x68, 0x44})

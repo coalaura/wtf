@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"unicode/utf8"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 )
 
 func DetectText(b types.Buffer) *types.Metadata {

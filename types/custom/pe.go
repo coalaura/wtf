@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func DetectPE(b types.Buffer) *types.Metadata {
 	if !b.Has(0, []byte{'M', 'Z'}) {

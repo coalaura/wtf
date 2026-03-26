@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func init() {
 	types.RegisterSignature(types.KindAmigaDiskFile, types.TypeNone, 0, []byte("DOS\x00"))

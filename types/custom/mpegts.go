@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func DetectMPEGTransport(b types.Buffer) *types.Metadata {
 	if b.Len() >= 3*188 && b[0] == 0x47 && b[188] == 0x47 && b[376] == 0x47 {

@@ -972,7 +972,7 @@ func DetectTar(b Buffer) *Metadata {
 				case "PKG-INFO", "setup.py", "pyproject.toml":
 					return &Metadata{Kind: KindTARArchive, Type: TypePythonSourceDistributionSDist}
 				case "info/index.json":
-					return &Metadata{Kind: KindTARArchive, Type: TypeCondaPackage}
+					return &Metadata{Kind: KindTARArchive, Type: TypeCwtfPackage}
 				case ".PKGINFO":
 					return &Metadata{Kind: KindTARArchive, Type: TypeArchLinuxPackage}
 				case "Vagrantfile":

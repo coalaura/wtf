@@ -2417,7 +2417,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x4c:
 							if len(b) >= 8 && string(b[:8]) == "OPLDatab" {
-								return &Metadata{Kind: KindPsionDatabase}
+								return &Metadata{Kind: KindPsiwtftabase}
 							}
 						}
 					}

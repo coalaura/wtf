@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func init() {
 	types.RegisterSignature(types.KindAccessDataFTK, types.TypeNone, 0, []byte{0xa9, 0x0d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})

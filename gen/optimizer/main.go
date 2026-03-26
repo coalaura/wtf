@@ -222,7 +222,7 @@ func mergeCustomDetectors(dir string, outPath string) {
 
 		for _, imp := range node.Imports {
 			p := imp.Path.Value
-			if p != `"github.com/coalaura/onda/types"` && p != `"github.com/coalaura/onda/types/internal/custom"` {
+			if p != `"github.com/coalaura/wtf/types"` && p != `"github.com/coalaura/wtf/types/internal/custom"` {
 				importSet[p] = true
 			}
 		}

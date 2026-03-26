@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 	"github.com/coalaura/plain"
 )
 
@@ -24,8 +24,8 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		switch arg {
 		case "-h", "--help":
-			fmt.Println("onda - hardware-accelerated file sniffer")
-			fmt.Println("\nUsage: onda [flags] <file>")
+			fmt.Println("wtf - hardware-accelerated file sniffer")
+			fmt.Println("\nUsage: wtf [flags] <file>")
 			fmt.Println("\nFlags:")
 			fmt.Println("  -p, --porcelain  Print easily parseable output (tab-separated: Kind\\tType)")
 			fmt.Println("  -v, --version    Print version information")
@@ -33,7 +33,7 @@ func main() {
 
 			os.Exit(0)
 		case "-v", "--version":
-			fmt.Printf("onda %s\n", Version)
+			fmt.Printf("wtf %s\n", Version)
 
 			os.Exit(0)
 		case "-p", "--porcelain":
@@ -50,7 +50,7 @@ func main() {
 	}
 
 	if targetFile == "" {
-		log.Errorln("Usage: onda [flags] <file>")
+		log.Errorln("Usage: wtf [flags] <file>")
 
 		os.Exit(1)
 	}

@@ -1,16 +1,16 @@
 ![img](banner.png)
 
-onda is a tiny, "hardware-accelerated" file sniffer for Go.
+**wtf** (*what's this file*) is a tiny, "hardware-accelerated" file sniffer for Go.
 
 ## Blazing Fast
 
-onda achieves sub-millisecond detection times through extreme mechanical sympathy. Instead of allocating memory, iterating slices or using locks at runtime, onda uses a custom Ahead-of-Time (AOT) compiler to generate a deeply nested Radix Trie (Prefix Tree) in pure Go.
+wtf achieves sub-millisecond detection times through extreme mechanical sympathy. Instead of allocating memory, iterating slices or using locks at runtime, wtf uses a custom Ahead-of-Time (AOT) compiler to generate a deeply nested Radix Trie (Prefix Tree) in pure Go.
 
 The Go compiler flattens this tree into a highly optimized jump table in assembly. The CPU branch predictor routes file signatures in nanoseconds-resulting in **zero-allocation startup**, **zero runtime locks** and $O(1)$ time complexity for 95% of files.
 
 ```bash
-$ time onda onda
-onda
+$ time wtf wtf
+wtf
   └─ Executable and Linkable Format
      Type: ELF64 Little-Endian
 
@@ -31,22 +31,22 @@ sys 	0m0.002s
 
 ## Installation
 
-Prebuilt releases are available [here](https://github.com/coalaura/onda/releases). You can bootstrap **onda** with a single command. This script will detect your OS and CPU (`amd64`/`arm64`), download the correct binary and install it to `/usr/local/bin/onda`.
+Prebuilt releases are available [here](https://github.com/coalaura/wtf/releases). You can bootstrap **wtf** with a single command. This script will detect your OS and CPU (`amd64`/`arm64`), download the correct binary and install it to `/usr/local/bin/wtf`.
 
 ```bash
-curl -sL https://src.ws2.sh/onda/install.sh | sh
+curl -sL https://src.ws2.sh/wtf/install.sh | sh
 ```
 
 Or install it via Go:
 
 ```bash
-go install github.com/coalaura/onda@latest
+go install github.com/coalaura/wtf@latest
 ```
 
 ## Usage
 
 ```bash
-onda [flags] <file>
+wtf [flags] <file>
 ```
 
 **Flags:**
@@ -57,8 +57,8 @@ onda [flags] <file>
 **Examples:**
 
 ```bash
-onda sample.png
-onda --porcelain sample.png
+wtf sample.png
+wtf --porcelain sample.png
 ```
 
 ## Go package
@@ -69,7 +69,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 )
 
 func main() {
@@ -86,6 +86,6 @@ func main() {
 
 ## Coverage
 
-onda detects over **950+ file formats** across a broad set of categories, including archives, packages, filesystems, disk images, documents, databases, audio, video, images, fonts, executables, forensic artifacts and text/source files.
+**wtf** detects over **950+ file formats** across a broad set of categories, including archives, packages, filesystems, disk images, documents, databases, audio, video, images, fonts, executables, forensic artifacts and text/source files.
 
 The project intentionally does **not** maintain a giant hand-written format list in the README. Coverage changes frequently and the detector set keeps growing. The goal is broad, precise detection with minimal false positives, using fixed signatures wherever possible and custom structural detection only when a format cannot be represented cleanly otherwise.

@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func DetectPCX(b types.Buffer) *types.Metadata {
 	if b.Len() < 128 || b[0] != 0x0a {

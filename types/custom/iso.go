@@ -3,7 +3,7 @@ package custom
 import (
 	"slices"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 )
 
 func DetectISOBaseMedia(b types.Buffer) *types.Metadata {

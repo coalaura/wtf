@@ -3,7 +3,7 @@ package custom
 import (
 	"bytes"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 )
 
 var (

@@ -1,6 +1,6 @@
 package custom
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func DetectELF(b types.Buffer) *types.Metadata {
 	if !b.Has(0, []byte{0x7f, 'E', 'L', 'F'}) {

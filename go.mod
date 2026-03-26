@@ -1,4 +1,4 @@
-module github.com/coalaura/onda
+module github.com/coalaura/wtf
 
 go 1.26.1
 

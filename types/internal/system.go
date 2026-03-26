@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func init() {
 	types.RegisterSignature(types.KindAmigaHunkExecutable, types.TypeNone, 0, []byte{0x00, 0x00, 0x03, 0xf3})

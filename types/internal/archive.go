@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/coalaura/onda/types"
+import "github.com/coalaura/wtf/types"
 
 func init() {
 	types.RegisterSignature(types.Kind7ZipArchive, types.TypeNone, 0, []byte{'7', 'z', 0xbc, 0xaf, 0x27, 0x1c})

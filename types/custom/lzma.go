@@ -3,7 +3,7 @@ package custom
 import (
 	"encoding/binary"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 )
 
 func DetectLZMA(b types.Buffer) *types.Metadata {

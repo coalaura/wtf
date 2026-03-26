@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/coalaura/onda/types"
+	"github.com/coalaura/wtf/types"
 )
 
 func TestDetectJavaClassNotMachOUniversal(t *testing.T) {
