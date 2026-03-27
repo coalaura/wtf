@@ -650,10 +650,10 @@ func DetectOgg(b Buffer) *Metadata {
 }
 
 var (
-	oleWordDocument       = []byte{'W', 0, 'o', 0, 'r', 0, 'd', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0}
-	oleWorkbook           = []byte{'W', 0, 'o', 0, 'r', 0, 'k', 0, 'b', 0, 'o', 0, 'o', 0, 'k', 0}
-	oleBook               = []byte{'B', 0, 'o', 0, 'o', 0, 'k', 0}
-	olePowerPointDocument = []byte{'P', 0, 'o', 0, 'w', 0, 'e', 0, 'r', 0, 'P', 0, 'o', 0, 'i', 0, 'n', 0, 't', 0, ' ', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0}
+	oleWordDocument       = []byte{'W', 0, 'o', 0, 'r', 0, 'd', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0, 0, 0}
+	oleWorkbook           = []byte{'W', 0, 'o', 0, 'r', 0, 'k', 0, 'b', 0, 'o', 0, 'o', 0, 'k', 0, 0, 0}
+	oleBook               = []byte{'B', 0, 'o', 0, 'o', 0, 'k', 0, 0, 0}
+	olePowerPointDocument = []byte{'P', 0, 'o', 0, 'w', 0, 'e', 0, 'r', 0, 'P', 0, 'o', 0, 'i', 0, 'n', 0, 't', 0, ' ', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0, 0, 0}
 	oleMSI                = []byte{0x84, 0x10, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}
 	oleOutlookMessage     = []byte{'_', 0, '_', 0, 's', 0, 'u', 0, 'b', 0, 's', 0, 't', 0, 'g', 0, '1', 0, '.', 0, '0', 0, '_', 0}
 	oleVisioDocument      = []byte{'V', 0, 'i', 0, 's', 0, 'i', 0, 'o', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0}
@@ -666,38 +666,35 @@ func DetectOLE(b Buffer) *Metadata {
 		return nil
 	}
 
-	limit := min(b.Len(), 4096)
-	data := b[:limit]
-
-	if bytes.Contains(data, oleWordDocument) {
+	if bytes.Contains(b, oleWordDocument) || bytes.Contains(b, []byte("MSWordDoc")) || bytes.Contains(b, []byte("Word.Document.")) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftWordDocumentDOC}
 	}
 
-	if bytes.Contains(data, oleWorkbook) || bytes.Contains(data, oleBook) {
+	if bytes.Contains(b, oleWorkbook) || bytes.Contains(b, oleBook) || bytes.Contains(b, []byte("Excel.Sheet.")) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftExcelWorkbookXLS}
 	}
 
-	if bytes.Contains(data, olePowerPointDocument) {
+	if bytes.Contains(b, olePowerPointDocument) || bytes.Contains(b, []byte("PowerPoint.Show.")) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftPowerPointPresentationPPT}
 	}
 
-	if bytes.Contains(data, oleMSI) {
+	if bytes.Contains(b, oleMSI) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstallerMSI}
 	}
 
-	if bytes.Contains(data, oleOutlookMessage) {
+	if bytes.Contains(b, oleOutlookMessage) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftOutlookMessageMSG}
 	}
 
-	if bytes.Contains(data, oleVisioDocument) {
+	if bytes.Contains(b, oleVisioDocument) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftVisioDrawingVSD}
 	}
 
-	if bytes.Contains(data, oleProject) {
+	if bytes.Contains(b, oleProject) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftProjectDocumentMPP}
 	}
 
-	if bytes.Contains(data, olePublisher) {
+	if bytes.Contains(b, olePublisher) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftPublisherDocumentPUB}
 	}
 
@@ -1338,6 +1335,13 @@ func isLikelyTextUTF8(b Buffer) bool {
 	return printable*100/limit >= 90
 }
 
+type tiffByteOrder uint8
+
+const (
+	tiffLittleEndian tiffByteOrder = iota
+	tiffBigEndian
+)
+
 func DetectTIFFSubtypes(b Buffer) *Metadata {
 	if !isTIFFHeader(b) {
 		if b.Has(0, []byte{'I', 'I', 'R', 'O', 0x08, 0x00}) || b.Has(0, []byte{'M', 'M', 'O', 'R', 0x00, 0x00}) {
@@ -1355,7 +1359,39 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 		return &Metadata{Kind: KindCanonRAWImage}
 	}
 
-	limit := min(b.Len(), 1024)
+	order, ifd0, ok := tiffHeaderInfo(b)
+	if !ok {
+		if b.Has(0, []byte{'I', 'I'}) {
+			return &Metadata{Kind: KindTIFFImage, Type: TypeLittleEndian}
+		}
+
+		return &Metadata{Kind: KindTIFFImage, Type: TypeBigEndian}
+	}
+
+	if tiffHasTag(b, order, ifd0, 0xc612) {
+		return &Metadata{Kind: KindTIFFImage, Type: TypeAdobeDNGDNG}
+	}
+
+	makeValue, ok := tiffASCIIValueForTag(b, order, ifd0, 0x010f)
+	if ok {
+		if bytes.HasPrefix(makeValue, []byte("NIKON")) || bytes.HasPrefix(makeValue, []byte("Nikon")) {
+			return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAWNEF}
+		}
+
+		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
+			return &Metadata{Kind: KindTIFFImage, Type: TypePentaxRAWPEF}
+		}
+
+		if bytes.HasPrefix(makeValue, []byte("SONY")) {
+			if bytes.Contains(makeValue, []byte("SR2")) {
+				return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAWSR2}
+			}
+
+			return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAWARW}
+		}
+	}
+
+	limit := min(b.Len(), 4096)
 	data := b[:limit]
 
 	if bytes.Contains(data, []byte("Nikon")) {
@@ -1383,6 +1419,130 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	return &Metadata{Kind: KindTIFFImage, Type: TypeBigEndian}
+}
+
+func tiffHeaderInfo(b Buffer) (tiffByteOrder, uint32, bool) {
+	if b.Has(0, []byte{'I', 'I', 42, 0}) {
+		ifd0, ok := b.U32LE(4)
+		if !ok || ifd0 >= uint32(b.Len()) {
+			return 0, 0, false
+		}
+
+		return tiffLittleEndian, ifd0, true
+	}
+
+	if b.Has(0, []byte{'M', 'M', 0, 42}) {
+		ifd0, ok := b.U32BE(4)
+		if !ok || ifd0 >= uint32(b.Len()) {
+			return 0, 0, false
+		}
+
+		return tiffBigEndian, ifd0, true
+	}
+
+	return 0, 0, false
+}
+
+func tiffHasTag(b Buffer, order tiffByteOrder, ifdOffset uint32, tag uint16) bool {
+	count, ok := tiffU16(b, order, int(ifdOffset))
+	if !ok {
+		return false
+	}
+
+	entryBase := int(ifdOffset) + 2
+	entryEnd := entryBase + int(count)*12
+	if entryBase < 0 || entryEnd > b.Len() {
+		return false
+	}
+
+	for i := range int(count) {
+		entry := entryBase + i*12
+
+		currentTag, ok := tiffU16(b, order, entry)
+		if !ok {
+			return false
+		}
+
+		if currentTag == tag {
+			return true
+		}
+	}
+
+	return false
+}
+
+func tiffASCIIValueForTag(b Buffer, order tiffByteOrder, ifdOffset uint32, tag uint16) ([]byte, bool) {
+	count, ok := tiffU16(b, order, int(ifdOffset))
+	if !ok {
+		return nil, false
+	}
+
+	entryBase := int(ifdOffset) + 2
+	entryEnd := entryBase + int(count)*12
+
+	if entryBase < 0 || entryEnd > b.Len() {
+		return nil, false
+	}
+
+	for i := range int(count) {
+		entry := entryBase + i*12
+
+		currentTag, ok := tiffU16(b, order, entry)
+		if !ok || currentTag != tag {
+			continue
+		}
+
+		fieldType, ok := tiffU16(b, order, entry+2)
+		if !ok || fieldType != 2 {
+			return nil, false
+		}
+
+		valueCount, ok := tiffU32(b, order, entry+4)
+		if !ok || valueCount == 0 {
+			return nil, false
+		}
+
+		if valueCount <= 4 {
+			end := entry + 8 + int(valueCount)
+			if end > b.Len() {
+				return nil, false
+			}
+
+			return bytes.TrimRight(b[entry+8:end], "\x00"), true
+		}
+
+		valueOffset, ok := tiffU32(b, order, entry+8)
+		if !ok {
+			return nil, false
+		}
+
+		start := int(valueOffset)
+		end := start + int(valueCount)
+
+		if start < 0 || end > b.Len() {
+			return nil, false
+		}
+
+		return bytes.TrimRight(b[start:end], "\x00"), true
+	}
+
+	return nil, false
+}
+
+func tiffU16(b Buffer, order tiffByteOrder, offset int) (uint16, bool) {
+	if order == tiffLittleEndian {
+		return b.U16LE(offset)
+	}
+
+	return b.U16BE(offset)
+}
+
+func tiffU32(b Buffer, order tiffByteOrder, offset int) (uint32, bool) {
+	if order == tiffLittleEndian {
+		return b.U32LE(offset)
+	}
+
+	return b.U32BE(offset)
 }
 
 func isTIFFHeader(b Buffer) bool {

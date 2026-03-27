@@ -6,6 +6,82 @@ func detectOptimized(b Buffer) *Metadata {
 		return nil
 	}
 
+	if meta := DetectAppleDiskImage(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectEBML(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectELF(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectExt(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectFAT(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectISOBaseMedia(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectMPEGAudioFrames(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectMachO(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectNetpbm(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectOLE(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectOgg(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectPE(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectPKCS12(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectPYC(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectSQLiteSHM(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectTIFFSubtypes(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectTar(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectTorrent(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectZIPContainer(b); meta != nil {
+		return meta
+	}
+
 	if len(b) > 0 {
 		switch b[0] {
 		case 0x00:
@@ -1874,9 +1950,6 @@ func detectOptimized(b Buffer) *Metadata {
 			if len(b) > 1 {
 				switch b[1] {
 				case 0x44:
-					if len(b) >= 7 && string(b[:7]) == "ID3\x03\x00\x00\x00" {
-						return &Metadata{Kind: KindSprintMusicStore}
-					}
 					if len(b) >= 3 && string(b[:3]) == "ID3" {
 						return &Metadata{Kind: KindMPEGAudio, Type: TypeMP3ID3Tagged}
 					}
@@ -4867,12 +4940,32 @@ func detectOptimized(b Buffer) *Metadata {
 		return &Metadata{Kind: KindBtrfsFilesystem}
 	}
 
-	return nil
-}
+	if meta := DetectJSON(b); meta != nil {
+		return meta
+	}
 
-func detectOptimizedWeak(b Buffer) *Metadata {
-	if len(b) == 0 {
-		return nil
+	if meta := DetectLZMA(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectMP3(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectMPEGTransport(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectPCX(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectXMLSubtypes(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectZlib(b); meta != nil {
+		return meta
 	}
 
 	if len(b) > 0 {
@@ -4897,36 +4990,9 @@ func detectOptimizedWeak(b Buffer) *Metadata {
 		}
 	}
 
-	return nil
-}
+	if meta := DetectText(b); meta != nil {
+		return meta
+	}
 
-var detectors = [...]Detector{
-	DetectFunc(DetectAppleDiskImage),
-	DetectFunc(DetectEBML),
-	DetectFunc(DetectELF),
-	DetectFunc(DetectExt),
-	DetectFunc(DetectFAT),
-	DetectFunc(DetectISOBaseMedia),
-	DetectFunc(DetectMPEGAudioFrames),
-	DetectFunc(DetectMachO),
-	DetectFunc(DetectNetpbm),
-	DetectFunc(DetectOLE),
-	DetectFunc(DetectOgg),
-	DetectFunc(DetectPE),
-	DetectFunc(DetectPKCS12),
-	DetectFunc(DetectPYC),
-	DetectFunc(DetectSQLiteSHM),
-	DetectFunc(DetectTIFFSubtypes),
-	DetectFunc(DetectTar),
-	DetectFunc(DetectTorrent),
-	DetectFunc(DetectZIPContainer),
-	DetectFunc(detectOptimizedWeak),
-	DetectFunc(DetectJSON),
-	DetectFunc(DetectLZMA),
-	DetectFunc(DetectMP3),
-	DetectFunc(DetectMPEGTransport),
-	DetectFunc(DetectPCX),
-	DetectFunc(DetectXMLSubtypes),
-	DetectFunc(DetectZlib),
-	DetectFunc(DetectText),
+	return nil
 }

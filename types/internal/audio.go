@@ -65,7 +65,6 @@ func init() {
 	types.RegisterSignature(types.KindSonyCompressedVoice, types.TypeNone, 0, []byte("MS_VOICE"))
 	types.RegisterSignature(types.KindSonyOpenMG, types.TypeNone, 0, []byte("ea3\x03"))
 	types.RegisterSignature(types.KindSonyWave64Audio, types.TypeNone, 0, []byte("riff\x2e\x91\xcf\x11\xa5\xd6\x28\xdb\x04\xc1\x00\x00"))
-	types.RegisterSignature(types.KindSprintMusicStore, types.TypeNone, 0, []byte("ID3\x03\x00\x00\x00"))
 	types.RegisterSignature(types.KindTAKAudio, types.TypeNone, 0, []byte("tBaK"))
 	types.RegisterSignature(types.KindTTAAudio, types.TypeNone, 0, []byte("TTA1"))
 	types.RegisterSignature(types.KindUndergroundAudio, types.TypeNone, 0, []byte("SCHl"))

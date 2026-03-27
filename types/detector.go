@@ -21,13 +21,5 @@ func Detect(name string, data []byte) (*Metadata, error) {
 		return meta, nil
 	}
 
-	for _, d := range detectors {
-		if meta := d.Detect(buf); meta != nil {
-			meta.File = name
-
-			return meta, nil
-		}
-	}
-
 	return nil, ErrUnknownFormat
 }

@@ -567,7 +567,6 @@ const (
 	KindSonyWave64Audio
 	KindSourceEngineBSP
 	KindSpeedtouchFirmware
-	KindSprintMusicStore
 	KindSPSSData
 	KindSPSSPortableData
 	KindSPSSTemplate
@@ -1580,7 +1579,6 @@ var kindNames = [...]string{
 	KindSonyWave64Audio:                     "Sony Wave64 Audio",
 	KindSourceEngineBSP:                     "Source Engine BSP",
 	KindSpeedtouchFirmware:                  "Speedtouch Firmware",
-	KindSprintMusicStore:                    "Sprint Music Store",
 	KindSPSSData:                            "SPSS Data",
 	KindSPSSPortableData:                    "SPSS Portable Data",
 	KindSPSSTemplate:                        "SPSS Template",
