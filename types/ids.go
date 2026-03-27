@@ -7,6 +7,7 @@ const (
 	KindUnknown KindID = iota
 	Kind1PasswordCloudKeychain
 	Kind1PasswordKeychain
+	Kind1PasswordKeychainCloud
 	Kind7ZipArchive
 	KindAACAudio
 	KindAccessDataFTK
@@ -229,7 +230,6 @@ const (
 	KindGoogleDriveDrawing
 	KindGoogleEarthETA
 	KindGoogleEarthPlacemark
-	KindGPGPublicKeyring
 	KindGPSExchangeFormat
 	KindGRIBData
 	KindGUIDPartitionTable
@@ -429,7 +429,6 @@ const (
 	KindOggContainer
 	KindOLECompoundDocument
 	KindOlympusRAWImage
-	KindOnePasswordKeychain
 	KindOpenEXRImage
 	KindOpenSSHPrivateKey
 	KindOpenTypeFont
@@ -671,7 +670,6 @@ const (
 	KindWin9xPassword
 	KindWin9xPrinterSpool
 	KindWin9xRegistryHive
-	KindWindowsApplicationLog
 	KindWindowsCalendar
 	KindWindowsEventLog
 	KindWindowsEventViewer
@@ -788,7 +786,6 @@ const (
 	TypeCharacterDevice
 	TypeCMake
 	TypeCodestream
-	TypeCwtfPackage
 	TypeContainer
 	TypeCorelDRAWDocumentCDR
 	TypeCOWD
@@ -798,6 +795,7 @@ const (
 	TypeCSharp
 	TypeCSS
 	TypeCubaseProjectCPR
+	TypeCwtfPackage
 	TypeDart
 	TypeDEX035
 	TypeDEX036
@@ -902,6 +900,7 @@ const (
 	TypeMP4Video
 	TypeMPEG12Video
 	TypeMPEG4AudioM4AFamily
+	TypeMPEGLayer1
 	TypeMPEGLayer2
 	TypeMPEGLayer3
 	TypeMSIXPackage
@@ -1021,6 +1020,7 @@ var kindNames = [...]string{
 	KindUnknown:                             "Unknown",
 	Kind1PasswordCloudKeychain:              "1Password Cloud Keychain",
 	Kind1PasswordKeychain:                   "1Password Keychain",
+	Kind1PasswordKeychainCloud:              "1Password Keychain (Cloud)",
 	Kind7ZipArchive:                         "7-Zip Archive",
 	KindAACAudio:                            "AAC Audio",
 	KindAccessDataFTK:                       "AccessData FTK Evidence",
@@ -1243,7 +1243,6 @@ var kindNames = [...]string{
 	KindGoogleDriveDrawing:                  "Google Drive Drawing",
 	KindGoogleEarthETA:                      "Google Earth ETA",
 	KindGoogleEarthPlacemark:                "Google Earth Placemark",
-	KindGPGPublicKeyring:                    "GPG Public Keyring",
 	KindGPSExchangeFormat:                   "GPS Exchange Format",
 	KindGRIBData:                            "GRIB Data",
 	KindGUIDPartitionTable:                  "GUID Partition Table",
@@ -1390,7 +1389,7 @@ var kindNames = [...]string{
 	KindMozillaArchive:                      "Mozilla Archive (MAR)",
 	KindMPEG2TransportStream:                "MPEG Transport Stream",
 	KindMPEGAudio:                           "MPEG Audio",
-	KindMPEGAudioFrame:                      "MPEG Audio",
+	KindMPEGAudioFrame:                      "MPEG Audio Frame",
 	KindMPEGProgramStream:                   "MPEG Program Stream",
 	KindMPEGTransportStream:                 "MPEG Transport Stream",
 	KindMPEGVideo:                           "MPEG Video",
@@ -1443,7 +1442,6 @@ var kindNames = [...]string{
 	KindOggContainer:                        "Ogg Container",
 	KindOLECompoundDocument:                 "OLE Compound Document",
 	KindOlympusRAWImage:                     "Olympus RAW Image",
-	KindOnePasswordKeychain:                 "1Password Keychain",
 	KindOpenEXRImage:                        "OpenEXR Image",
 	KindOpenSSHPrivateKey:                   "OpenSSH Private Key",
 	KindOpenTypeFont:                        "OpenType Font",
@@ -1503,7 +1501,7 @@ var kindNames = [...]string{
 	KindPowerISODAA:                         "PowerISO DAA",
 	KindPRTGDatabase:                        "PRTG Database",
 	KindPSFFont:                             "PC Screen Font",
-	KindPsiwtftabase:                       "Psion Database",
+	KindPsiwtftabase:                        "Psion Database",
 	KindPufferArchive:                       "Puffer Archive",
 	KindPuttyPrivateKey:                     "PuTTY Private Key",
 	KindPVRTexture:                          "PVR Texture",
@@ -1685,7 +1683,6 @@ var kindNames = [...]string{
 	KindWin9xPassword:                       "Win9x Password",
 	KindWin9xPrinterSpool:                   "Win9x Printer Spool",
 	KindWin9xRegistryHive:                   "Win9x Registry Hive",
-	KindWindowsApplicationLog:               "Windows Application Log",
 	KindWindowsCalendar:                     "Windows Calendar",
 	KindWindowsEventLog:                     "Windows Event Log",
 	KindWindowsEventViewer:                  "Windows Event Viewer",
@@ -1802,7 +1799,6 @@ var typeNames = [...]string{
 	TypeCharacterDevice:          "Character Device",
 	TypeCMake:                    "CMake Script",
 	TypeCodestream:               "Codestream",
-	TypeCwtfPackage:             "Cwtf Package",
 	TypeContainer:                "Container",
 	TypeCorelDRAWDocumentCDR:     "CorelDRAW Document (CDR)",
 	TypeCOWD:                     "COWD",
@@ -1812,6 +1808,7 @@ var typeNames = [...]string{
 	TypeCSharp:                   "C# Source",
 	TypeCSS:                      "Cascading Style Sheets (CSS)",
 	TypeCubaseProjectCPR:         "Cubase Project (CPR)",
+	TypeCwtfPackage:              "Cwtf Package",
 	TypeDart:                     "Dart Source",
 	TypeDEX035:                   "DEX 035",
 	TypeDEX036:                   "DEX 036",
@@ -1916,6 +1913,7 @@ var typeNames = [...]string{
 	TypeMP4Video:                                        "MP4 Video",
 	TypeMPEG12Video:                                     "MPEG-1/2 Video",
 	TypeMPEG4AudioM4AFamily:                             "MPEG-4 Audio (M4A Family)",
+	TypeMPEGLayer1:                                      "MPEG Layer I",
 	TypeMPEGLayer2:                                      "MPEG Layer II",
 	TypeMPEGLayer3:                                      "MPEG Layer III",
 	TypeMSIXPackage:                                     "MSIX Package",

@@ -124,7 +124,7 @@ func hasISOBrandPrefix(b types.Buffer, majorOffset int, compatOffset int, boxEnd
 		}
 	}
 
-	for off := compatOffset; off+3 <= boxEnd && off+4 <= b.Len(); off += 4 {
+	for off := compatOffset; off+4 <= boxEnd && off+4 <= b.Len(); off += 4 {
 		if slices.Contains(prefixes, string(b[off:off+3])) {
 			return true
 		}

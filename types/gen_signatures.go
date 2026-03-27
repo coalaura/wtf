@@ -2003,9 +2003,6 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x44:
 					if len(b) >= 4 && string(b[:4]) == "KDMV" {
-						return &Metadata{Kind: KindVMwareDiskImage, Type: TypeVMDK}
-					}
-					if len(b) >= 3 && string(b[:3]) == "KDM" {
 						return &Metadata{Kind: KindVMwareDiskImage, Type: TypeKDM}
 					}
 				case 0x47:
@@ -2102,7 +2099,7 @@ func detectOptimized(b Buffer) *Metadata {
 								return &Metadata{Kind: KindDeluxePaintAnimation}
 							}
 						case 0x4b:
-							if len(b) >= 6 && string(b[:6]) == "LPKSHR" {
+							if len(b) >= 8 && string(b[:8]) == "LPKSHHRH" {
 								return &Metadata{Kind: KindSystemdJournal}
 							}
 						}
@@ -2776,6 +2773,9 @@ func detectOptimized(b Buffer) *Metadata {
 							if b.HasMask(0, "RIFF\x00\x00\x00\x00ACON", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
 								return &Metadata{Kind: KindRIFFContainer, Type: TypeWindowsAnimatedCursor}
 							}
+							if b.HasMask(0, "RIFF\x00\x00\x00\x00acid", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
+								return &Metadata{Kind: KindSonicFoundryAcid}
+							}
 							if len(b) >= 4 && string(b[:4]) == "RIFF" {
 								return &Metadata{Kind: KindRIFFContainer}
 							}
@@ -3129,6 +3129,10 @@ func detectOptimized(b Buffer) *Metadata {
 				case 0x4d:
 					if len(b) > 2 {
 						switch b[2] {
+						case 0x44:
+							if len(b) >= 4 && string(b[:4]) == "VMDK" {
+								return &Metadata{Kind: KindVMwareDiskImage, Type: TypeVMDK}
+							}
 						case 0x53:
 							if len(b) > 3 {
 								switch b[3] {
@@ -3678,9 +3682,6 @@ func detectOptimized(b Buffer) *Metadata {
 					if len(b) >= 16 && string(b[:16]) == "riff.\x91\xcf\x11\xa5\xd6(\xdb\x04\xc1\x00\x00" {
 						return &Metadata{Kind: KindSonyWave64Audio}
 					}
-					if len(b) >= 4 && string(b[:4]) == "riff" {
-						return &Metadata{Kind: KindSonicFoundryAcid}
-					}
 				case 0x6f:
 					if len(b) >= 4 && string(b[:4]) == "root" {
 						return &Metadata{Kind: KindROOTData}
@@ -3844,10 +3845,6 @@ func detectOptimized(b Buffer) *Metadata {
 		case 0x7b:
 			if len(b) > 1 {
 				switch b[1] {
-				case 0x0d:
-					if len(b) >= 5 && string(b[:5]) == "{\r\no " {
-						return &Metadata{Kind: KindWindowsApplicationLog}
-					}
 				case 0x22:
 					if len(b) >= 16 && string(b[:16]) == "{\"url\": \"https:/" {
 						return &Metadata{Kind: KindGoogleDriveDrawing}
@@ -3883,9 +3880,6 @@ func detectOptimized(b Buffer) *Metadata {
 						return &Metadata{Kind: KindEasyStreetDraw}
 					}
 				case 0x74:
-					if len(b) >= 9 && string(b[:9]) == "~t,\x01Pp\x02MR" {
-						return &Metadata{Kind: KindDigitalWatchdogAudio}
-					}
 					if len(b) >= 9 && string(b[:9]) == "~t,\x01Pp\x02MR" {
 						return &Metadata{Kind: KindDigitalWatchdogAudio}
 					}

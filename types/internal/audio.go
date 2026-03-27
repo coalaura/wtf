@@ -22,7 +22,6 @@ func init() {
 	types.RegisterSignature(types.KindCsoundMusic, types.TypeNone, 0, []byte("<CsoundSynthesiz"))
 	types.RegisterSignature(types.KindDigitalSpeechStandard, types.TypeNone, 0, []byte{0x02, 0x64, 0x73, 0x73})
 	types.RegisterSignature(types.KindDigitalSpeechStandard, types.TypeNone, 0, []byte{0x03, 0x64, 0x73, 0x73})
-	types.RegisterSignature(types.KindDigitalWatchdogAudio, types.TypeNone, 0, []byte("~t,\x01Pp\x02MR"))
 	types.RegisterSignature(types.KindDigitalWatchdogAudio, types.TypeNone, 0, []byte{0x7e, 0x74, 0x2c, 0x01, 0x50, 0x70, 0x02, 0x4d, 0x52})
 	types.RegisterSignature(types.KindDreamcastAudio, types.TypeNone, 0, []byte{0x80, 0x00, 0x00, 0x20, 0x03, 0x12, 0x04})
 	types.RegisterSignature(types.KindDSFAudio, types.TypeNone, 0, []byte("DSD "))
@@ -63,7 +62,6 @@ func init() {
 	types.RegisterSignature(types.KindShortenAudio, types.TypeNone, 0, []byte("ajkg"))
 	types.RegisterSignature(types.KindSkypeData, types.TypeNone, 0, []byte("#!SILK\n"))
 	types.RegisterSignature(types.KindSNESSPC, types.TypeNone, 0, []byte("SNES-SPC700 Sound File Data"))
-	types.RegisterSignature(types.KindSonicFoundryAcid, types.TypeNone, 0, []byte("riff"))
 	types.RegisterSignature(types.KindSonyCompressedVoice, types.TypeNone, 0, []byte("MS_VOICE"))
 	types.RegisterSignature(types.KindSonyOpenMG, types.TypeNone, 0, []byte("ea3\x03"))
 	types.RegisterSignature(types.KindSonyWave64Audio, types.TypeNone, 0, []byte("riff\x2e\x91\xcf\x11\xa5\xd6\x28\xdb\x04\xc1\x00\x00"))
@@ -90,4 +88,5 @@ func init() {
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeRIFFMIDI, 0, []byte("RIFF\x00\x00\x00\x00RMID"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeSoundFont2, 0, []byte("RIFF\x00\x00\x00\x00sfbk"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeWAVAudio, 0, []byte("RIFF\x00\x00\x00\x00WAVE"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
+	types.RegisterMaskedSignature(types.KindSonicFoundryAcid, types.TypeNone, 0, []byte("RIFF\x00\x00\x00\x00acid"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 }

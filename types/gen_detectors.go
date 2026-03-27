@@ -321,7 +321,7 @@ func hasISOBrandPrefix(b Buffer, majorOffset int, compatOffset int, boxEnd int, 
 		}
 	}
 
-	for off := compatOffset; off+3 <= boxEnd && off+4 <= b.Len(); off += 4 {
+	for off := compatOffset; off+4 <= boxEnd && off+4 <= b.Len(); off += 4 {
 		if slices.Contains(prefixes, string(b[off:off+3])) {
 			return true
 		}
@@ -535,12 +535,16 @@ func DetectMP3(b Buffer) *Metadata {
 		return nil
 	}
 
+	if layer == 1 {
+		return &Metadata{Kind: KindMPEGAudio, Type: TypeMPEGLayer3, Confidence: ConfidenceMedium}
+	}
+
 	if layer == 2 {
 		return &Metadata{Kind: KindMPEGAudio, Type: TypeMPEGLayer2, Confidence: ConfidenceMedium}
 	}
 
-	if layer == 1 {
-		return &Metadata{Kind: KindMPEGAudio, Type: TypeMP3, Confidence: ConfidenceMedium}
+	if layer == 3 {
+		return &Metadata{Kind: KindMPEGAudio, Type: TypeMPEGLayer1, Confidence: ConfidenceMedium}
 	}
 
 	return nil

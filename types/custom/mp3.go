@@ -20,12 +20,16 @@ func DetectMP3(b types.Buffer) *types.Metadata {
 		return nil
 	}
 
+	if layer == 1 {
+		return &types.Metadata{Kind: types.KindMPEGAudio, Type: types.TypeMPEGLayer3, Confidence: types.ConfidenceMedium}
+	}
+
 	if layer == 2 {
 		return &types.Metadata{Kind: types.KindMPEGAudio, Type: types.TypeMPEGLayer2, Confidence: types.ConfidenceMedium}
 	}
 
-	if layer == 1 {
-		return &types.Metadata{Kind: types.KindMPEGAudio, Type: types.TypeMP3, Confidence: types.ConfidenceMedium}
+	if layer == 3 {
+		return &types.Metadata{Kind: types.KindMPEGAudio, Type: types.TypeMPEGLayer1, Confidence: types.ConfidenceMedium}
 	}
 
 	return nil
