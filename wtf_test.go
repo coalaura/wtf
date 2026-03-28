@@ -45,6 +45,8 @@ func TestDetectFixtures(t *testing.T) {
 		{file: "ogg.ogg", kind: types.KindOggContainer, typ: types.TypeVorbisAudio},
 		{file: "open-doc.odt", kind: types.KindZIPArchive, typ: types.TypeOpenDocumentTextODT},
 		{file: "open-spread.ods", kind: types.KindZIPArchive, typ: types.TypeOpenDocumentSpreadsheetODS},
+		{file: "pcap.pcap", kind: types.KindPCAPCapture, typ: types.TypeLittleEndian},
+		{file: "pcapng.pcapng", kind: types.KindPCAPNGCapture, typ: types.TypeNone},
 		{file: "pcx.pcx", kind: types.KindPCXImage, typ: types.TypeNone},
 		{file: "pdf.pdf", kind: types.KindPDFDocument, typ: types.TypeNone},
 		{file: "pe_x64", kind: types.KindPortableExecutable, typ: types.TypePE32PlusX8664},

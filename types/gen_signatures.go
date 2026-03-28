@@ -50,10 +50,6 @@ func detectOptimized(b Buffer) *Metadata {
 		return meta
 	}
 
-	if meta := DetectPCAPNG(b); meta != nil {
-		return meta
-	}
-
 	if meta := DetectPE(b); meta != nil {
 		return meta
 	}
@@ -470,8 +466,20 @@ func detectOptimized(b Buffer) *Metadata {
 				}
 			}
 		case 0x0a:
-			if len(b) >= 16 && string(b[:16]) == "\n\x16org.bitcoin.pr" {
-				return &Metadata{Kind: KindMultiBitWallet}
+			if len(b) > 1 {
+				switch b[1] {
+				case 0x0d:
+					if b.HasMask(0, "\n\r\r\n\x00\x00\x00\x00\x1a+<M", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
+						return &Metadata{Kind: KindPCAPNGCapture}
+					}
+					if b.HasMask(0, "\n\r\r\n\x00\x00\x00\x00M<+\x1a", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
+						return &Metadata{Kind: KindPCAPNGCapture}
+					}
+				case 0x16:
+					if len(b) >= 16 && string(b[:16]) == "\n\x16org.bitcoin.pr" {
+						return &Metadata{Kind: KindMultiBitWallet}
+					}
+				}
 			}
 		case 0x0c:
 			if len(b) > 1 {
@@ -4856,6 +4864,69 @@ func detectOptimized(b Buffer) *Metadata {
 
 	if len(b) >= 1036 && string(b[1032:1036]) == "\x02\t\x01\x12" {
 		return &Metadata{Kind: KindNILFS2Filesystem}
+	}
+
+	if len(b) > 1080 {
+		switch b[1080] {
+		case 0x31:
+			if len(b) >= 1084 && string(b[1080:1084]) == "16CN" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		case 0x32:
+			if len(b) >= 1084 && string(b[1080:1084]) == "2CHN" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		case 0x33:
+			if len(b) >= 1084 && string(b[1080:1084]) == "32CN" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		case 0x34:
+			if len(b) >= 1084 && string(b[1080:1084]) == "4CHN" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		case 0x36:
+			if len(b) >= 1084 && string(b[1080:1084]) == "6CHN" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		case 0x38:
+			if len(b) >= 1084 && string(b[1080:1084]) == "8CHN" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		case 0x43:
+			if len(b) >= 1084 && string(b[1080:1084]) == "CD81" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		case 0x46:
+			if len(b) > 1083 {
+				switch b[1083] {
+				case 0x34:
+					if len(b) >= 1084 && string(b[1080:1084]) == "FLT4" {
+						return &Metadata{Kind: KindProTrackerModule}
+					}
+				case 0x38:
+					if len(b) >= 1084 && string(b[1080:1084]) == "FLT8" {
+						return &Metadata{Kind: KindProTrackerModule}
+					}
+				}
+			}
+		case 0x4d:
+			if len(b) > 1081 {
+				switch b[1081] {
+				case 0x21:
+					if len(b) >= 1084 && string(b[1080:1084]) == "M!K!" {
+						return &Metadata{Kind: KindProTrackerModule}
+					}
+				case 0x2e:
+					if len(b) >= 1084 && string(b[1080:1084]) == "M.K." {
+						return &Metadata{Kind: KindProTrackerModule}
+					}
+				}
+			}
+		case 0x4f:
+			if len(b) >= 1084 && string(b[1080:1084]) == "OKTA" {
+				return &Metadata{Kind: KindProTrackerModule}
+			}
+		}
 	}
 
 	if len(b) >= 4112 && string(b[4096:4112]) == "ƅs\xf6N\x1aEʂe\xf5\x7fH\xbam\x81" {

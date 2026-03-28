@@ -486,6 +486,7 @@ const (
 	KindPowerBASICDebugger
 	KindPowerBuilderIDE
 	KindPowerISODAA
+	KindProTrackerModule
 	KindPRTGDatabase
 	KindPSFFont
 	KindPsiwtftabase
@@ -1500,6 +1501,7 @@ var kindNames = [...]string{
 	KindPowerBASICDebugger:                  "PowerBASIC Debugger",
 	KindPowerBuilderIDE:                     "PowerBuilder IDE",
 	KindPowerISODAA:                         "PowerISO DAA",
+	KindProTrackerModule:                    "ProTracker Module",
 	KindPRTGDatabase:                        "PRTG Database",
 	KindPSFFont:                             "PC Screen Font",
 	KindPsiwtftabase:                        "Psion Database",
