@@ -50,6 +50,10 @@ func detectOptimized(b Buffer) *Metadata {
 		return meta
 	}
 
+	if meta := DetectPCAPNG(b); meta != nil {
+		return meta
+	}
+
 	if meta := DetectPE(b); meta != nil {
 		return meta
 	}
@@ -466,17 +470,8 @@ func detectOptimized(b Buffer) *Metadata {
 				}
 			}
 		case 0x0a:
-			if len(b) > 1 {
-				switch b[1] {
-				case 0x0d:
-					if len(b) >= 4 && string(b[:4]) == "\n\r\r\n" {
-						return &Metadata{Kind: KindPCAPNGCapture}
-					}
-				case 0x16:
-					if len(b) >= 16 && string(b[:16]) == "\n\x16org.bitcoin.pr" {
-						return &Metadata{Kind: KindMultiBitWallet}
-					}
-				}
+			if len(b) >= 16 && string(b[:16]) == "\n\x16org.bitcoin.pr" {
+				return &Metadata{Kind: KindMultiBitWallet}
 			}
 		case 0x0c:
 			if len(b) > 1 {
@@ -4627,35 +4622,6 @@ func detectOptimized(b Buffer) *Metadata {
 		case 0x54:
 			if len(b) >= 8 && string(b[4:8]) == "TFL3" {
 				return &Metadata{Kind: KindTensorFlowLiteModel}
-			}
-		case 0x66:
-			if len(b) >= 8 && string(b[4:8]) == "free" {
-				return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
-			}
-		case 0x6d:
-			if len(b) > 5 {
-				switch b[5] {
-				case 0x64:
-					if len(b) >= 8 && string(b[4:8]) == "mdat" {
-						return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
-					}
-				case 0x6f:
-					if len(b) >= 8 && string(b[4:8]) == "moov" {
-						return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
-					}
-				}
-			}
-		case 0x70:
-			if len(b) >= 8 && string(b[4:8]) == "pnot" {
-				return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
-			}
-		case 0x73:
-			if len(b) >= 8 && string(b[4:8]) == "skip" {
-				return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
-			}
-		case 0x77:
-			if len(b) >= 8 && string(b[4:8]) == "wide" {
-				return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
 			}
 		}
 	}

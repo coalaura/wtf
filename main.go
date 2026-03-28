@@ -19,6 +19,11 @@ var (
 
 const MaxReadSize = 128 * 1024
 
+type kindGroup struct {
+	kind  string
+	types []string
+}
+
 func main() {
 	var (
 		targetFile string
@@ -29,17 +34,22 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		switch arg {
 		case "-h", "--help":
-			fmt.Println("wtf - hardware-accelerated file sniffer")
-			fmt.Println("\nUsage: wtf [flags] <file>")
-			fmt.Println("\nFlags:")
-			fmt.Println("  -p, --porcelain  Print easily parseable output (tab-separated: Kind\\tType)")
-			fmt.Println("  -t, --time       Print time taken (read / sniff; disabled by -p)")
-			fmt.Println("  -v, --version    Print version information")
-			fmt.Println("  -h, --help       Print this help message")
+			log.Println("wtf - hardware-accelerated file sniffer")
+			log.Println("\nUsage: wtf [flags] <file>")
+			log.Println("\nFlags:")
+			log.Println("  -l, --list       List all supported formats and sub-formats")
+			log.Println("  -p, --porcelain  Print easily parseable output (tab-separated: Kind\\tType)")
+			log.Println("  -t, --time       Print time taken (read / sniff; disabled by -p)")
+			log.Println("  -v, --version    Print version information")
+			log.Println("  -h, --help       Print this help message")
 
 			os.Exit(0)
 		case "-v", "--version":
-			fmt.Printf("wtf %s\n", Version)
+			log.Printf("wtf %s\n", Version)
+
+			os.Exit(0)
+		case "-l", "--list":
+			listFormats()
 
 			os.Exit(0)
 		case "-p", "--porcelain":
@@ -122,7 +132,7 @@ func main() {
 	meta, err = types.Detect(name, buf[:n])
 	if err != nil {
 		if porcelain {
-			fmt.Println("Unknown\t")
+			log.Println("Unknown\t")
 		} else {
 			log.Errorln(err)
 		}
@@ -199,7 +209,7 @@ func detectPath(name string, info os.FileInfo) *types.Metadata {
 
 func printMeta(meta *types.Metadata, timings string, porcelain bool) {
 	if porcelain {
-		fmt.Printf("%s\t%s\t%s\n", meta.Kind.String(), meta.Type.String(), meta.Confidence.String())
+		log.Printf("%s\t%s\t%s\n", meta.Kind.String(), meta.Type.String(), meta.Confidence.String())
 	} else {
 		log.Println(meta.Format(timings))
 	}
@@ -253,4 +263,42 @@ func formatTime(d time.Duration) string {
 	}
 
 	return strings.Join(parts, " ")
+}
+
+func listFormats() {
+	formats := types.ListFormats()
+
+	if len(formats) == 0 {
+		return
+	}
+
+	var groups []kindGroup
+
+	current := &kindGroup{kind: formats[0].Kind}
+
+	for _, f := range formats[1:] {
+		if f.Kind != current.kind {
+			groups = append(groups, *current)
+
+			current = &kindGroup{kind: f.Kind}
+		}
+
+		if f.Type != "" {
+			current.types = append(current.types, f.Type)
+		}
+	}
+
+	groups = append(groups, *current)
+
+	for _, g := range groups {
+		log.Printf("%s\n", g.kind)
+
+		for i, t := range g.types {
+			if i == len(g.types)-1 {
+				log.Printf("  └─ %s\n", t)
+			} else {
+				log.Printf("  ├─ %s\n", t)
+			}
+		}
+	}
 }

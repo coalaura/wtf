@@ -17,6 +17,7 @@ func init() {
 	types.Register(types.DetectFunc(custom.DetectNetpbm))
 	types.Register(types.DetectFunc(custom.DetectOgg))
 	types.Register(types.DetectFunc(custom.DetectOLE))
+	types.Register(types.DetectFunc(custom.DetectPCAPNG))
 	types.Register(types.DetectFunc(custom.DetectPE))
 	types.Register(types.DetectFunc(custom.DetectPKCS12))
 	types.Register(types.DetectFunc(custom.DetectPYC))

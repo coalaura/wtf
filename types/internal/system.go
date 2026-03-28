@@ -91,7 +91,6 @@ func init() {
 	types.RegisterSignature(types.KindPCAPCapture, types.TypeLittleEndian, 0, []byte{0xd4, 0xc3, 0xb2, 0xa1})
 	types.RegisterSignature(types.KindPCAPCapture, types.TypeNanosecondBigEndian, 0, []byte{0xa1, 0xb2, 0x3c, 0x4d})
 	types.RegisterSignature(types.KindPCAPCapture, types.TypeNanosecondLittleEndian, 0, []byte{0x4d, 0x3c, 0xb2, 0xa1})
-	types.RegisterSignature(types.KindPCAPNGCapture, types.TypeNone, 0, []byte{0x0a, 0x0d, 0x0d, 0x0a})
 	types.RegisterSignature(types.KindPEMCertificate, types.TypeNone, 0, []byte("-----BEGIN CERTIFICATE-----"))
 	types.RegisterSignature(types.KindPEMPrivateKey, types.TypeDSAPrivateKey, 0, []byte("-----BEGIN DSA PRIVATE KEY-----"))
 	types.RegisterSignature(types.KindPEMPrivateKey, types.TypeECPrivateKey, 0, []byte("-----BEGIN EC PRIVATE KEY-----"))
