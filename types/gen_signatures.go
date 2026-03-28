@@ -6,6 +6,10 @@ func detectOptimized(b Buffer) *Metadata {
 		return nil
 	}
 
+	if meta := DetectAC3(b); meta != nil {
+		return meta
+	}
+
 	if meta := DetectAppleDiskImage(b); meta != nil {
 		return meta
 	}
@@ -27,10 +31,6 @@ func detectOptimized(b Buffer) *Metadata {
 	}
 
 	if meta := DetectISOBaseMedia(b); meta != nil {
-		return meta
-	}
-
-	if meta := DetectMPEGAudioFrames(b); meta != nil {
 		return meta
 	}
 
@@ -1960,6 +1960,10 @@ func detectOptimized(b Buffer) *Metadata {
 							if len(b) >= 8 && string(b[:8]) == "II\x1a\x00\x00\x00HE" {
 								return &Metadata{Kind: KindCanonRAWImage, Type: TypeHE}
 							}
+						case 0x2a:
+							if len(b) >= 4 && string(b[:4]) == "II*\x00" {
+								return &Metadata{Kind: KindTIFFImage, Type: TypeLittleEndian}
+							}
 						case 0xbc:
 							if len(b) >= 4 && string(b[:4]) == "II\xbc\x01" {
 								return &Metadata{Kind: KindJPEGXRImage, Type: TypeLittleEndian}
@@ -2295,8 +2299,17 @@ func detectOptimized(b Buffer) *Metadata {
 					if len(b) > 2 {
 						switch b[2] {
 						case 0x00:
-							if len(b) >= 4 && string(b[:4]) == "MM\x00+" {
-								return &Metadata{Kind: KindTIFFImage, Type: TypeBigTIFF}
+							if len(b) > 3 {
+								switch b[3] {
+								case 0x2a:
+									if len(b) >= 4 && string(b[:4]) == "MM\x00*" {
+										return &Metadata{Kind: KindTIFFImage, Type: TypeBigEndian}
+									}
+								case 0x2b:
+									if len(b) >= 4 && string(b[:4]) == "MM\x00+" {
+										return &Metadata{Kind: KindTIFFImage, Type: TypeBigTIFF}
+									}
+								}
 							}
 						case 0x01:
 							if len(b) >= 4 && string(b[:4]) == "MM\x01\xbc" {
@@ -4926,6 +4939,10 @@ func detectOptimized(b Buffer) *Metadata {
 				}
 			case 0x33:
 				if len(b) >= 65597 && string(b[65588:65597]) == "ReIsEr3Fs" {
+					return &Metadata{Kind: KindReiserFSFilesystem}
+				}
+			case 0x34:
+				if len(b) >= 65595 && string(b[65588:65595]) == "ReIsEr4" {
 					return &Metadata{Kind: KindReiserFSFilesystem}
 				}
 			case 0x46:

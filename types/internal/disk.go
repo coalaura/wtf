@@ -36,6 +36,7 @@ func init() {
 	types.RegisterSignature(types.KindQEMUQEDDiskImage, types.TypeNone, 0, []byte("QED\x00"))
 	types.RegisterSignature(types.KindReiserFSFilesystem, types.TypeNone, 65588, []byte("ReIsEr2Fs"))
 	types.RegisterSignature(types.KindReiserFSFilesystem, types.TypeNone, 65588, []byte("ReIsEr3Fs"))
+	types.RegisterSignature(types.KindReiserFSFilesystem, types.TypeNone, 65588, []byte("ReIsEr4"))
 	types.RegisterSignature(types.KindReiserFSFilesystem, types.TypeNone, 65588, []byte("ReIsErFs"))
 	types.RegisterSignature(types.KindROMFS, types.TypeNone, 0, []byte("-rom1fs-"))
 	types.RegisterSignature(types.KindRuntimeSoftwareImage, types.TypeNone, 0, []byte("RTS COM"))

@@ -2,7 +2,7 @@ package custom
 
 import "github.com/coalaura/wtf/types"
 
-func DetectMPEGAudioFrames(b types.Buffer) *types.Metadata {
+func DetectAC3(b types.Buffer) *types.Metadata {
 	if b.Len() >= 6 && b[0] == 0x0b && b[1] == 0x77 {
 		bsid := (b[5] >> 3) & 0x1f
 		if bsid <= 10 {

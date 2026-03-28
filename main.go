@@ -6,14 +6,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coalaura/wtf/types"
 	"github.com/coalaura/plain"
+	"github.com/coalaura/wtf/types"
 )
 
 var (
 	Version = "dev"
 	log     = plain.New()
 )
+
+const MaxReadSize = 128 * 1024
 
 func main() {
 	var (
@@ -78,12 +80,6 @@ func main() {
 		return
 	}
 
-	if info.Size() == 0 {
-		log.Errorln("empty file")
-
-		os.Exit(2)
-	}
-
 	file, err := os.Open(path)
 	if err != nil {
 		log.Errorln(err)
@@ -93,9 +89,24 @@ func main() {
 
 	defer file.Close()
 
-	var buf [65536]byte
+	fileInfo, err := file.Stat()
+	if err != nil {
+		log.Errorln(err)
 
-	n, err := file.Read(buf[:])
+		os.Exit(1)
+	}
+
+	readSize := min(int(fileInfo.Size()), MaxReadSize)
+
+	if readSize == 0 {
+		log.Errorln("empty file")
+
+		os.Exit(2)
+	}
+
+	buf := make([]byte, readSize)
+
+	n, err := file.Read(buf)
 	if err != nil && err != io.EOF {
 		log.Errorln(err)
 

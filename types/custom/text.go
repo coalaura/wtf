@@ -68,14 +68,14 @@ func detectTextSubtype(data []byte) types.TypeID {
 		return types.TypeNone
 	}
 
-	// 1. Shebangs (Highly Reliable)
-	if bytes.HasPrefix(trimmed, []byte("#!")) {
-		lineEnd := bytes.IndexByte(trimmed, '\n')
+	// 1. Shebangs (Highly Reliable) - must be at byte 0, not after whitespace
+	if bytes.HasPrefix(data, []byte("#!")) {
+		lineEnd := bytes.IndexByte(data, '\n')
 		if lineEnd == -1 {
-			lineEnd = len(trimmed)
+			lineEnd = len(data)
 		}
 
-		shebang := trimmed[:lineEnd]
+		shebang := data[:lineEnd]
 
 		if bytes.Contains(shebang, []byte("bash")) || bytes.Contains(shebang, []byte("sh")) {
 			return types.TypeBashScript
@@ -201,7 +201,7 @@ func detectTextSubtype(data []byte) types.TypeID {
 		return types.TypeSwift
 	}
 
-	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) {
+	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) || bytes.HasPrefix(code, []byte("#[derive(")) || bytes.HasPrefix(code, []byte("#[allow(")) {
 		return types.TypeRust
 	}
 
@@ -217,8 +217,8 @@ func detectTextSubtype(data []byte) types.TypeID {
 		}
 	}
 
-	if bytes.HasPrefix(code, []byte("local ")) || bytes.HasPrefix(code, []byte("function ")) {
-		if bytes.Contains(code, []byte("end")) && (bytes.Contains(code, []byte(" then")) || bytes.Contains(code, []byte(" do")) || bytes.Contains(code, []byte("require("))) {
+	if bytes.HasPrefix(code, []byte("local ")) || bytes.HasPrefix(code, []byte("function ")) || bytes.HasPrefix(code, []byte("require ")) || bytes.HasPrefix(code, []byte("require(\"")) {
+		if bytes.Contains(code, []byte("end")) || bytes.Contains(code, []byte(" then")) || bytes.Contains(code, []byte(" do")) || bytes.Contains(code, []byte(".lua")) {
 			return types.TypeLua
 		}
 	}
@@ -234,7 +234,7 @@ func detectTextSubtype(data []byte) types.TypeID {
 	}
 
 	if bytes.HasPrefix(code, []byte("const ")) || bytes.HasPrefix(code, []byte("let ")) || bytes.HasPrefix(code, []byte("var ")) || bytes.HasPrefix(code, []byte("import ")) {
-		if bytes.Contains(code, []byte("interface ")) || bytes.Contains(code, []byte("type ")) || bytes.Contains(code, []byte(" as ")) {
+		if bytes.Contains(code, []byte("interface ")) || bytes.Contains(code, []byte("type ")) || bytes.Contains(code, []byte(" as ")) || bytes.Contains(code, []byte(": string")) || bytes.Contains(code, []byte(": number")) || bytes.Contains(code, []byte(": boolean")) {
 			if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) || bytes.Contains(code, []byte("from '")) || bytes.Contains(code, []byte("from \"")) {
 				return types.TypeTypeScript
 			}

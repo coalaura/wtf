@@ -44,6 +44,10 @@ func DetectXMLSubtypes(b types.Buffer) *types.Metadata {
 			return &types.Metadata{Kind: types.KindAtomFeed, Confidence: types.ConfidenceMedium}
 		}
 
+		if bytes.Contains(data, []byte("<xsl:stylesheet")) || bytes.Contains(data, []byte("<xsl:transform")) {
+			return &types.Metadata{Kind: types.KindXMLDocument, Type: types.TypeXSLTStylesheet, Confidence: types.ConfidenceMedium}
+		}
+
 		if bytes.Contains(data, []byte("<soap:Envelope")) {
 			return &types.Metadata{Kind: types.KindSOAPMessage, Confidence: types.ConfidenceMedium}
 		}

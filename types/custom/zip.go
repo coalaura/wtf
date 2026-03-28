@@ -106,6 +106,8 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 			hasSketchMeta = true
 		} else if matchASCII(name, "user.json") {
 			hasSketchUser = true
+		} else if matchASCII(name, "modules") {
+			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeJMOD}
 		} else if matchASCII(name, "meta-inf/manifest.mf") {
 			hasManifestMF = true
 		} else if matchASCII(name, "web-inf/web.xml") {
@@ -156,7 +158,7 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeVisualStudioExtensionVSIX}
 		} else if matchASCII(name, "3d/3dmodel.model") {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.Type3MFDocument}
-		} else if hasSuffixASCII(name, ".nuspec") && bytes.Contains(b, []byte("package/services/metadata/core-properties")) {
+		} else if hasSuffixASCII(name, ".nuspec") {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeNuGetPackageNUPKG}
 		} else if matchASCII(name, "comicinfo.xml") {
 			hasComicInfo = true

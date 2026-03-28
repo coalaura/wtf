@@ -8,7 +8,7 @@ import (
 	"unicode/utf8"
 )
 
-func DetectMPEGAudioFrames(b Buffer) *Metadata {
+func DetectAC3(b Buffer) *Metadata {
 	if b.Len() >= 6 && b[0] == 0x0b && b[1] == 0x77 {
 		bsid := (b[5] >> 3) & 0x1f
 		if bsid <= 10 {
@@ -241,7 +241,7 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 		boxEnd = b.Len()
 	}
 
-	if !hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash", "avif", "avis", "heic", "heix", "hevc", "hevx", "mif1", "msf1", "M4A ", "M4B ", "M4P ", "M4V ", "f4v ", "qt  ", "3gp4", "3gp5", "3gp6", "3gs7", "3ge6", "3gg6", "3gp1", "3gp2", "3g2a", "3g2b", "crx ", "braw", "MSNV") {
+	if !hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash", "avif", "avis", "heic", "heix", "hevc", "hevx", "mif1", "msf1", "mjp2", "M4A ", "M4B ", "M4P ", "M4V ", "f4v ", "qt  ", "3gp4", "3gp5", "3gp6", "3gs7", "3ge6", "3gg6", "3gp1", "3gp2", "3g2a", "3g2b", "crx ", "braw", "MSNV") {
 		return nil
 	}
 
@@ -279,6 +279,10 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "qt  ") {
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
+	}
+
+	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "mjp2") {
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
@@ -1055,13 +1059,13 @@ func detectTextSubtype(data []byte) TypeID {
 		return TypeNone
 	}
 
-	if bytes.HasPrefix(trimmed, []byte("#!")) {
-		lineEnd := bytes.IndexByte(trimmed, '\n')
+	if bytes.HasPrefix(data, []byte("#!")) {
+		lineEnd := bytes.IndexByte(data, '\n')
 		if lineEnd == -1 {
-			lineEnd = len(trimmed)
+			lineEnd = len(data)
 		}
 
-		shebang := trimmed[:lineEnd]
+		shebang := data[:lineEnd]
 
 		if bytes.Contains(shebang, []byte("bash")) || bytes.Contains(shebang, []byte("sh")) {
 			return TypeBashScript
@@ -1185,7 +1189,7 @@ func detectTextSubtype(data []byte) TypeID {
 		return TypeSwift
 	}
 
-	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) {
+	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) || bytes.HasPrefix(code, []byte("#[derive(")) || bytes.HasPrefix(code, []byte("#[allow(")) {
 		return TypeRust
 	}
 
@@ -1201,8 +1205,8 @@ func detectTextSubtype(data []byte) TypeID {
 		}
 	}
 
-	if bytes.HasPrefix(code, []byte("local ")) || bytes.HasPrefix(code, []byte("function ")) {
-		if bytes.Contains(code, []byte("end")) && (bytes.Contains(code, []byte(" then")) || bytes.Contains(code, []byte(" do")) || bytes.Contains(code, []byte("require("))) {
+	if bytes.HasPrefix(code, []byte("local ")) || bytes.HasPrefix(code, []byte("function ")) || bytes.HasPrefix(code, []byte("require ")) || bytes.HasPrefix(code, []byte("require(\"")) {
+		if bytes.Contains(code, []byte("end")) || bytes.Contains(code, []byte(" then")) || bytes.Contains(code, []byte(" do")) || bytes.Contains(code, []byte(".lua")) {
 			return TypeLua
 		}
 	}
@@ -1218,7 +1222,7 @@ func detectTextSubtype(data []byte) TypeID {
 	}
 
 	if bytes.HasPrefix(code, []byte("const ")) || bytes.HasPrefix(code, []byte("let ")) || bytes.HasPrefix(code, []byte("var ")) || bytes.HasPrefix(code, []byte("import ")) {
-		if bytes.Contains(code, []byte("interface ")) || bytes.Contains(code, []byte("type ")) || bytes.Contains(code, []byte(" as ")) {
+		if bytes.Contains(code, []byte("interface ")) || bytes.Contains(code, []byte("type ")) || bytes.Contains(code, []byte(" as ")) || bytes.Contains(code, []byte(": string")) || bytes.Contains(code, []byte(": number")) || bytes.Contains(code, []byte(": boolean")) {
 			if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) || bytes.Contains(code, []byte("from '")) || bytes.Contains(code, []byte("from \"")) {
 				return TypeTypeScript
 			}
@@ -1602,6 +1606,10 @@ func DetectXMLSubtypes(b Buffer) *Metadata {
 			return &Metadata{Kind: KindAtomFeed, Confidence: ConfidenceMedium}
 		}
 
+		if bytes.Contains(data, []byte("<xsl:stylesheet")) || bytes.Contains(data, []byte("<xsl:transform")) {
+			return &Metadata{Kind: KindXMLDocument, Type: TypeXSLTStylesheet, Confidence: ConfidenceMedium}
+		}
+
 		if bytes.Contains(data, []byte("<soap:Envelope")) {
 			return &Metadata{Kind: KindSOAPMessage, Confidence: ConfidenceMedium}
 		}
@@ -1712,6 +1720,8 @@ func DetectZIPContainer(b Buffer) *Metadata {
 			hasSketchMeta = true
 		} else if matchASCII(name, "user.json") {
 			hasSketchUser = true
+		} else if matchASCII(name, "modules") {
+			return &Metadata{Kind: KindZIPArchive, Type: TypeJMOD}
 		} else if matchASCII(name, "meta-inf/manifest.mf") {
 			hasManifestMF = true
 		} else if matchASCII(name, "web-inf/web.xml") {
@@ -1762,7 +1772,7 @@ func DetectZIPContainer(b Buffer) *Metadata {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeVisualStudioExtensionVSIX}
 		} else if matchASCII(name, "3d/3dmodel.model") {
 			return &Metadata{Kind: KindZIPArchive, Type: Type3MFDocument}
-		} else if hasSuffixASCII(name, ".nuspec") && bytes.Contains(b, []byte("package/services/metadata/core-properties")) {
+		} else if hasSuffixASCII(name, ".nuspec") {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeNuGetPackageNUPKG}
 		} else if matchASCII(name, "comicinfo.xml") {
 			hasComicInfo = true

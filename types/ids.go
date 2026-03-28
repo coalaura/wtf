@@ -894,6 +894,7 @@ const (
 	TypeMicrosoftWordMacroEnabledTemplateDOTM
 	TypeMicrosoftWordTemplateDOTX
 	TypeMinecraftResourcePack
+	TypeMotionJPEG2000
 	TypeMP3
 	TypeMP3ID3Tagged
 	TypeMP4Video
@@ -1010,6 +1011,7 @@ const (
 	TypeWindowsNE
 	TypeWrapper
 	TypeXMLPaperSpecificationXPS
+	TypeXSLTStylesheet
 	TypeYAML
 	TypeZlibCompressed
 	TypeZstandardSkinnableFrame
@@ -1906,6 +1908,7 @@ var typeNames = [...]string{
 	TypeMicrosoftWordMacroEnabledTemplateDOTM:           "Microsoft Word Macro-Enabled Template (DOTM)",
 	TypeMicrosoftWordTemplateDOTX:                       "Microsoft Word Template (DOTX)",
 	TypeMinecraftResourcePack:                           "Minecraft Resource Pack",
+	TypeMotionJPEG2000:                                  "Motion JPEG 2000",
 	TypeMP3:                                             "MP3",
 	TypeMP3ID3Tagged:                                    "MP3 (ID3 Tagged)",
 	TypeMP4Video:                                        "MP4 Video",
@@ -2022,6 +2025,7 @@ var typeNames = [...]string{
 	TypeWindowsNE:                                       "16-bit New Executable (NE)",
 	TypeWrapper:                                         "Wrapper",
 	TypeXMLPaperSpecificationXPS:                        "XML Paper Specification (XPS)",
+	TypeXSLTStylesheet:                                  "XSLT Stylesheet",
 	TypeYAML:                                            "YAML Configuration",
 	TypeZlibCompressed:                                  "Zlib Compressed",
 	TypeZstandardSkinnableFrame:                         "Zstandard Skinnable Frame",
