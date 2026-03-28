@@ -13,7 +13,7 @@ const (
 	ansiLow    = "\x1b[31m"
 )
 
-func (m *Metadata) Format() string {
+func (m *Metadata) Format(timings string) string {
 	if m == nil {
 		return "Unknown"
 	}
@@ -71,6 +71,17 @@ func (m *Metadata) Format() string {
 		b.WriteString(ansiReset)
 		b.WriteString(ansiValue)
 		b.WriteString(typ)
+		b.WriteString(ansiReset)
+	}
+
+	if timings != "" {
+		b.WriteByte('\n')
+		b.WriteString("     ")
+		b.WriteString(ansiLabel)
+		b.WriteString("Time: ")
+		b.WriteString(ansiReset)
+		b.WriteString(ansiValue)
+		b.WriteString(timings)
 		b.WriteString(ansiReset)
 	}
 
