@@ -2380,11 +2380,11 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x2b:
 							if len(b) >= 3 && string(b[:3]) == "MP+" {
-								return &Metadata{Kind: KindMusepackAudio, Type: TypeStreamVersion7}
+								return &Metadata{Kind: KindMusepackAudio, Type: TypeVersion7}
 							}
 						case 0x43:
 							if len(b) >= 4 && string(b[:4]) == "MPCK" {
-								return &Metadata{Kind: KindMusepackAudio, Type: TypeStreamVersion8}
+								return &Metadata{Kind: KindMusepackAudio, Type: TypeVersion8}
 							}
 						case 0x51:
 							if len(b) >= 4 && string(b[:4]) == "MPQ\x1a" {
@@ -2475,7 +2475,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x42:
 					if len(b) >= 4 && string(b[:4]) == "NB*\x00" {
-						return &Metadata{Kind: KindMicrosoftJournal, Type: TypeNB}
+						return &Metadata{Kind: KindMicrosoftJournal}
 					}
 				case 0x45:
 					if len(b) > 3 {
@@ -2499,7 +2499,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x54:
 							if len(b) >= 5 && string(b[:5]) == "NITF0" {
-								return &Metadata{Kind: KindNationalImageryTransmission, Type: TypeNITF}
+								return &Metadata{Kind: KindNationalImageryTransmission}
 							}
 						}
 					}
@@ -2982,7 +2982,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x65:
 					if len(b) >= 8 && string(b[:8]) == "Return-P" {
-						return &Metadata{Kind: KindMBOXEmailFolder, Type: TypeReturnPath}
+						return &Metadata{Kind: KindMBOXEmailFolder}
 					}
 				case 0x75:
 					if len(b) >= 8 && string(b[:8]) == "RubyGems" {
@@ -3148,7 +3148,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x20:
 							if len(b) >= 8 && string(b[:8]) == "SZ \x88\xf0'3\xd1" {
-								return &Metadata{Kind: KindMicrosoftCompress, Type: TypeSZ}
+								return &Metadata{Kind: KindMicrosoftCompress}
 							}
 						case 0x44:
 							if len(b) >= 8 && string(b[:8]) == "SZDD\x88\xf0'3" {
@@ -3537,7 +3537,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x4d:
 							if len(b) >= 5 && string(b[:5]) == "[VMD]" {
-								return &Metadata{Kind: KindVocalTecMedia, Type: TypeVMD}
+								return &Metadata{Kind: KindVocalTecMedia}
 							}
 						}
 					}
@@ -3822,7 +3822,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x64:
 							if len(b) >= 8 && string(b[:8]) == "opdata01" {
-								return &Metadata{Kind: Kind1PasswordCloudKeychain, Type: TypeOpdata01}
+								return &Metadata{Kind: Kind1PasswordCloudKeychain}
 							}
 						case 0x65:
 							if len(b) >= 15 && string(b[:15]) == "openssh-key-v1\x00" {
@@ -4408,7 +4408,7 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0xd7:
 			if len(b) >= 4 && string(b[:4]) == "\xd7\xcdƚ" {
-				return &Metadata{Kind: KindMetafileImage, Type: TypeWindowsMetafileWMF}
+				return &Metadata{Kind: KindMetafileImage, Type: TypeWindowsMetafile}
 			}
 		case 0xd9:
 			if len(b) >= 3 && string(b[:3]) == "\xd9\xd9\xf7" {

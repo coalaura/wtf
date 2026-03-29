@@ -3,7 +3,7 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
-	types.RegisterSignature(types.Kind1PasswordCloudKeychain, types.TypeOpdata01, 0, []byte("opdata01"))
+	types.RegisterSignature(types.Kind1PasswordCloudKeychain, types.TypeNone, 0, []byte("opdata01"))
 	types.RegisterSignature(types.KindAmigaHunkExecutable, types.TypeNone, 0, []byte{0x00, 0x00, 0x03, 0xf3})
 	types.RegisterSignature(types.KindAmigaIcon, types.TypeNone, 0, []byte{0xe3, 0x10, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00})
 	types.RegisterSignature(types.KindAndroidART, types.TypeNone, 0, []byte("art\n"))

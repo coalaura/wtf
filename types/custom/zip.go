@@ -158,7 +158,7 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 		} else if bytes.Contains(name, []byte("apex_manifest")) {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeAndroidSystemPackage}
 		} else if matchASCII(name, "extension.vsixmanifest") {
-			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeVisualStudioExtensionVSIX}
+			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeVisualStudioExtension}
 		} else if matchASCII(name, "3d/3dmodel.model") {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.Type3MFDocument}
 		} else if hasSuffixASCII(name, ".nuspec") {
@@ -294,7 +294,7 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 
 	if hasSketchDoc && (hasSketchMeta || hasSketchUser) {
 		if bytes.Contains(searchArea, []byte("com.bohemiancoding.sketch")) || bytes.Contains(searchArea, []byte("com.sketch3")) {
-			return &types.Metadata{Kind: types.KindSketchDocument, Type: types.TypeSketchDocument}
+			return &types.Metadata{Kind: types.KindSketchDocument}
 		}
 	}
 

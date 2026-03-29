@@ -587,7 +587,7 @@ func DetectMP3(b Buffer) *Metadata {
 
 func DetectMPEGTransport(b Buffer) *Metadata {
 	if b.Len() >= 3*188 && b[0] == 0x47 && b[188] == 0x47 && b[376] == 0x47 {
-		return &Metadata{Kind: KindMPEGTransportStream, Type: TypeTS, Confidence: ConfidenceMedium}
+		return &Metadata{Kind: KindMPEGTransportStream, Type: TypeNone, Confidence: ConfidenceMedium}
 	}
 
 	if b.Len() >= 4+3*192 && b[4] == 0x47 && b[196] == 0x47 && b[388] == 0x47 {
@@ -1419,7 +1419,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("OLYMPUS")) || bytes.HasPrefix(makeValue, []byte("Olympus")) {
-			return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAW}
+			return &Metadata{Kind: KindOlympusRAWImage}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
@@ -1443,7 +1443,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
-		return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAW}
+		return &Metadata{Kind: KindOlympusRAWImage}
 	}
 
 	if bytes.Contains(data, []byte("PENTAX")) {
@@ -1816,7 +1816,7 @@ func DetectZIPContainer(b Buffer) *Metadata {
 		} else if bytes.Contains(name, []byte("apex_manifest")) {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidSystemPackage}
 		} else if matchASCII(name, "extension.vsixmanifest") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeVisualStudioExtensionVSIX}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeVisualStudioExtension}
 		} else if matchASCII(name, "3d/3dmodel.model") {
 			return &Metadata{Kind: KindZIPArchive, Type: Type3MFDocument}
 		} else if hasSuffixASCII(name, ".nuspec") {
@@ -1947,7 +1947,7 @@ func DetectZIPContainer(b Buffer) *Metadata {
 
 	if hasSketchDoc && (hasSketchMeta || hasSketchUser) {
 		if bytes.Contains(searchArea, []byte("com.bohemiancoding.sketch")) || bytes.Contains(searchArea, []byte("com.sketch3")) {
-			return &Metadata{Kind: KindSketchDocument, Type: TypeSketchDocument}
+			return &Metadata{Kind: KindSketchDocument}
 		}
 	}
 

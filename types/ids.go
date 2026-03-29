@@ -875,19 +875,15 @@ const (
 	TypeNamedPipe
 	TypeNanosecondBigEndian
 	TypeNanosecondLittleEndian
-	TypeNB
 	TypeNewASCII
 	TypeNewASCIIWithCRC
 	TypeNikonRAW
-	TypeNITF
 	TypeNpmPackageTarball
 	TypeNuGetPackage
 	TypeOBJ
 	TypeObjectiveC
 	TypeOCIImageLayoutTar
 	TypeOldASCII
-	TypeOlympusRAW
-	TypeOpdata01
 	TypeOpenDocumentChart
 	TypeOpenDocumentDatabase
 	TypeOpenDocumentFormula
@@ -936,14 +932,12 @@ const (
 	TypeR
 	TypeRAR5
 	TypeRARLegacy
-	TypeReturnPath
 	TypeRIFFMIDI
 	TypeRIFFPalette
 	TypeRSAPrivateKey
 	TypeRuby
 	TypeRust
 	TypeScala
-	TypeSketchDocument
 	TypeSlackwarePackage
 	TypeSocket
 	TypeSonyRAW
@@ -952,15 +946,11 @@ const (
 	TypeSpecial
 	TypeSpeexAudio
 	TypeSQL
-	TypeStreamVersion7
-	TypeStreamVersion8
 	TypeSwift
 	TypeSymbolicLink
-	TypeSZ
 	TypeTerraform
 	TypeTheoraVideo
 	TypeTOML
-	TypeTS
 	TypeTypeScript
 	TypeUCE
 	TypeUncompressed
@@ -969,8 +959,9 @@ const (
 	TypeVersion1
 	TypeVersion2
 	TypeVersion3
-	TypeVisualStudioExtensionVSIX
-	TypeVMD
+	TypeVersion7
+	TypeVersion8
+	TypeVisualStudioExtension
 	TypeVMDK
 	TypeVMDKDescription
 	TypeVorbisAudio
@@ -982,7 +973,7 @@ const (
 	TypeWindowsIcon
 	TypeWindowsLE
 	TypeWindowsLX
-	TypeWindowsMetafileWMF
+	TypeWindowsMetafile
 	TypeWindowsNE
 	TypeWorkspace
 	TypeWrapper
@@ -1069,7 +1060,7 @@ var kindNames = [...]string{
 	KindBAMData:                             "BAM Data",
 	KindBase85:                              "BASE85 File",
 	KindBcachefsFilesystem:                  "Bcachefs Filesystem",
-	KindBCFData:                             "Binary Call Format (BCF)",
+	KindBCFData:                             "Binary Call Format",
 	KindBerkeleyDB:                          "Berkeley DB",
 	KindBGBlitzDatabase:                     "BGBlitz Database",
 	KindBinHex:                              "BinHex Archive",
@@ -1098,7 +1089,7 @@ var kindNames = [...]string{
 	KindCALSImage:                           "CALS Raster Image",
 	KindCanonRAWImage:                       "Canon RAW Image",
 	KindCBORData:                            "CBOR Data",
-	KindCHMDocument:                         "Compiled HTML Help (CHM)",
+	KindCHMDocument:                         "Compiled HTML Help",
 	KindChromaGraphBitmap:                   "ChromaGraph Bitmap",
 	KindChromiumPatch:                       "Chromium Patch",
 	KindCinema4DModel:                       "Cinema 4D Model",
@@ -1207,7 +1198,7 @@ var kindNames = [...]string{
 	KindGitPackReverseIndex:                 "Git Pack Reverse Index",
 	KindGlibcLocale:                         "Glibc Locale",
 	KindGLTFBinary:                          "glTF Binary",
-	KindGlyphBitmapDistributionFormat:       "Glyph Bitmap Distribution Format (BDF)",
+	KindGlyphBitmapDistributionFormat:       "Glyph Bitmap Distribution Format",
 	KindGNOMEKeyring:                        "GNOME Keyring",
 	KindGNUGettextMachineCatalog:            "GNU Gettext Machine Catalog",
 	KindGnuPGKeybox:                         "GnuPG Keybox",
@@ -1275,7 +1266,7 @@ var kindNames = [...]string{
 	KindKTXTexture:                          "KTX Texture",
 	KindKyotoCabinetDatabase:                "Kyoto Cabinet Database",
 	KindLHAArchive:                          "LHA Archive",
-	KindLidarData:                           "LiDAR Data (LAS)",
+	KindLidarData:                           "LiDAR Data",
 	KindLightWaveScene:                      "LightWave Scene",
 	KindLinuxKernelImage:                    "Linux Kernel Image",
 	KindLLVMBitcode:                         "LLVM Bitcode",
@@ -1333,7 +1324,7 @@ var kindNames = [...]string{
 	KindMicrosoftNetworkMonitor:             "Microsoft Network Monitor Capture",
 	KindMicrosoftOneNoteNote:                "Microsoft OneNote Note",
 	KindMicrosoftOutlookEmailFolder:         "Microsoft Outlook Email Folder",
-	KindMicrosoftProgramDatabase:            "Microsoft Program Database (PDB)",
+	KindMicrosoftProgramDatabase:            "Microsoft Program Database",
 	KindMicrosoftReader:                     "Microsoft Reader eBook",
 	KindMicrosoftSQLServerDatabase:          "Microsoft SQL Server Database",
 	KindMicrosoftWinMobileNote:              "Microsoft WinMobile Note",
@@ -1349,8 +1340,8 @@ var kindNames = [...]string{
 	KindMonkeysAudio:                        "Monkey's Audio",
 	KindMonochromePictureTIFF:               "Monochrome Picture TIFF",
 	KindMoPaQArchive:                        "MoPaQ Archive",
-	KindMozillaArchive:                      "Mozilla Archive (MAR)",
-	KindMPEG2TransportStream:                "MPEG Transport Stream",
+	KindMozillaArchive:                      "Mozilla Archive",
+	KindMPEG2TransportStream:                "MPEG-2 Transport Stream",
 	KindMPEGAudio:                           "MPEG Audio",
 	KindMPEGAudioFrame:                      "MPEG Audio Frame",
 	KindMPEGProgramStream:                   "MPEG Program Stream",
@@ -1555,7 +1546,7 @@ var kindNames = [...]string{
 	KindSTLStereoLithography:                "STL StereoLithography",
 	KindStorageCraftBackup:                  "StorageCraft Backup",
 	KindStuffItArchive:                      "StuffIt Archive",
-	KindSubRipText:                          "SubRip Text (SRT)",
+	KindSubRipText:                          "SubRip Text",
 	KindSunRasterImage:                      "Sun Raster Image",
 	KindSuperCalcWorksheet:                  "SuperCalc Worksheet",
 	KindSurfplanProject:                     "Surfplan Project",
@@ -1580,7 +1571,7 @@ var kindNames = [...]string{
 	KindTokyoCabinetDatabase:                "Tokyo Cabinet Database",
 	KindTomTomTraffic:                       "TomTom Traffic",
 	KindTorrentFile:                         "Torrent File",
-	KindTransportNeutralEncapsulationFormat: "Transport Neutral Encapsulation Format (TNEF)",
+	KindTransportNeutralEncapsulationFormat: "Transport Neutral Encapsulation Format",
 	KindTrueTypeCollection:                  "TrueType Collection",
 	KindTrueTypeFont:                        "TrueType Font",
 	KindTTAAudio:                            "TTA Audio",
@@ -1604,7 +1595,7 @@ var kindNames = [...]string{
 	KindVeeamBackup:                         "Veeam Backup",
 	KindVHDDiskImage:                        "VHD Disk Image",
 	KindVHDXDiskImage:                       "VHDX Disk Image",
-	KindVideoGameMusic:                      "Video Game Music (VGM)",
+	KindVideoGameMusic:                      "Video Game Music",
 	KindVideoVCD:                            "Video VCD",
 	KindVirtualBoxDiskImage:                 "VirtualBox Disk Image",
 	KindVirtualBoxSavedState:                "VirtualBox Saved State",
@@ -1656,7 +1647,7 @@ var kindNames = [...]string{
 	KindWindowsResourceFile:                 "Windows Resource File",
 	KindWindowsShortcut:                     "Windows Shortcut",
 	KindWindowsThumbnailCache:               "Windows Thumbnail Cache",
-	KindWindowsTypeLibrary:                  "Windows Type Library (TLB)",
+	KindWindowsTypeLibrary:                  "Windows Type Library",
 	KindWindowsUserStateMigration:           "Windows User State Migration",
 	KindWinNTNetmonCapture:                  "WinNT Netmon Capture",
 	KindWinNTRegistryUndo:                   "WinNT Registry Undo",
@@ -1713,17 +1704,17 @@ var typeNames = [...]string{
 	Type64BitBigEndian:                     "64-bit Big-Endian",
 	Type64BitLittleEndian:                  "64-bit Little-Endian",
 	TypeAC3:                                "AC-3",
-	TypeAdobeDNG:                           "Adobe DNG (DNG)",
+	TypeAdobeDNG:                           "Adobe DNG",
 	TypeADTS:                               "ADTS",
-	TypeAfterEffectsProject:                "After Effects Project (AEP)",
+	TypeAfterEffectsProject:                "After Effects Project",
 	TypeAIFCAudio:                          "AIFC Audio",
 	TypeAIFFAudio:                          "AIFF Audio",
-	TypeAndroidAppBundle:                   "Android App Bundle (AAB)",
-	TypeAndroidArchive:                     "Android Archive (AAR)",
-	TypeAndroidPackage:                     "Android Package (APK)",
-	TypeAndroidPackageX:                    "Android Package (XAPK)",
-	TypeAndroidSplitAPKSet:                 "Android Split APK Set (APKS)",
-	TypeAndroidSystemPackage:               "Android System Package (APEX)",
+	TypeAndroidAppBundle:                   "Android App Bundle",
+	TypeAndroidArchive:                     "Android Archive",
+	TypeAndroidPackage:                     "Android Package",
+	TypeAndroidPackageX:                    "Android XAPK Package",
+	TypeAndroidSplitAPKSet:                 "Android Split APK Set",
+	TypeAndroidSystemPackage:               "Android System Package",
 	TypeAPPXPackage:                        "APPX Package",
 	TypeArchLinuxPackage:                   "Arch Linux Package",
 	TypeASCIIText:                          "ASCII Text",
@@ -1758,7 +1749,7 @@ var typeNames = [...]string{
 	TypeCOWD:                               "COWD",
 	TypeCPP:                                "C++ Source",
 	TypeCSharp:                             "C# Source",
-	TypeCSS:                                "Cascading Style Sheets (CSS)",
+	TypeCSS:                                "Cascading Style Sheets",
 	TypeCubaseProject:                      "Cubase Project",
 	TypeDart:                               "Dart Source",
 	TypeDEX035:                             "DEX 035",
@@ -1865,19 +1856,15 @@ var typeNames = [...]string{
 	TypeNamedPipe:                                   "Named Pipe",
 	TypeNanosecondBigEndian:                         "Nanosecond Big-Endian",
 	TypeNanosecondLittleEndian:                      "Nanosecond Little-Endian",
-	TypeNB:                                          "NB",
 	TypeNewASCII:                                    "New ASCII",
 	TypeNewASCIIWithCRC:                             "New ASCII with CRC",
 	TypeNikonRAW:                                    "Nikon RAW",
-	TypeNITF:                                        "NITF",
 	TypeNpmPackageTarball:                           "npm Package Tarball",
 	TypeNuGetPackage:                                "NuGet Package",
 	TypeOBJ:                                         "COFF Object",
 	TypeObjectiveC:                                  "Objective-C Source",
-	TypeOCIImageLayoutTar:                           "OCI Image Layout (TAR)",
+	TypeOCIImageLayoutTar:                           "OCI Image Layout",
 	TypeOldASCII:                                    "Old ASCII",
-	TypeOlympusRAW:                                  "Olympus RAW",
-	TypeOpdata01:                                    "opdata01",
 	TypeOpenDocumentChart:                           "OpenDocument Chart",
 	TypeOpenDocumentDatabase:                        "OpenDocument Database",
 	TypeOpenDocumentFormula:                         "OpenDocument Formula",
@@ -1926,14 +1913,12 @@ var typeNames = [...]string{
 	TypeR:                                           "R Script",
 	TypeRAR5:                                        "RAR5",
 	TypeRARLegacy:                                   "RAR (Legacy)",
-	TypeReturnPath:                                  "Return Path",
 	TypeRIFFMIDI:                                    "MIDI",
 	TypeRIFFPalette:                                 "Palette",
 	TypeRSAPrivateKey:                               "RSA Private Key",
 	TypeRuby:                                        "Ruby Script",
 	TypeRust:                                        "Rust Source",
 	TypeScala:                                       "Scala Source",
-	TypeSketchDocument:                              "Sketch Document",
 	TypeSlackwarePackage:                            "Slackware Package",
 	TypeSocket:                                      "Socket",
 	TypeSonyRAW:                                     "Sony RAW",
@@ -1942,15 +1927,11 @@ var typeNames = [...]string{
 	TypeSpecial:                                     "Special",
 	TypeSpeexAudio:                                  "Speex Audio",
 	TypeSQL:                                         "SQL Script",
-	TypeStreamVersion7:                              "Stream Version 7",
-	TypeStreamVersion8:                              "Stream Version 8",
 	TypeSwift:                                       "Swift Source",
 	TypeSymbolicLink:                                "Symbolic Link",
-	TypeSZ:                                          "SZ",
 	TypeTerraform:                                   "Terraform Configuration",
 	TypeTheoraVideo:                                 "Theora Video",
 	TypeTOML:                                        "TOML Configuration",
-	TypeTS:                                          "TS",
 	TypeTypeScript:                                  "TypeScript Source",
 	TypeUCE:                                         "Unicode Extensions",
 	TypeUncompressed:                                "Uncompressed",
@@ -1959,8 +1940,9 @@ var typeNames = [...]string{
 	TypeVersion1:                                    "Version 1",
 	TypeVersion2:                                    "Version 2",
 	TypeVersion3:                                    "Version 3",
-	TypeVisualStudioExtensionVSIX:                   "Visual Studio Extension (VSIX)",
-	TypeVMD:                                         "VocalTec Media (VMD)",
+	TypeVersion7:                                    "Version 7",
+	TypeVersion8:                                    "Version 8",
+	TypeVisualStudioExtension:                       "Visual Studio Extension",
 	TypeVMDK:                                        "VMDK",
 	TypeVMDKDescription:                             "VMDK Description",
 	TypeVorbisAudio:                                 "Vorbis Audio",
@@ -1972,7 +1954,7 @@ var typeNames = [...]string{
 	TypeWindowsIcon:                                 "Windows Icon",
 	TypeWindowsLE:                                   "Linear Executable (LE)",
 	TypeWindowsLX:                                   "OS/2 Linear Executable (LX)",
-	TypeWindowsMetafileWMF:                          "Windows Metafile (WMF)",
+	TypeWindowsMetafile:                             "Windows Metafile",
 	TypeWindowsNE:                                   "16-bit New Executable (NE)",
 	TypeWorkspace:                                   "Workspace",
 	TypeWrapper:                                     "Wrapper",

@@ -62,7 +62,7 @@ func init() {
 	types.RegisterSignature(types.KindKTXTexture, types.TypeVersion2, 0, []byte{0xab, 'K', 'T', 'X', ' ', '2', '0', 0xbb, 0x0d, 0x0a, 0x1a, 0x0a})
 	types.RegisterSignature(types.KindLytroLightField, types.TypeNone, 0, []byte("\x89LFP\x0d\x0a\x1a\x0a"))
 	types.RegisterSignature(types.KindMagicaVoxel, types.TypeNone, 0, []byte("VOX "))
-	types.RegisterSignature(types.KindMetafileImage, types.TypeWindowsMetafileWMF, 0, []byte{0xd7, 0xcd, 0xc6, 0x9a})
+	types.RegisterSignature(types.KindMetafileImage, types.TypeWindowsMetafile, 0, []byte{0xd7, 0xcd, 0xc6, 0x9a})
 	types.RegisterSignature(types.KindMicrografxDrawing, types.TypeNone, 0, []byte{0x01, 0xff, 0x02, 0x04, 0x03, 0x02})
 	types.RegisterSignature(types.KindMinoltaRAWImage, types.TypeNone, 0, []byte("\x00MRM"))
 	types.RegisterSignature(types.KindMNGImage, types.TypeNone, 0, []byte{0x8a, 'M', 'N', 'G', 0x0d, 0x0a, 0x1a, 0x0a})

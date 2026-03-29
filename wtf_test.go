@@ -48,7 +48,7 @@ func TestDetectFixtures(t *testing.T) {
 		{file: "macho", kind: types.KindMachOBinary, typ: types.Type64BitLittleEndian},
 		{file: "mkv.mkv", kind: types.KindEBMLContainer, typ: types.TypeMatroska},
 		{file: "mp4.mp4", kind: types.KindISOBaseMedia, typ: types.TypeMP4Video},
-		{file: "mpeg2.ts", kind: types.KindMPEGTransportStream, typ: types.TypeTS},
+		{file: "mpeg2.ts", kind: types.KindMPEGTransportStream, typ: types.TypeNone},
 		{file: "mpeg3.mp3", kind: types.KindMPEGAudio, typ: types.TypeMP3ID3Tagged},
 		{file: "nef.nef", kind: types.KindTIFFImage, typ: types.TypeNikonRAW},
 		{file: "nifti.nii", kind: types.KindNIfTIMedicalImage, typ: types.TypeNone},
