@@ -917,6 +917,7 @@ const (
 	TypeObjectiveC
 	TypeOCIImageLayoutTar
 	TypeOldASCII
+	TypeOlympusRAWORF
 	TypeOpenDocumentChartODC
 	TypeOpenDocumentDatabaseODB
 	TypeOpenDocumentFormulaODF
@@ -1932,6 +1933,7 @@ var typeNames = [...]string{
 	TypeObjectiveC:                                      "Objective-C Source",
 	TypeOCIImageLayoutTar:                               "OCI Image Layout (TAR)",
 	TypeOldASCII:                                        "Old ASCII",
+	TypeOlympusRAWORF:                                   "Olympus RAW (ORF)",
 	TypeOpenDocumentChartODC:                            "OpenDocument Chart (ODC)",
 	TypeOpenDocumentDatabaseODB:                         "OpenDocument Database (ODB)",
 	TypeOpenDocumentFormulaODF:                          "OpenDocument Formula (ODF)",

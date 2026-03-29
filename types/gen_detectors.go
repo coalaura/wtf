@@ -245,6 +245,43 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 		return nil
 	}
 
+	var majorBrand string
+
+	if brandOffset+4 <= b.Len() {
+		majorBrand = string(b[brandOffset : brandOffset+4])
+	}
+
+	switch majorBrand {
+	case "qt  ":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeQuickTimeMovie}
+	case "M4V ":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeM4VVideo}
+	case "f4v ":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeF4VVideo}
+	case "M4A ", "M4B ", "M4P ":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMPEG4AudioM4AFamily}
+	case "avif":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeAVIFImage}
+	case "avis":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeAVIFImageSequence}
+	case "heic", "heix", "hevc", "hevx", "mif1", "msf1":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeHEIFImage}
+	case "mjp2":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000}
+	case "crx ":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3CR3}
+	case "braw":
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeBlackmagicRAW}
+	case "3g2a", "3g2b":
+		return &Metadata{Kind: KindISOBaseMedia, Type: Type3G2Media}
+	}
+
+	if len(majorBrand) == 4 && (majorBrand[:3] == "3gp" || majorBrand[:3] == "3g2") {
+		if majorBrand[3] >= '1' && majorBrand[3] <= '9' {
+			return &Metadata{Kind: KindISOBaseMedia, Type: Type3GPPMedia}
+		}
+	}
+
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "avif") {
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeAVIFImage}
 	}
@@ -285,16 +322,16 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000}
 	}
 
-	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMP4Video}
-	}
-
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "crx ") {
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3CR3}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "braw") {
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeBlackmagicRAW}
+	}
+
+	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMP4Video}
 	}
 
 	return &Metadata{
@@ -439,15 +476,9 @@ func DetectMachO(b Buffer) *Metadata {
 	if b.Has(0, []byte{0xca, 0xfe, 0xba, 0xbe}) {
 
 		if b.Len() >= 8 {
-			val, ok := b.U32BE(4)
-			if ok {
-				if val >= 0x20 {
-					return &Metadata{Kind: KindJavaClass}
-				}
-
-				if val == 0 {
-					return nil
-				}
+			majorVersion, ok := b.U16BE(6)
+			if ok && majorVersion >= 45 && majorVersion <= 75 {
+				return &Metadata{Kind: KindJavaClass}
 			}
 		}
 
@@ -1382,6 +1413,10 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 			return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAWNEF}
 		}
 
+		if bytes.HasPrefix(makeValue, []byte("OLYMPUS")) || bytes.HasPrefix(makeValue, []byte("Olympus")) {
+			return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAWORF}
+		}
+
 		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
 			return &Metadata{Kind: KindTIFFImage, Type: TypePentaxRAWPEF}
 		}
@@ -1400,6 +1435,10 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 
 	if bytes.Contains(data, []byte("Nikon")) {
 		return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAWNEF}
+	}
+
+	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
+		return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAWORF}
 	}
 
 	if bytes.Contains(data, []byte("PENTAX")) {

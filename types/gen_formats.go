@@ -44,6 +44,7 @@ var subtypeMap = map[KindID][]TypeID{
 	KindNintendo64ROM:         {TypeBigEndian, TypeByteSwapped, TypeLittleEndian},
 	KindOLECompoundDocument:   {TypeMicrosoftExcelWorkbookXLS, TypeMicrosoftInstallerMSI, TypeMicrosoftOutlookMessageMSG, TypeMicrosoftPowerPointPresentationPPT, TypeMicrosoftProjectDocumentMPP, TypeMicrosoftPublisherDocumentPUB, TypeMicrosoftVisioDrawingVSD, TypeMicrosoftWordDocumentDOC},
 	KindOggContainer:          {TypeFLACAudio, TypeOpusAudio, TypeSpeexAudio, TypeTheoraVideo, TypeVorbisAudio},
+	KindOlympusRAWImage:       {TypeOlympusRAWORF},
 	KindPCAPCapture:           {TypeBigEndian, TypeLittleEndian, TypeNanosecondBigEndian, TypeNanosecondLittleEndian},
 	KindPEMPrivateKey:         {TypeDSAPrivateKey, TypeECPrivateKey, TypeRSAPrivateKey},
 	KindPhotoshopDocument:     {TypePSB, TypePSD},

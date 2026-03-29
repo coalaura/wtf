@@ -49,6 +49,10 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeNikonRAWNEF}
 		}
 
+		if bytes.HasPrefix(makeValue, []byte("OLYMPUS")) || bytes.HasPrefix(makeValue, []byte("Olympus")) {
+			return &types.Metadata{Kind: types.KindOlympusRAWImage, Type: types.TypeOlympusRAWORF}
+		}
+
 		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
 			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypePentaxRAWPEF}
 		}
@@ -67,6 +71,10 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 
 	if bytes.Contains(data, []byte("Nikon")) {
 		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeNikonRAWNEF}
+	}
+
+	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
+		return &types.Metadata{Kind: types.KindOlympusRAWImage, Type: types.TypeOlympusRAWORF}
 	}
 
 	if bytes.Contains(data, []byte("PENTAX")) {

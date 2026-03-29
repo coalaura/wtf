@@ -48,6 +48,47 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 		return nil
 	}
 
+	// Get major brand
+	var majorBrand string
+
+	if brandOffset+4 <= b.Len() {
+		majorBrand = string(b[brandOffset : brandOffset+4])
+	}
+
+	// Check major brand first
+	switch majorBrand {
+	case "qt  ":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeQuickTimeMovie}
+	case "M4V ":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeM4VVideo}
+	case "f4v ":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeF4VVideo}
+	case "M4A ", "M4B ", "M4P ":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMPEG4AudioM4AFamily}
+	case "avif":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeAVIFImage}
+	case "avis":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeAVIFImageSequence}
+	case "heic", "heix", "hevc", "hevx", "mif1", "msf1":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeHEIFImage}
+	case "mjp2":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMotionJPEG2000}
+	case "crx ":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeCanonRAW3CR3}
+	case "braw":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeBlackmagicRAW}
+	case "3g2a", "3g2b":
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3G2Media}
+	}
+
+	// Check for 3GPP prefix in major brand (3gp1-3gp6, 3gs7, 3ge6, 3gg6)
+	if len(majorBrand) == 4 && (majorBrand[:3] == "3gp" || majorBrand[:3] == "3g2") {
+		if majorBrand[3] >= '1' && majorBrand[3] <= '9' {
+			return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3GPPMedia}
+		}
+	}
+
+	// For generic major brands (isom, iso2, mp41, etc.), check compatible brands
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "avif") {
 		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeAVIFImage}
 	}
@@ -88,16 +129,16 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMotionJPEG2000}
 	}
 
-	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMP4Video}
-	}
-
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "crx ") {
 		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeCanonRAW3CR3}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "braw") {
 		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeBlackmagicRAW}
+	}
+
+	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMP4Video}
 	}
 
 	return &types.Metadata{

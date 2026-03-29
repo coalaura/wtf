@@ -48,17 +48,12 @@ func DetectMachO(b types.Buffer) *types.Metadata {
 	}
 
 	if b.Has(0, []byte{0xca, 0xfe, 0xba, 0xbe}) {
-		// java class check
+		// Java class files: minor version at offset 4-5, major version at offset 6-7
+		// Valid major version range: 45 (Java 1.1) to ~75 (Java 21+)
 		if b.Len() >= 8 {
-			val, ok := b.U32BE(4)
-			if ok {
-				if val >= 0x20 {
-					return &types.Metadata{Kind: types.KindJavaClass}
-				}
-
-				if val == 0 {
-					return nil
-				}
+			majorVersion, ok := b.U16BE(6)
+			if ok && majorVersion >= 45 && majorVersion <= 75 {
+				return &types.Metadata{Kind: types.KindJavaClass}
 			}
 		}
 
