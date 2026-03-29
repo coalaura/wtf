@@ -37,11 +37,11 @@ func init() {
 	types.RegisterSignature(types.KindYouTubeTimedText, types.TypeNone, 0, []byte("\xef\xbb\xbf<?xml version"))
 	types.RegisterSignature(types.KindYUV4MPEG2Video, types.TypeNone, 0, []byte("YUV4MPEG2 "))
 
-	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeAfterEffectsProjectAEP, 0, []byte("RIFF\x00\x00\x00\x00FXTC"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
+	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeAfterEffectsProject, 0, []byte("RIFF\x00\x00\x00\x00FXTC"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeAVIVideo, 0, []byte("RIFF\x00\x00\x00\x00AVI "), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
-	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeCubaseProjectCPR, 0, []byte("RIFF\x00\x00\x00\x00SMED"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
+	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeCubaseProject, 0, []byte("RIFF\x00\x00\x00\x00SMED"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
+	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeHDPhoto, 0, []byte("RIFF\x00\x00\x00\x00HDP "), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeWindowsAnimatedCursor, 0, []byte("RIFF\x00\x00\x00\x00ACON"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
-	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeXPS, 0, []byte("RIFF\x00\x00\x00\x00HDP "), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 
 	types.RegisterWeakSignature(types.KindSubRipText, types.TypeNone, 0, []byte("1\n00:00:"))
 	types.RegisterWeakSignature(types.KindSubRipText, types.TypeNone, 0, []byte("1\r\n00:00:"))

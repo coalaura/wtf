@@ -472,7 +472,7 @@ const (
 	KindProTrackerModule
 	KindPRTGDatabase
 	KindPSFFont
-	KindPsiwtftabase
+	KindPsionDatabase
 	KindPufferArchive
 	KindPuttyPrivateKey
 	KindPVRTexture
@@ -723,17 +723,17 @@ const (
 	Type64BitBigEndian
 	Type64BitLittleEndian
 	TypeAC3
-	TypeAdobeDNGDNG
+	TypeAdobeDNG
 	TypeADTS
-	TypeAfterEffectsProjectAEP
+	TypeAfterEffectsProject
 	TypeAIFCAudio
 	TypeAIFFAudio
-	TypeAndroidAppBundleAAB
-	TypeAndroidArchiveAAR
-	TypeAndroidPackageAPK
-	TypeAndroidPackageXAPK
-	TypeAndroidSplitAPKS
-	TypeAndroidSystemPackageAPEX
+	TypeAndroidAppBundle
+	TypeAndroidArchive
+	TypeAndroidPackage
+	TypeAndroidPackageX
+	TypeAndroidSplitAPKSet
+	TypeAndroidSystemPackage
 	TypeAPPXPackage
 	TypeArchLinuxPackage
 	TypeASCIIText
@@ -752,7 +752,7 @@ const (
 	TypeBlockDevice
 	TypeByteSwapped
 	TypeC
-	TypeCanonRAW3CR3
+	TypeCanonRAW3
 	TypeCanonRAWHE
 	TypeCAT
 	TypeCBT
@@ -762,17 +762,14 @@ const (
 	TypeCharacterDevice
 	TypeCMake
 	TypeCodestream
+	TypeCondaPackage
 	TypeContainer
-	TypeCorelDRAWDocumentCDR
+	TypeCorelDRAWDocument
 	TypeCOWD
 	TypeCPP
-	TypeCRXVersion2
-	TypeCRXVersion3
 	TypeCSharp
-	TypeCSO
 	TypeCSS
-	TypeCubaseProjectCPR
-	TypeCwtfPackage
+	TypeCubaseProject
 	TypeDart
 	TypeDEX035
 	TypeDEX036
@@ -785,7 +782,6 @@ const (
 	TypeDocker
 	TypeDownloadableSounds
 	TypeDSAPrivateKey
-	TypeDSW
 	TypeEAC3
 	TypeECPrivateKey
 	TypeELF
@@ -796,7 +792,7 @@ const (
 	TypeELF64BigEndian
 	TypeELF64LittleEndian
 	TypeEmpty
-	TypeEnhancedMetafileEMF
+	TypeEnhancedMetafile
 	TypeEPUBDocument
 	TypeExt2
 	TypeExt3
@@ -806,40 +802,35 @@ const (
 	TypeFAT12
 	TypeFAT16
 	TypeFAT32
-	TypeFirefoxExtensionXPI
+	TypeFirefoxExtension
 	TypeFLACAudio
-	TypeFLI
 	TypeForgeMod
 	TypeGIF87a
 	TypeGIF89a
 	TypeGo
 	TypeGraphQL
+	TypeHDPhoto
 	TypeHE
 	TypeHEIFImage
 	TypeILBMImage
 	TypeIMMM
 	TypeINI
-	TypeIOSApplicationArchiveIPA
+	TypeIOSApplicationArchive
 	TypeIWAD
 	TypeJava
-	TypeJavaArchiveJAR
-	TypeJavaEnterpriseArchiveEAR
+	TypeJavaArchive
+	TypeJavaEnterpriseArchive
 	TypeJavaScript
-	TypeJavaWebArchiveWAR
-	TypeJMOD
+	TypeJavaWebArchive
 	TypeKDB
 	TypeKDBX
 	TypeKDM
 	TypeKerasModel
 	TypeKMZArchive
 	TypeKotlin
-	TypeKritaDocumentKRA
-	TypeKTX
-	TypeKTX2
-	TypeLGC
+	TypeKritaDocument
 	TypeLIST
 	TypeLittleEndian
-	TypeLN
 	TypeLOVEGame
 	TypeLua
 	TypeLZ4Legacy
@@ -849,30 +840,28 @@ const (
 	TypeMakefile
 	TypeMarkdown
 	TypeMatroska
-	TypeMicrosoftExcelAddInXLAM
-	TypeMicrosoftExcelMacroEnabledTemplateXLTM
-	TypeMicrosoftExcelMacroEnabledWorkbookXLSM
-	TypeMicrosoftExcelSpreadsheetXLSX
-	TypeMicrosoftExcelTemplateXLTX
-	TypeMicrosoftExcelWorkbookXLS
-	TypeMicrosoftInstallerMSI
-	TypeMicrosoftOutlookMessageMSG
-	TypeMicrosoftPowerPointAddInPPAM
-	TypeMicrosoftPowerPointMacroEnabledPresentationPPTM
-	TypeMicrosoftPowerPointMacroEnabledSlideshowPPSM
-	TypeMicrosoftPowerPointMacroEnabledTemplatePOTM
-	TypeMicrosoftPowerPointPresentationPPT
-	TypeMicrosoftPowerPointPresentationPPTX
-	TypeMicrosoftPowerPointSlideshowPPSX
-	TypeMicrosoftPowerPointTemplatePOTX
-	TypeMicrosoftProjectDocumentMPP
-	TypeMicrosoftPublisherDocumentPUB
-	TypeMicrosoftVisioDrawingVSD
-	TypeMicrosoftWordDocumentDOC
-	TypeMicrosoftWordDocumentDOCX
-	TypeMicrosoftWordMacroEnabledDocumentDOCM
-	TypeMicrosoftWordMacroEnabledTemplateDOTM
-	TypeMicrosoftWordTemplateDOTX
+	TypeMicrosoftExcelAddIn
+	TypeMicrosoftExcelMacroEnabledTemplate
+	TypeMicrosoftExcelMacroEnabledWorkbook
+	TypeMicrosoftExcelTemplate
+	TypeMicrosoftExcelWorkbook
+	TypeMicrosoftInstaller
+	TypeMicrosoftInstallerPatch
+	TypeMicrosoftOutlookMessage
+	TypeMicrosoftPowerPointAddIn
+	TypeMicrosoftPowerPointMacroEnabledPresentation
+	TypeMicrosoftPowerPointMacroEnabledSlideshow
+	TypeMicrosoftPowerPointMacroEnabledTemplate
+	TypeMicrosoftPowerPointPresentation
+	TypeMicrosoftPowerPointSlideshow
+	TypeMicrosoftPowerPointTemplate
+	TypeMicrosoftProjectDocument
+	TypeMicrosoftPublisherDocument
+	TypeMicrosoftVisioDrawing
+	TypeMicrosoftWordDocument
+	TypeMicrosoftWordMacroEnabledDocument
+	TypeMicrosoftWordMacroEnabledTemplate
+	TypeMicrosoftWordTemplate
 	TypeMinecraftResourcePack
 	TypeMotionJPEG2000
 	TypeMP3ID3Tagged
@@ -883,35 +872,34 @@ const (
 	TypeMPEGLayer2
 	TypeMPEGLayer3
 	TypeMSIXPackage
-	TypeMSP
 	TypeNamedPipe
 	TypeNanosecondBigEndian
 	TypeNanosecondLittleEndian
 	TypeNB
 	TypeNewASCII
 	TypeNewASCIIWithCRC
-	TypeNikonRAWNEF
+	TypeNikonRAW
 	TypeNITF
 	TypeNpmPackageTarball
-	TypeNuGetPackageNUPKG
+	TypeNuGetPackage
 	TypeOBJ
 	TypeObjectiveC
 	TypeOCIImageLayoutTar
 	TypeOldASCII
-	TypeOlympusRAWORF
+	TypeOlympusRAW
 	TypeOpdata01
-	TypeOpenDocumentChartODC
-	TypeOpenDocumentDatabaseODB
-	TypeOpenDocumentFormulaODF
-	TypeOpenDocumentGraphicsODG
-	TypeOpenDocumentImageODI
-	TypeOpenDocumentPresentationODP
-	TypeOpenDocumentSpreadsheetODS
-	TypeOpenDocumentTextODT
-	TypeOpenRasterImageORA
+	TypeOpenDocumentChart
+	TypeOpenDocumentDatabase
+	TypeOpenDocumentFormula
+	TypeOpenDocumentGraphics
+	TypeOpenDocumentImage
+	TypeOpenDocumentPresentation
+	TypeOpenDocumentSpreadsheet
+	TypeOpenDocumentText
+	TypeOpenRasterImage
 	TypeOpusAudio
 	TypePAM
-	TypePanasonicRAWRW2
+	TypePanasonicRAW
 	TypePBMASCII
 	TypePBMBinary
 	TypePE32ARM
@@ -925,7 +913,7 @@ const (
 	TypePE32X86
 	TypePE32X8664
 	TypePEC
-	TypePentaxRAWPEF
+	TypePentaxRAW
 	TypePerl
 	TypePES
 	TypePGMASCII
@@ -938,8 +926,8 @@ const (
 	TypePSD
 	TypePWAD
 	TypePython
-	TypePythonSourceDistributionSDist
-	TypePythonWheelWHL
+	TypePythonSourceDistribution
+	TypePythonWheel
 	TypePyTorchModel
 	TypeQCOW1
 	TypeQCOW2
@@ -958,10 +946,9 @@ const (
 	TypeSketchDocument
 	TypeSlackwarePackage
 	TypeSocket
-	TypeSonyRAWARW
+	TypeSonyRAW
 	TypeSonyRAWSR2
 	TypeSoundFont2
-	TypeSpanned
 	TypeSpecial
 	TypeSpeexAudio
 	TypeSQL
@@ -973,13 +960,15 @@ const (
 	TypeTerraform
 	TypeTheoraVideo
 	TypeTOML
-	TypeTrue
 	TypeTS
 	TypeTypeScript
 	TypeUCE
 	TypeUncompressed
 	TypeUTF8Text
 	TypeVagrantBox
+	TypeVersion1
+	TypeVersion2
+	TypeVersion3
 	TypeVisualStudioExtensionVSIX
 	TypeVMD
 	TypeVMDK
@@ -995,9 +984,9 @@ const (
 	TypeWindowsLX
 	TypeWindowsMetafileWMF
 	TypeWindowsNE
+	TypeWorkspace
 	TypeWrapper
-	TypeXMLPaperSpecificationXPS
-	TypeXPS
+	TypeXMLPaperSpecification
 	TypeXSLTStylesheet
 	TypeYAML
 	TypeZlibCompressed
@@ -1473,7 +1462,7 @@ var kindNames = [...]string{
 	KindProTrackerModule:                    "ProTracker Module",
 	KindPRTGDatabase:                        "PRTG Database",
 	KindPSFFont:                             "PC Screen Font",
-	KindPsiwtftabase:                        "Psion Database",
+	KindPsionDatabase:                       "Psion Database",
 	KindPufferArchive:                       "Puffer Archive",
 	KindPuttyPrivateKey:                     "PuTTY Private Key",
 	KindPVRTexture:                          "PVR Texture",
@@ -1713,296 +1702,285 @@ var kindNames = [...]string{
 }
 
 var typeNames = [...]string{
-	TypeNone:                     "",
-	Type32Bit:                    "32-bit",
-	Type32BitBigEndian:           "32-bit Big-Endian",
-	Type32BitLittleEndian:        "32-bit Little-Endian",
-	Type3G2Media:                 "3G2 Media",
-	Type3GPPMedia:                "3GPP Media",
-	Type3MFDocument:              "3MF Document",
-	Type64Bit:                    "64-bit",
-	Type64BitBigEndian:           "64-bit Big-Endian",
-	Type64BitLittleEndian:        "64-bit Little-Endian",
-	TypeAC3:                      "AC-3",
-	TypeAdobeDNGDNG:              "Adobe DNG (DNG)",
-	TypeADTS:                     "ADTS",
-	TypeAfterEffectsProjectAEP:   "After Effects Project (AEP)",
-	TypeAIFCAudio:                "AIFC Audio",
-	TypeAIFFAudio:                "AIFF Audio",
-	TypeAndroidAppBundleAAB:      "Android App Bundle (AAB)",
-	TypeAndroidArchiveAAR:        "Android Archive (AAR)",
-	TypeAndroidPackageAPK:        "Android Package (APK)",
-	TypeAndroidPackageXAPK:       "Android Package (XAPK)",
-	TypeAndroidSplitAPKS:         "Android Split APK Set (APKS)",
-	TypeAndroidSystemPackageAPEX: "Android System Package (APEX)",
-	TypeAPPXPackage:              "APPX Package",
-	TypeArchLinuxPackage:         "Arch Linux Package",
-	TypeASCIIText:                "ASCII Text",
-	TypeAVIFImage:                "AVIF Image",
-	TypeAVIFImageSequence:        "AVIF Image Sequence",
-	TypeAVIVideo:                 "AVI Video",
-	TypeB4:                       "B4",
-	TypeBashScript:               "Bash Script",
-	TypeBatch:                    "Batch Script",
-	TypeBGZF:                     "BGZF",
-	TypeBigEndian:                "Big-Endian",
-	TypeBigTIFF:                  "BigTIFF",
-	TypeBinaryBigEndian:          "Binary Big-Endian",
-	TypeBinaryLittleEndian:       "Binary Little-Endian",
-	TypeBlackmagicRAW:            "Blackmagic RAW",
-	TypeBlockDevice:              "Block Device",
-	TypeByteSwapped:              "Byte-Swapped",
-	TypeC:                        "C Source",
-	TypeCanonRAW3CR3:             "Canon RAW 3 (CR3)",
-	TypeCanonRAWHE:               "Canon RAW HE",
-	TypeCAT:                      "CAT",
-	TypeCBT:                      "CBT",
-	TypeCBZ:                      "CBZ",
-	TypeCDAAudio:                 "CD Audio",
-	TypeCE:                       "CE",
-	TypeCharacterDevice:          "Character Device",
-	TypeCMake:                    "CMake Script",
-	TypeCodestream:               "Codestream",
-	TypeContainer:                "Container",
-	TypeCorelDRAWDocumentCDR:     "CorelDRAW Document (CDR)",
-	TypeCOWD:                     "COWD",
-	TypeCPP:                      "C++ Source",
-	TypeCRXVersion2:              "Version 2",
-	TypeCRXVersion3:              "Version 3",
-	TypeCSharp:                   "C# Source",
-	TypeCSO:                      "CSO",
-	TypeCSS:                      "Cascading Style Sheets (CSS)",
-	TypeCubaseProjectCPR:         "Cubase Project (CPR)",
-	TypeCwtfPackage:              "Cwtf Package",
-	TypeDart:                     "Dart Source",
-	TypeDEX035:                   "DEX 035",
-	TypeDEX036:                   "DEX 036",
-	TypeDEX037:                   "DEX 037",
-	TypeDEX038:                   "DEX 038",
-	TypeDEX039:                   "DEX 039",
-	TypeDEX040:                   "DEX 040",
-	TypeDEX041:                   "DEX 041",
-	TypeDirectory:                "Directory",
-	TypeDocker:                   "Dockerfile",
-	TypeDownloadableSounds:       "Downloadable Sounds",
-	TypeDSAPrivateKey:            "DSA Private Key",
-	TypeDSW:                      "Visual Studio Workspace (DSW)",
-	TypeEAC3:                     "E-AC-3",
-	TypeECPrivateKey:             "EC Private Key",
-	TypeELF:                      "ELF",
-	TypeELF32:                    "ELF32",
-	TypeELF32BigEndian:           "ELF32 Big-Endian",
-	TypeELF32LittleEndian:        "ELF32 Little-Endian",
-	TypeELF64:                    "ELF64",
-	TypeELF64BigEndian:           "ELF64 Big-Endian",
-	TypeELF64LittleEndian:        "ELF64 Little-Endian",
-	TypeEmpty:                    "Empty",
-	TypeEnhancedMetafileEMF:      "Enhanced Metafile (EMF)",
-	TypeEPUBDocument:             "EPUB Document",
-	TypeExt2:                     "ext2",
-	TypeExt3:                     "ext3",
-	TypeExt4:                     "ext4",
-	TypeF4VVideo:                 "F4V Video",
-	TypeFabricMod:                "Fabric Mod",
-	TypeFAT12:                    "FAT12",
-	TypeFAT16:                    "FAT16",
-	TypeFAT32:                    "FAT32",
-	TypeFirefoxExtensionXPI:      "Firefox Extension (XPI)",
-	TypeFLACAudio:                "FLAC Audio",
-	TypeFLI:                      "FLI",
-	TypeForgeMod:                 "Forge Mod",
-	TypeGIF87a:                   "GIF87a",
-	TypeGIF89a:                   "GIF89a",
-	TypeGo:                       "Go Source",
-	TypeGraphQL:                  "GraphQL",
-	TypeHE:                       "HE",
-	TypeHEIFImage:                "HEIF Image",
-	TypeILBMImage:                "ILBM Image",
-	TypeIMMM:                     "IMMM",
-	TypeINI:                      "INI Configuration",
-	TypeIOSApplicationArchiveIPA: "iOS Application Archive (IPA)",
-	TypeIWAD:                     "IWAD",
-	TypeJava:                     "Java Source",
-	TypeJavaArchiveJAR:           "Java Archive (JAR)",
-	TypeJavaEnterpriseArchiveEAR: "Java Enterprise Archive (EAR)",
-	TypeJavaScript:               "JavaScript Source",
-	TypeJavaWebArchiveWAR:        "Java Web Archive (WAR)",
-	TypeJMOD:                     "JMOD",
-	TypeKDB:                      "KDB",
-	TypeKDBX:                     "KDBX",
-	TypeKDM:                      "KDM",
-	TypeKerasModel:               "Keras Model",
-	TypeKMZArchive:               "KMZ Archive",
-	TypeKotlin:                   "Kotlin Source",
-	TypeKritaDocumentKRA:         "Krita Document (KRA)",
-	TypeKTX:                      "KTX",
-	TypeKTX2:                     "KTX2",
-	TypeLGC:                      "Application Log (LGC)",
-	TypeLIST:                     "LIST",
-	TypeLittleEndian:             "Little-Endian",
-	TypeLN:                       "LN",
-	TypeLOVEGame:                 "LÖVE Game",
-	TypeLua:                      "Lua Script",
-	TypeLZ4Legacy:                "LZ4 Legacy",
-	TypeLZMACompressed:           "LZMA Compressed",
-	TypeM2TSBDAV:                 "M2TS/BDAV",
-	TypeM4VVideo:                 "M4V Video",
-	TypeMakefile:                 "Makefile",
-	TypeMarkdown:                 "Markdown Document",
-	TypeMatroska:                 "Matroska",
-	TypeMicrosoftExcelAddInXLAM:  "Microsoft Excel Add-In (XLAM)",
-	TypeMicrosoftExcelMacroEnabledTemplateXLTM:          "Microsoft Excel Macro-Enabled Template (XLTM)",
-	TypeMicrosoftExcelMacroEnabledWorkbookXLSM:          "Microsoft Excel Macro-Enabled Workbook (XLSM)",
-	TypeMicrosoftExcelSpreadsheetXLSX:                   "Microsoft Excel Spreadsheet (XLSX)",
-	TypeMicrosoftExcelTemplateXLTX:                      "Microsoft Excel Template (XLTX)",
-	TypeMicrosoftExcelWorkbookXLS:                       "Microsoft Excel Workbook (XLS)",
-	TypeMicrosoftInstallerMSI:                           "Microsoft Installer (MSI)",
-	TypeMicrosoftOutlookMessageMSG:                      "Microsoft Outlook Message (MSG)",
-	TypeMicrosoftPowerPointAddInPPAM:                    "Microsoft PowerPoint Add-In (PPAM)",
-	TypeMicrosoftPowerPointMacroEnabledPresentationPPTM: "Microsoft PowerPoint Macro-Enabled Presentation (PPTM)",
-	TypeMicrosoftPowerPointMacroEnabledSlideshowPPSM:    "Microsoft PowerPoint Macro-Enabled Slideshow (PPSM)",
-	TypeMicrosoftPowerPointMacroEnabledTemplatePOTM:     "Microsoft PowerPoint Macro-Enabled Template (POTM)",
-	TypeMicrosoftPowerPointPresentationPPT:              "Microsoft PowerPoint Presentation (PPT)",
-	TypeMicrosoftPowerPointPresentationPPTX:             "Microsoft PowerPoint Presentation (PPTX)",
-	TypeMicrosoftPowerPointSlideshowPPSX:                "Microsoft PowerPoint Slideshow (PPSX)",
-	TypeMicrosoftPowerPointTemplatePOTX:                 "Microsoft PowerPoint Template (POTX)",
-	TypeMicrosoftProjectDocumentMPP:                     "Microsoft Project Document (MPP)",
-	TypeMicrosoftPublisherDocumentPUB:                   "Microsoft Publisher Document (PUB)",
-	TypeMicrosoftVisioDrawingVSD:                        "Microsoft Visio Drawing (VSD)",
-	TypeMicrosoftWordDocumentDOC:                        "Microsoft Word Document (DOC)",
-	TypeMicrosoftWordDocumentDOCX:                       "Microsoft Word Document (DOCX)",
-	TypeMicrosoftWordMacroEnabledDocumentDOCM:           "Microsoft Word Macro-Enabled Document (DOCM)",
-	TypeMicrosoftWordMacroEnabledTemplateDOTM:           "Microsoft Word Macro-Enabled Template (DOTM)",
-	TypeMicrosoftWordTemplateDOTX:                       "Microsoft Word Template (DOTX)",
-	TypeMinecraftResourcePack:                           "Minecraft Resource Pack",
-	TypeMotionJPEG2000:                                  "Motion JPEG 2000",
-	TypeMP3ID3Tagged:                                    "MP3 (ID3 Tagged)",
-	TypeMP4Video:                                        "MP4 Video",
-	TypeMPEG12Video:                                     "MPEG-1/2 Video",
-	TypeMPEG4AudioM4AFamily:                             "MPEG-4 Audio (M4A Family)",
-	TypeMPEGLayer1:                                      "MPEG Layer I",
-	TypeMPEGLayer2:                                      "MPEG Layer II",
-	TypeMPEGLayer3:                                      "MPEG Layer III",
-	TypeMSIXPackage:                                     "MSIX Package",
-	TypeMSP:                                             "Microsoft Installer Patch (MSP)",
-	TypeNamedPipe:                                       "Named Pipe",
-	TypeNanosecondBigEndian:                             "Nanosecond Big-Endian",
-	TypeNanosecondLittleEndian:                          "Nanosecond Little-Endian",
-	TypeNB:                                              "NB",
-	TypeNewASCII:                                        "New ASCII",
-	TypeNewASCIIWithCRC:                                 "New ASCII with CRC",
-	TypeNikonRAWNEF:                                     "Nikon RAW (NEF)",
-	TypeNITF:                                            "NITF",
-	TypeNpmPackageTarball:                               "npm Package Tarball",
-	TypeNuGetPackageNUPKG:                               "NuGet Package (NUPKG)",
-	TypeOBJ:                                             "COFF Object (OBJ)",
-	TypeObjectiveC:                                      "Objective-C Source",
-	TypeOCIImageLayoutTar:                               "OCI Image Layout (TAR)",
-	TypeOldASCII:                                        "Old ASCII",
-	TypeOlympusRAWORF:                                   "Olympus RAW (ORF)",
-	TypeOpdata01:                                        "opdata01",
-	TypeOpenDocumentChartODC:                            "OpenDocument Chart (ODC)",
-	TypeOpenDocumentDatabaseODB:                         "OpenDocument Database (ODB)",
-	TypeOpenDocumentFormulaODF:                          "OpenDocument Formula (ODF)",
-	TypeOpenDocumentGraphicsODG:                         "OpenDocument Graphics (ODG)",
-	TypeOpenDocumentImageODI:                            "OpenDocument Image (ODI)",
-	TypeOpenDocumentPresentationODP:                     "OpenDocument Presentation (ODP)",
-	TypeOpenDocumentSpreadsheetODS:                      "OpenDocument Spreadsheet (ODS)",
-	TypeOpenDocumentTextODT:                             "OpenDocument Text (ODT)",
-	TypeOpenRasterImageORA:                              "OpenRaster Image (ORA)",
-	TypeOpusAudio:                                       "Opus Audio",
-	TypePAM:                                             "PAM",
-	TypePanasonicRAWRW2:                                 "Panasonic RAW (RW2)",
-	TypePBMASCII:                                        "PBM ASCII",
-	TypePBMBinary:                                       "PBM binary",
-	TypePE32ARM:                                         "PE32 ARM",
-	TypePE32ARM64:                                       "PE32 ARM64",
-	TypePE32ARMv7:                                       "PE32 ARMv7",
-	TypePE32Itanium:                                     "PE32 Itanium",
-	TypePE32PlusARM64:                                   "PE32+ ARM64",
-	TypePE32PlusUnknown:                                 "PE32+ Unknown",
-	TypePE32PlusX8664:                                   "PE32+ x86-64",
-	TypePE32Unknown:                                     "PE32 Unknown",
-	TypePE32X86:                                         "PE32 x86",
-	TypePE32X8664:                                       "PE32 x86-64",
-	TypePEC:                                             "PEC",
-	TypePentaxRAWPEF:                                    "Pentax RAW (PEF)",
-	TypePerl:                                            "Perl Script",
-	TypePES:                                             "PES",
-	TypePGMASCII:                                        "PGM ASCII",
-	TypePGMBinary:                                       "PGM binary",
-	TypePHP:                                             "PHP Script",
-	TypePowerShell:                                      "PowerShell Script",
-	TypePPMASCII:                                        "PPM ASCII",
-	TypePPMBinary:                                       "PPM binary",
-	TypePSB:                                             "PSB",
-	TypePSD:                                             "PSD",
-	TypePWAD:                                            "PWAD",
-	TypePython:                                          "Python Script",
-	TypePythonSourceDistributionSDist:                   "Python Source Distribution (sdist)",
-	TypePythonWheelWHL:                                  "Python Wheel (WHL)",
-	TypePyTorchModel:                                    "PyTorch Model",
-	TypeQCOW1:                                           "QCOW1",
-	TypeQCOW2:                                           "QCOW2",
-	TypeQCPAudio:                                        "QCP Audio",
-	TypeQuickTimeMovie:                                  "QuickTime Movie",
-	TypeR:                                               "R Script",
-	TypeRAR5:                                            "RAR5",
-	TypeRARLegacy:                                       "RAR (Legacy)",
-	TypeReturnPath:                                      "Return Path",
-	TypeRIFFMIDI:                                        "MIDI",
-	TypeRIFFPalette:                                     "Palette",
-	TypeRSAPrivateKey:                                   "RSA Private Key",
-	TypeRuby:                                            "Ruby Script",
-	TypeRust:                                            "Rust Source",
-	TypeScala:                                           "Scala Source",
-	TypeSketchDocument:                                  "Sketch Document",
-	TypeSlackwarePackage:                                "Slackware Package",
-	TypeSocket:                                          "Socket",
-	TypeSonyRAWARW:                                      "Sony RAW (ARW)",
-	TypeSonyRAWSR2:                                      "Sony RAW (SR2)",
-	TypeSoundFont2:                                      "SoundFont 2",
-	TypeSpanned:                                         "Spanned",
-	TypeSpecial:                                         "Special",
-	TypeSpeexAudio:                                      "Speex Audio",
-	TypeSQL:                                             "SQL Script",
-	TypeStreamVersion7:                                  "Stream Version 7",
-	TypeStreamVersion8:                                  "Stream Version 8",
-	TypeSwift:                                           "Swift Source",
-	TypeSymbolicLink:                                    "Symbolic Link",
-	TypeSZ:                                              "SZ",
-	TypeTerraform:                                       "Terraform Configuration",
-	TypeTheoraVideo:                                     "Theora Video",
-	TypeTOML:                                            "TOML Configuration",
-	TypeTrue:                                            "True",
-	TypeTS:                                              "TS",
-	TypeTypeScript:                                      "TypeScript Source",
-	TypeUCE:                                             "Unicode Extensions",
-	TypeUncompressed:                                    "Uncompressed",
-	TypeUTF8Text:                                        "UTF-8 Text",
-	TypeVagrantBox:                                      "Vagrant Box",
-	TypeVisualStudioExtensionVSIX:                       "Visual Studio Extension (VSIX)",
-	TypeVMD:                                             "VocalTec Media (VMD)",
-	TypeVMDK:                                            "VMDK",
-	TypeVMDKDescription:                                 "VMDK Description",
-	TypeVorbisAudio:                                     "Vorbis Audio",
-	TypeWAVAudio:                                        "WAV Audio",
-	TypeWebM:                                            "WebM",
-	TypeWebPImage:                                       "WebP Image",
-	TypeWindowsAnimatedCursor:                           "Windows Animated Cursor",
-	TypeWindowsCursor:                                   "Windows Cursor",
-	TypeWindowsIcon:                                     "Windows Icon",
-	TypeWindowsLE:                                       "Linear Executable (LE)",
-	TypeWindowsLX:                                       "OS/2 Linear Executable (LX)",
-	TypeWindowsMetafileWMF:                              "Windows Metafile (WMF)",
-	TypeWindowsNE:                                       "16-bit New Executable (NE)",
-	TypeWrapper:                                         "Wrapper",
-	TypeXMLPaperSpecificationXPS:                        "XML Paper Specification (XPS)",
-	TypeXPS:                                             "XML Paper Specification (XPS)",
-	TypeXSLTStylesheet:                                  "XSLT Stylesheet",
-	TypeYAML:                                            "YAML Configuration",
-	TypeZlibCompressed:                                  "Zlib Compressed",
-	TypeZstandardSkinnableFrame:                         "Zstandard Skinnable Frame",
+	TypeNone:                               "",
+	Type32Bit:                              "32-bit",
+	Type32BitBigEndian:                     "32-bit Big-Endian",
+	Type32BitLittleEndian:                  "32-bit Little-Endian",
+	Type3G2Media:                           "3G2 Media",
+	Type3GPPMedia:                          "3GPP Media",
+	Type3MFDocument:                        "3MF Document",
+	Type64Bit:                              "64-bit",
+	Type64BitBigEndian:                     "64-bit Big-Endian",
+	Type64BitLittleEndian:                  "64-bit Little-Endian",
+	TypeAC3:                                "AC-3",
+	TypeAdobeDNG:                           "Adobe DNG (DNG)",
+	TypeADTS:                               "ADTS",
+	TypeAfterEffectsProject:                "After Effects Project (AEP)",
+	TypeAIFCAudio:                          "AIFC Audio",
+	TypeAIFFAudio:                          "AIFF Audio",
+	TypeAndroidAppBundle:                   "Android App Bundle (AAB)",
+	TypeAndroidArchive:                     "Android Archive (AAR)",
+	TypeAndroidPackage:                     "Android Package (APK)",
+	TypeAndroidPackageX:                    "Android Package (XAPK)",
+	TypeAndroidSplitAPKSet:                 "Android Split APK Set (APKS)",
+	TypeAndroidSystemPackage:               "Android System Package (APEX)",
+	TypeAPPXPackage:                        "APPX Package",
+	TypeArchLinuxPackage:                   "Arch Linux Package",
+	TypeASCIIText:                          "ASCII Text",
+	TypeAVIFImage:                          "AVIF Image",
+	TypeAVIFImageSequence:                  "AVIF Image Sequence",
+	TypeAVIVideo:                           "AVI Video",
+	TypeB4:                                 "B4",
+	TypeBashScript:                         "Bash Script",
+	TypeBatch:                              "Batch Script",
+	TypeBGZF:                               "BGZF",
+	TypeBigEndian:                          "Big-Endian",
+	TypeBigTIFF:                            "BigTIFF",
+	TypeBinaryBigEndian:                    "Binary Big-Endian",
+	TypeBinaryLittleEndian:                 "Binary Little-Endian",
+	TypeBlackmagicRAW:                      "Blackmagic RAW",
+	TypeBlockDevice:                        "Block Device",
+	TypeByteSwapped:                        "Byte-Swapped",
+	TypeC:                                  "C Source",
+	TypeCanonRAW3:                          "Canon RAW 3",
+	TypeCanonRAWHE:                         "Canon RAW HE",
+	TypeCAT:                                "CAT",
+	TypeCBT:                                "CBT",
+	TypeCBZ:                                "CBZ",
+	TypeCDAAudio:                           "CD Audio",
+	TypeCE:                                 "CE",
+	TypeCharacterDevice:                    "Character Device",
+	TypeCMake:                              "CMake Script",
+	TypeCodestream:                         "Codestream",
+	TypeCondaPackage:                       "Cwtf Package",
+	TypeContainer:                          "Container",
+	TypeCorelDRAWDocument:                  "CorelDRAW Document",
+	TypeCOWD:                               "COWD",
+	TypeCPP:                                "C++ Source",
+	TypeCSharp:                             "C# Source",
+	TypeCSS:                                "Cascading Style Sheets (CSS)",
+	TypeCubaseProject:                      "Cubase Project",
+	TypeDart:                               "Dart Source",
+	TypeDEX035:                             "DEX 035",
+	TypeDEX036:                             "DEX 036",
+	TypeDEX037:                             "DEX 037",
+	TypeDEX038:                             "DEX 038",
+	TypeDEX039:                             "DEX 039",
+	TypeDEX040:                             "DEX 040",
+	TypeDEX041:                             "DEX 041",
+	TypeDirectory:                          "Directory",
+	TypeDocker:                             "Dockerfile",
+	TypeDownloadableSounds:                 "Downloadable Sounds",
+	TypeDSAPrivateKey:                      "DSA Private Key",
+	TypeEAC3:                               "E-AC-3",
+	TypeECPrivateKey:                       "EC Private Key",
+	TypeELF:                                "ELF",
+	TypeELF32:                              "ELF32",
+	TypeELF32BigEndian:                     "ELF32 Big-Endian",
+	TypeELF32LittleEndian:                  "ELF32 Little-Endian",
+	TypeELF64:                              "ELF64",
+	TypeELF64BigEndian:                     "ELF64 Big-Endian",
+	TypeELF64LittleEndian:                  "ELF64 Little-Endian",
+	TypeEmpty:                              "Empty",
+	TypeEnhancedMetafile:                   "Enhanced Metafile",
+	TypeEPUBDocument:                       "EPUB Document",
+	TypeExt2:                               "ext2",
+	TypeExt3:                               "ext3",
+	TypeExt4:                               "ext4",
+	TypeF4VVideo:                           "F4V Video",
+	TypeFabricMod:                          "Fabric Mod",
+	TypeFAT12:                              "FAT12",
+	TypeFAT16:                              "FAT16",
+	TypeFAT32:                              "FAT32",
+	TypeFirefoxExtension:                   "Firefox Extension",
+	TypeFLACAudio:                          "FLAC Audio",
+	TypeForgeMod:                           "Forge Mod",
+	TypeGIF87a:                             "GIF87a",
+	TypeGIF89a:                             "GIF89a",
+	TypeGo:                                 "Go Source",
+	TypeGraphQL:                            "GraphQL",
+	TypeHDPhoto:                            "HD Photo",
+	TypeHE:                                 "HE",
+	TypeHEIFImage:                          "HEIF Image",
+	TypeILBMImage:                          "ILBM Image",
+	TypeIMMM:                               "IMMM",
+	TypeINI:                                "INI Configuration",
+	TypeIOSApplicationArchive:              "iOS Application Archive",
+	TypeIWAD:                               "IWAD",
+	TypeJava:                               "Java Source",
+	TypeJavaArchive:                        "Java Archive",
+	TypeJavaEnterpriseArchive:              "Java Enterprise Archive",
+	TypeJavaScript:                         "JavaScript Source",
+	TypeJavaWebArchive:                     "Java Web Archive",
+	TypeKDB:                                "KDB",
+	TypeKDBX:                               "KDBX",
+	TypeKDM:                                "KDM",
+	TypeKerasModel:                         "Keras Model",
+	TypeKMZArchive:                         "KMZ Archive",
+	TypeKotlin:                             "Kotlin Source",
+	TypeKritaDocument:                      "Krita Document",
+	TypeLIST:                               "LIST",
+	TypeLittleEndian:                       "Little-Endian",
+	TypeLOVEGame:                           "LÖVE Game",
+	TypeLua:                                "Lua Script",
+	TypeLZ4Legacy:                          "LZ4 Legacy",
+	TypeLZMACompressed:                     "LZMA Compressed",
+	TypeM2TSBDAV:                           "M2TS/BDAV",
+	TypeM4VVideo:                           "M4V Video",
+	TypeMakefile:                           "Makefile",
+	TypeMarkdown:                           "Markdown Document",
+	TypeMatroska:                           "Matroska",
+	TypeMicrosoftExcelAddIn:                "Microsoft Excel Add-In",
+	TypeMicrosoftExcelMacroEnabledTemplate: "Microsoft Excel Macro-Enabled Template",
+	TypeMicrosoftExcelMacroEnabledWorkbook: "Microsoft Excel Macro-Enabled Workbook",
+	TypeMicrosoftExcelTemplate:             "Microsoft Excel Template",
+	TypeMicrosoftExcelWorkbook:             "Microsoft Excel Workbook",
+	TypeMicrosoftInstaller:                 "Microsoft Installer",
+	TypeMicrosoftInstallerPatch:            "Microsoft Installer Patch",
+	TypeMicrosoftOutlookMessage:            "Microsoft Outlook Message",
+	TypeMicrosoftPowerPointAddIn:           "Microsoft PowerPoint Add-In",
+	TypeMicrosoftPowerPointMacroEnabledPresentation: "Microsoft PowerPoint Macro-Enabled Presentation",
+	TypeMicrosoftPowerPointMacroEnabledSlideshow:    "Microsoft PowerPoint Macro-Enabled Slideshow",
+	TypeMicrosoftPowerPointMacroEnabledTemplate:     "Microsoft PowerPoint Macro-Enabled Template",
+	TypeMicrosoftPowerPointPresentation:             "Microsoft PowerPoint Presentation",
+	TypeMicrosoftPowerPointSlideshow:                "Microsoft PowerPoint Slideshow",
+	TypeMicrosoftPowerPointTemplate:                 "Microsoft PowerPoint Template",
+	TypeMicrosoftProjectDocument:                    "Microsoft Project Document",
+	TypeMicrosoftPublisherDocument:                  "Microsoft Publisher Document",
+	TypeMicrosoftVisioDrawing:                       "Microsoft Visio Drawing",
+	TypeMicrosoftWordDocument:                       "Microsoft Word Document",
+	TypeMicrosoftWordMacroEnabledDocument:           "Microsoft Word Macro-Enabled Document",
+	TypeMicrosoftWordMacroEnabledTemplate:           "Microsoft Word Macro-Enabled Template",
+	TypeMicrosoftWordTemplate:                       "Microsoft Word Template",
+	TypeMinecraftResourcePack:                       "Minecraft Resource Pack",
+	TypeMotionJPEG2000:                              "Motion JPEG 2000",
+	TypeMP3ID3Tagged:                                "MP3 (ID3 Tagged)",
+	TypeMP4Video:                                    "MP4 Video",
+	TypeMPEG12Video:                                 "MPEG-1/2 Video",
+	TypeMPEG4AudioM4AFamily:                         "MPEG-4 Audio (M4A Family)",
+	TypeMPEGLayer1:                                  "MPEG Layer I",
+	TypeMPEGLayer2:                                  "MPEG Layer II",
+	TypeMPEGLayer3:                                  "MPEG Layer III",
+	TypeMSIXPackage:                                 "MSIX Package",
+	TypeNamedPipe:                                   "Named Pipe",
+	TypeNanosecondBigEndian:                         "Nanosecond Big-Endian",
+	TypeNanosecondLittleEndian:                      "Nanosecond Little-Endian",
+	TypeNB:                                          "NB",
+	TypeNewASCII:                                    "New ASCII",
+	TypeNewASCIIWithCRC:                             "New ASCII with CRC",
+	TypeNikonRAW:                                    "Nikon RAW",
+	TypeNITF:                                        "NITF",
+	TypeNpmPackageTarball:                           "npm Package Tarball",
+	TypeNuGetPackage:                                "NuGet Package",
+	TypeOBJ:                                         "COFF Object",
+	TypeObjectiveC:                                  "Objective-C Source",
+	TypeOCIImageLayoutTar:                           "OCI Image Layout (TAR)",
+	TypeOldASCII:                                    "Old ASCII",
+	TypeOlympusRAW:                                  "Olympus RAW",
+	TypeOpdata01:                                    "opdata01",
+	TypeOpenDocumentChart:                           "OpenDocument Chart",
+	TypeOpenDocumentDatabase:                        "OpenDocument Database",
+	TypeOpenDocumentFormula:                         "OpenDocument Formula",
+	TypeOpenDocumentGraphics:                        "OpenDocument Graphics",
+	TypeOpenDocumentImage:                           "OpenDocument Image",
+	TypeOpenDocumentPresentation:                    "OpenDocument Presentation",
+	TypeOpenDocumentSpreadsheet:                     "OpenDocument Spreadsheet",
+	TypeOpenDocumentText:                            "OpenDocument Text",
+	TypeOpenRasterImage:                             "OpenRaster Image",
+	TypeOpusAudio:                                   "Opus Audio",
+	TypePAM:                                         "PAM",
+	TypePanasonicRAW:                                "Panasonic RAW",
+	TypePBMASCII:                                    "PBM ASCII",
+	TypePBMBinary:                                   "PBM binary",
+	TypePE32ARM:                                     "PE32 ARM",
+	TypePE32ARM64:                                   "PE32 ARM64",
+	TypePE32ARMv7:                                   "PE32 ARMv7",
+	TypePE32Itanium:                                 "PE32 Itanium",
+	TypePE32PlusARM64:                               "PE32+ ARM64",
+	TypePE32PlusUnknown:                             "PE32+ Unknown",
+	TypePE32PlusX8664:                               "PE32+ x86-64",
+	TypePE32Unknown:                                 "PE32 Unknown",
+	TypePE32X86:                                     "PE32 x86",
+	TypePE32X8664:                                   "PE32 x86-64",
+	TypePEC:                                         "PEC",
+	TypePentaxRAW:                                   "Pentax RAW",
+	TypePerl:                                        "Perl Script",
+	TypePES:                                         "PES",
+	TypePGMASCII:                                    "PGM ASCII",
+	TypePGMBinary:                                   "PGM binary",
+	TypePHP:                                         "PHP Script",
+	TypePowerShell:                                  "PowerShell Script",
+	TypePPMASCII:                                    "PPM ASCII",
+	TypePPMBinary:                                   "PPM binary",
+	TypePSB:                                         "PSB",
+	TypePSD:                                         "PSD",
+	TypePWAD:                                        "PWAD",
+	TypePython:                                      "Python Script",
+	TypePythonSourceDistribution:                    "Python Source Distribution",
+	TypePythonWheel:                                 "Python Wheel",
+	TypePyTorchModel:                                "PyTorch Model",
+	TypeQCOW1:                                       "QCOW1",
+	TypeQCOW2:                                       "QCOW2",
+	TypeQCPAudio:                                    "QCP Audio",
+	TypeQuickTimeMovie:                              "QuickTime Movie",
+	TypeR:                                           "R Script",
+	TypeRAR5:                                        "RAR5",
+	TypeRARLegacy:                                   "RAR (Legacy)",
+	TypeReturnPath:                                  "Return Path",
+	TypeRIFFMIDI:                                    "MIDI",
+	TypeRIFFPalette:                                 "Palette",
+	TypeRSAPrivateKey:                               "RSA Private Key",
+	TypeRuby:                                        "Ruby Script",
+	TypeRust:                                        "Rust Source",
+	TypeScala:                                       "Scala Source",
+	TypeSketchDocument:                              "Sketch Document",
+	TypeSlackwarePackage:                            "Slackware Package",
+	TypeSocket:                                      "Socket",
+	TypeSonyRAW:                                     "Sony RAW",
+	TypeSonyRAWSR2:                                  "Sony SR2 RAW",
+	TypeSoundFont2:                                  "SoundFont 2",
+	TypeSpecial:                                     "Special",
+	TypeSpeexAudio:                                  "Speex Audio",
+	TypeSQL:                                         "SQL Script",
+	TypeStreamVersion7:                              "Stream Version 7",
+	TypeStreamVersion8:                              "Stream Version 8",
+	TypeSwift:                                       "Swift Source",
+	TypeSymbolicLink:                                "Symbolic Link",
+	TypeSZ:                                          "SZ",
+	TypeTerraform:                                   "Terraform Configuration",
+	TypeTheoraVideo:                                 "Theora Video",
+	TypeTOML:                                        "TOML Configuration",
+	TypeTS:                                          "TS",
+	TypeTypeScript:                                  "TypeScript Source",
+	TypeUCE:                                         "Unicode Extensions",
+	TypeUncompressed:                                "Uncompressed",
+	TypeUTF8Text:                                    "UTF-8 Text",
+	TypeVagrantBox:                                  "Vagrant Box",
+	TypeVersion1:                                    "Version 1",
+	TypeVersion2:                                    "Version 2",
+	TypeVersion3:                                    "Version 3",
+	TypeVisualStudioExtensionVSIX:                   "Visual Studio Extension (VSIX)",
+	TypeVMD:                                         "VocalTec Media (VMD)",
+	TypeVMDK:                                        "VMDK",
+	TypeVMDKDescription:                             "VMDK Description",
+	TypeVorbisAudio:                                 "Vorbis Audio",
+	TypeWAVAudio:                                    "WAV Audio",
+	TypeWebM:                                        "WebM",
+	TypeWebPImage:                                   "WebP Image",
+	TypeWindowsAnimatedCursor:                       "Windows Animated Cursor",
+	TypeWindowsCursor:                               "Windows Cursor",
+	TypeWindowsIcon:                                 "Windows Icon",
+	TypeWindowsLE:                                   "Linear Executable (LE)",
+	TypeWindowsLX:                                   "OS/2 Linear Executable (LX)",
+	TypeWindowsMetafileWMF:                          "Windows Metafile (WMF)",
+	TypeWindowsNE:                                   "16-bit New Executable (NE)",
+	TypeWorkspace:                                   "Workspace",
+	TypeWrapper:                                     "Wrapper",
+	TypeXMLPaperSpecification:                       "XML Paper Specification",
+	TypeXSLTStylesheet:                              "XSLT Stylesheet",
+	TypeYAML:                                        "YAML Configuration",
+	TypeZlibCompressed:                              "Zlib Compressed",
+	TypeZstandardSkinnableFrame:                     "Zstandard Skinnable Frame",
 }
 
 func (k KindID) String() string {

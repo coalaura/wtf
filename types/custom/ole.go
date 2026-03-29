@@ -25,39 +25,39 @@ func DetectOLE(b types.Buffer) *types.Metadata {
 	}
 
 	if bytes.Contains(b, oleWordDocument) || bytes.Contains(b, []byte("MSWordDoc")) || bytes.Contains(b, []byte("Word.Document.")) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftWordDocumentDOC}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftWordDocument}
 	}
 
 	if bytes.Contains(b, oleWorkbook) || bytes.Contains(b, oleBook) || bytes.Contains(b, []byte("Excel.Sheet.")) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftExcelWorkbookXLS}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftExcelWorkbook}
 	}
 
 	if bytes.Contains(b, olePowerPointDocument) || bytes.Contains(b, []byte("PowerPoint.Show.")) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftPowerPointPresentationPPT}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftPowerPointPresentation}
 	}
 
 	if bytes.Contains(b, oleMSI) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftInstallerMSI}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftInstaller}
 	}
 
 	if bytes.Contains(b, oleMSP) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMSP}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftInstallerPatch}
 	}
 
 	if bytes.Contains(b, oleOutlookMessage) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftOutlookMessageMSG}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftOutlookMessage}
 	}
 
 	if bytes.Contains(b, oleVisioDocument) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftVisioDrawingVSD}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftVisioDrawing}
 	}
 
 	if bytes.Contains(b, oleProject) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftProjectDocumentMPP}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftProjectDocument}
 	}
 
 	if bytes.Contains(b, olePublisher) {
-		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftPublisherDocumentPUB}
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftPublisherDocument}
 	}
 
 	return &types.Metadata{

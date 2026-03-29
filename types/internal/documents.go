@@ -128,7 +128,7 @@ func init() {
 	types.RegisterSignature(types.KindTransportNeutralEncapsulationFormat, types.TypeNone, 0, []byte{0x78, 0x9f, 0x3e, 0x22})
 	types.RegisterSignature(types.KindU3DModel, types.TypeNone, 0, []byte("U3D\x00"))
 	types.RegisterSignature(types.KindVCard, types.TypeNone, 0, []byte("BEGIN:VCARD"))
-	types.RegisterSignature(types.KindVisualStudioSolution, types.TypeDSW, 0, []byte("dsworkspace"))
+	types.RegisterSignature(types.KindVisualStudioSolution, types.TypeWorkspace, 0, []byte("dsworkspace"))
 	types.RegisterSignature(types.KindVRML3DModel, types.TypeNone, 0, []byte("#VRML V2.0 utf8"))
 	types.RegisterSignature(types.KindWARCFile, types.TypeNone, 0, []byte("WARC/"))
 	types.RegisterSignature(types.KindWebVTT, types.TypeNone, 0, []byte("WEBVTT"))
@@ -147,8 +147,8 @@ func init() {
 	types.RegisterMaskedSignature(types.KindHTMLDocument, types.TypeNone, 0, []byte("<!DOCTYPE HTML"), []byte{0xff, 0xff, 0xdf, 0xdf, 0xdf, 0xdf, 0xdf, 0xdf, 0xdf, 0xff, 0xdf, 0xdf, 0xdf, 0xdf})
 	types.RegisterMaskedSignature(types.KindHTMLDocument, types.TypeNone, 0, []byte("<HTML "), []byte{0xff, 0xdf, 0xdf, 0xdf, 0xdf, 0xff})
 	types.RegisterMaskedSignature(types.KindHTMLDocument, types.TypeNone, 0, []byte("<HTML>"), []byte{0xff, 0xdf, 0xdf, 0xdf, 0xdf, 0xff})
-	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeCorelDRAWDocumentCDR, 0, []byte("RIFF\x00\x00\x00\x00CDR\x00"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00})
+	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeCorelDRAWDocument, 0, []byte("RIFF\x00\x00\x00\x00CDR\x00"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x00})
 
 	types.RegisterWeakSignature(types.KindMBOXEmailFolder, types.TypeNone, 0, []byte("From "))
-	types.RegisterWeakSignature(types.KindWindowsApplicationLog, types.TypeLGC, 0, []byte("{\r\no "))
+	types.RegisterWeakSignature(types.KindWindowsApplicationLog, types.TypeNone, 0, []byte("{\r\no "))
 }

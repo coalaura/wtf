@@ -69,7 +69,7 @@ func init() {
 	types.RegisterSignature(types.KindPalmData, types.TypeNone, 0, []byte{0x00, 0x01, 0x42, 0x41})
 	types.RegisterSignature(types.KindPalmData, types.TypeNone, 0, []byte{0x00, 0x01, 0x42, 0x44})
 	types.RegisterSignature(types.KindPRTGDatabase, types.TypeNone, 0, []byte{0x00, 0x3b, 0x05, 0x00, 0x01, 0x00, 0x00, 0x00})
-	types.RegisterSignature(types.KindPsiwtftabase, types.TypeNone, 0, []byte("OPLDatab"))
+	types.RegisterSignature(types.KindPsionDatabase, types.TypeNone, 0, []byte("OPLDatab"))
 	types.RegisterSignature(types.KindPythonPickle, types.TypeNone, 0, []byte{0x80, 0x03})
 	types.RegisterSignature(types.KindPythonPickle, types.TypeNone, 0, []byte{0x80, 0x04})
 	types.RegisterSignature(types.KindPythonPickle, types.TypeNone, 0, []byte{0x80, 0x05})

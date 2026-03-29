@@ -25,9 +25,9 @@ func DetectTar(b types.Buffer) *types.Metadata {
 				case "oci-layout", "index.json", "manifest.json":
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeOCIImageLayoutTar}
 				case "PKG-INFO", "setup.py", "pyproject.toml":
-					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypePythonSourceDistributionSDist}
+					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypePythonSourceDistribution}
 				case "info/index.json":
-					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeCwtfPackage}
+					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeCondaPackage}
 				case ".PKGINFO":
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeArchLinuxPackage}
 				case "Vagrantfile":

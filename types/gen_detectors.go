@@ -269,7 +269,7 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	case "mjp2":
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000}
 	case "crx ":
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3CR3}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3}
 	case "braw":
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeBlackmagicRAW}
 	case "3g2a", "3g2b":
@@ -323,7 +323,7 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "crx ") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3CR3}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "braw") {
@@ -703,39 +703,39 @@ func DetectOLE(b Buffer) *Metadata {
 	}
 
 	if bytes.Contains(b, oleWordDocument) || bytes.Contains(b, []byte("MSWordDoc")) || bytes.Contains(b, []byte("Word.Document.")) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftWordDocumentDOC}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftWordDocument}
 	}
 
 	if bytes.Contains(b, oleWorkbook) || bytes.Contains(b, oleBook) || bytes.Contains(b, []byte("Excel.Sheet.")) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftExcelWorkbookXLS}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftExcelWorkbook}
 	}
 
 	if bytes.Contains(b, olePowerPointDocument) || bytes.Contains(b, []byte("PowerPoint.Show.")) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftPowerPointPresentationPPT}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftPowerPointPresentation}
 	}
 
 	if bytes.Contains(b, oleMSI) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstallerMSI}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstaller}
 	}
 
 	if bytes.Contains(b, oleMSP) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMSP}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstallerPatch}
 	}
 
 	if bytes.Contains(b, oleOutlookMessage) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftOutlookMessageMSG}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftOutlookMessage}
 	}
 
 	if bytes.Contains(b, oleVisioDocument) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftVisioDrawingVSD}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftVisioDrawing}
 	}
 
 	if bytes.Contains(b, oleProject) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftProjectDocumentMPP}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftProjectDocument}
 	}
 
 	if bytes.Contains(b, olePublisher) {
-		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftPublisherDocumentPUB}
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftPublisherDocument}
 	}
 
 	return &Metadata{
@@ -1011,9 +1011,9 @@ func DetectTar(b Buffer) *Metadata {
 				case "oci-layout", "index.json", "manifest.json":
 					return &Metadata{Kind: KindTARArchive, Type: TypeOCIImageLayoutTar}
 				case "PKG-INFO", "setup.py", "pyproject.toml":
-					return &Metadata{Kind: KindTARArchive, Type: TypePythonSourceDistributionSDist}
+					return &Metadata{Kind: KindTARArchive, Type: TypePythonSourceDistribution}
 				case "info/index.json":
-					return &Metadata{Kind: KindTARArchive, Type: TypeCwtfPackage}
+					return &Metadata{Kind: KindTARArchive, Type: TypeCondaPackage}
 				case ".PKGINFO":
 					return &Metadata{Kind: KindTARArchive, Type: TypeArchLinuxPackage}
 				case "Vagrantfile":
@@ -1392,7 +1392,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	if b.Has(0, []byte{'I', 'I', 'U', 0x00}) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypePanasonicRAWRW2}
+		return &Metadata{Kind: KindTIFFImage, Type: TypePanasonicRAW}
 	}
 
 	if b.Has(0, []byte{'I', 'I', 0x2a, 0x00, 0x10, 0x00, 0x00, 0x00, 'C', 'R'}) {
@@ -1409,21 +1409,21 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	if tiffHasTag(b, order, ifd0, 0xc612) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeAdobeDNGDNG}
+		return &Metadata{Kind: KindTIFFImage, Type: TypeAdobeDNG}
 	}
 
 	makeValue, ok := tiffASCIIValueForTag(b, order, ifd0, 0x010f)
 	if ok {
 		if bytes.HasPrefix(makeValue, []byte("NIKON")) || bytes.HasPrefix(makeValue, []byte("Nikon")) {
-			return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAWNEF}
+			return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("OLYMPUS")) || bytes.HasPrefix(makeValue, []byte("Olympus")) {
-			return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAWORF}
+			return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
-			return &Metadata{Kind: KindTIFFImage, Type: TypePentaxRAWPEF}
+			return &Metadata{Kind: KindTIFFImage, Type: TypePentaxRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("SONY")) {
@@ -1431,7 +1431,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 				return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAWSR2}
 			}
 
-			return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAWARW}
+			return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAW}
 		}
 	}
 
@@ -1439,19 +1439,19 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	data := b[:limit]
 
 	if bytes.Contains(data, []byte("Nikon")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAWNEF}
+		return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAW}
 	}
 
 	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
-		return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAWORF}
+		return &Metadata{Kind: KindOlympusRAWImage, Type: TypeOlympusRAW}
 	}
 
 	if bytes.Contains(data, []byte("PENTAX")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypePentaxRAWPEF}
+		return &Metadata{Kind: KindTIFFImage, Type: TypePentaxRAW}
 	}
 
 	if bytes.Contains(data, []byte("SONY DSC")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAWARW}
+		return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAW}
 	}
 
 	if bytes.Contains(data, []byte("SONY SR2")) {
@@ -1459,7 +1459,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	if bytes.Contains(data, []byte("DNGVersion")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeAdobeDNGDNG}
+		return &Metadata{Kind: KindTIFFImage, Type: TypeAdobeDNG}
 	}
 
 	if b.Has(0, []byte{'I', 'I'}) {
@@ -1728,25 +1728,25 @@ func DetectZIPContainer(b Buffer) *Metadata {
 				case "application/epub+zip":
 					return &Metadata{Kind: KindZIPArchive, Type: TypeEPUBDocument}
 				case "application/vnd.oasis.opendocument.text":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentTextODT}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentText}
 				case "application/vnd.oasis.opendocument.spreadsheet":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentSpreadsheetODS}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentSpreadsheet}
 				case "application/vnd.oasis.opendocument.presentation":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentPresentationODP}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentPresentation}
 				case "application/vnd.oasis.opendocument.graphics":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentGraphicsODG}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentGraphics}
 				case "application/vnd.oasis.opendocument.database":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentDatabaseODB}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentDatabase}
 				case "application/vnd.oasis.opendocument.formula":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentFormulaODF}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentFormula}
 				case "application/vnd.oasis.opendocument.chart":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentChartODC}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentChart}
 				case "application/vnd.oasis.opendocument.image":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentImageODI}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenDocumentImage}
 				case "application/x-krita":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeKritaDocumentKRA}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeKritaDocument}
 				case "image/openraster":
-					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenRasterImageORA}
+					return &Metadata{Kind: KindZIPArchive, Type: TypeOpenRasterImage}
 				}
 			}
 		}
@@ -1768,7 +1768,7 @@ func DetectZIPContainer(b Buffer) *Metadata {
 		} else if matchASCII(name, "user.json") {
 			hasSketchUser = true
 		} else if matchASCII(name, "modules") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeJMOD}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeNone}
 		} else if matchASCII(name, "meta-inf/manifest.mf") {
 			hasManifestMF = true
 		} else if matchASCII(name, "web-inf/web.xml") {
@@ -1792,35 +1792,35 @@ func DetectZIPContainer(b Buffer) *Metadata {
 		} else if matchASCII(name, "doc.kml") {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeKMZArchive}
 		} else if hasSuffixASCII(name, ".dist-info/wheel") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypePythonWheelWHL}
+			return &Metadata{Kind: KindZIPArchive, Type: TypePythonWheel}
 		} else if matchASCII(name, "manifest.json") {
 			hasLottieManifest = true
 
 			if bytes.Contains(b, []byte("xapk_version")) {
-				return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidPackageXAPK}
+				return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidPackageX}
 			}
 
 			if bytes.Contains(b, []byte("browser_specific_settings")) {
-				return &Metadata{Kind: KindZIPArchive, Type: TypeFirefoxExtensionXPI}
+				return &Metadata{Kind: KindZIPArchive, Type: TypeFirefoxExtension}
 			}
 		} else if matchASCII(name, "install.rdf") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeFirefoxExtensionXPI}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeFirefoxExtension}
 		} else if hasPrefixASCII(name, "animations/") {
 			hasLottieAnimations = true
 		} else if hasPrefixASCII(name, "payload/") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeIOSApplicationArchiveIPA}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeIOSApplicationArchive}
 		} else if matchASCII(name, "bundleconfig.pb") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidAppBundleAAB}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidAppBundle}
 		} else if matchASCII(name, "toc.pb") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidSplitAPKS}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidSplitAPKSet}
 		} else if bytes.Contains(name, []byte("apex_manifest")) {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidSystemPackageAPEX}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidSystemPackage}
 		} else if matchASCII(name, "extension.vsixmanifest") {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeVisualStudioExtensionVSIX}
 		} else if matchASCII(name, "3d/3dmodel.model") {
 			return &Metadata{Kind: KindZIPArchive, Type: Type3MFDocument}
 		} else if hasSuffixASCII(name, ".nuspec") {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeNuGetPackageNUPKG}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeNuGetPackage}
 		} else if matchASCII(name, "comicinfo.xml") {
 			hasComicInfo = true
 		} else if matchASCII(name, "metadata/buildversionhistory.plist") || hasPrefixASCII(name, "index/document.iwa") {
@@ -1850,91 +1850,91 @@ func DetectZIPContainer(b Buffer) *Metadata {
 	searchArea := b[:limitSearch]
 
 	if hasWordVBA {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocumentDOCM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocument}
 	}
 
 	if hasExcelVBA {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledWorkbookXLSM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledWorkbook}
 	}
 
 	if hasPowerPointVBA {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledPresentationPPTM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledPresentation}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.document.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocumentDOCM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocument}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordTemplateDOTX}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordTemplate}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.template.macroEnabledTemplate.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledTemplateDOTM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledTemplate}
 	}
 
 	if hasWord {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordDocumentDOCX}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordDocument}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.sheet.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledWorkbookXLSM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledWorkbook}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelTemplateXLTX}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelTemplate}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.template.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledTemplateXLTM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledTemplate}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.addin.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelAddInXLAM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelAddIn}
 	}
 
 	if hasExcel {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelSpreadsheetXLSX}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelWorkbook}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledPresentationPPTM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledPresentation}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.presentationml.template.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointTemplatePOTX}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointTemplate}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.template.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledTemplatePOTM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledTemplate}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointSlideshowPPSX}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointSlideshow}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.slideshow.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledSlideshowPPSM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledSlideshow}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.addin.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointAddInPPAM}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointAddIn}
 	}
 
 	if hasPowerPoint {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointPresentationPPTX}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointPresentation}
 	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-xpsdocument.document+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeXMLPaperSpecificationXPS}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeXMLPaperSpecification}
 	}
 
 	if hasManifest {
 		if hasDex {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidPackageAPK}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidPackage}
 		}
 
-		return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidArchiveAAR}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidArchive}
 	}
 
 	if hasAppxManifest {
@@ -1953,11 +1953,11 @@ func DetectZIPContainer(b Buffer) *Metadata {
 
 	if hasManifestMF {
 		if hasWebXML {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeJavaWebArchiveWAR}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeJavaWebArchive}
 		}
 
 		if hasAppXML {
-			return &Metadata{Kind: KindZIPArchive, Type: TypeJavaEnterpriseArchiveEAR}
+			return &Metadata{Kind: KindZIPArchive, Type: TypeJavaEnterpriseArchive}
 		}
 
 		if hasFabricMod {
@@ -1972,7 +1972,7 @@ func DetectZIPContainer(b Buffer) *Metadata {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeMinecraftResourcePack}
 		}
 
-		return &Metadata{Kind: KindZIPArchive, Type: TypeJavaArchiveJAR}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeJavaArchive}
 	}
 
 	if hasLottieManifest && hasLottieAnimations {

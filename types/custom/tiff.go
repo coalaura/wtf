@@ -23,7 +23,7 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 	}
 
 	if b.Has(0, []byte{'I', 'I', 'U', 0x00}) {
-		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypePanasonicRAWRW2}
+		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypePanasonicRAW}
 	}
 
 	if b.Has(0, []byte{'I', 'I', 0x2a, 0x00, 0x10, 0x00, 0x00, 0x00, 'C', 'R'}) {
@@ -40,21 +40,21 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 	}
 
 	if tiffHasTag(b, order, ifd0, 0xc612) {
-		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeAdobeDNGDNG}
+		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeAdobeDNG}
 	}
 
 	makeValue, ok := tiffASCIIValueForTag(b, order, ifd0, 0x010f)
 	if ok {
 		if bytes.HasPrefix(makeValue, []byte("NIKON")) || bytes.HasPrefix(makeValue, []byte("Nikon")) {
-			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeNikonRAWNEF}
+			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeNikonRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("OLYMPUS")) || bytes.HasPrefix(makeValue, []byte("Olympus")) {
-			return &types.Metadata{Kind: types.KindOlympusRAWImage, Type: types.TypeOlympusRAWORF}
+			return &types.Metadata{Kind: types.KindOlympusRAWImage, Type: types.TypeOlympusRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
-			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypePentaxRAWPEF}
+			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypePentaxRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("SONY")) {
@@ -62,7 +62,7 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 				return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeSonyRAWSR2}
 			}
 
-			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeSonyRAWARW}
+			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeSonyRAW}
 		}
 	}
 
@@ -70,19 +70,19 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 	data := b[:limit]
 
 	if bytes.Contains(data, []byte("Nikon")) {
-		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeNikonRAWNEF}
+		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeNikonRAW}
 	}
 
 	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
-		return &types.Metadata{Kind: types.KindOlympusRAWImage, Type: types.TypeOlympusRAWORF}
+		return &types.Metadata{Kind: types.KindOlympusRAWImage, Type: types.TypeOlympusRAW}
 	}
 
 	if bytes.Contains(data, []byte("PENTAX")) {
-		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypePentaxRAWPEF}
+		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypePentaxRAW}
 	}
 
 	if bytes.Contains(data, []byte("SONY DSC")) {
-		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeSonyRAWARW}
+		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeSonyRAW}
 	}
 
 	if bytes.Contains(data, []byte("SONY SR2")) {
@@ -90,7 +90,7 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 	}
 
 	if bytes.Contains(data, []byte("DNGVersion")) {
-		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeAdobeDNGDNG}
+		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeAdobeDNG}
 	}
 
 	if b.Has(0, []byte{'I', 'I'}) {

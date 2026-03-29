@@ -58,8 +58,8 @@ func init() {
 	types.RegisterSignature(types.KindJPEGXLImage, types.TypeContainer, 0, []byte{0x00, 0x00, 0x00, 0x0c, 'J', 'X', 'L', ' ', 0x0d, 0x0a, 0x87, 0x0a})
 	types.RegisterSignature(types.KindJPEGXRImage, types.TypeBigEndian, 0, []byte{'M', 'M', 0x01, 0xbc})
 	types.RegisterSignature(types.KindJPEGXRImage, types.TypeLittleEndian, 0, []byte{'I', 'I', 0xbc, 0x01})
-	types.RegisterSignature(types.KindKTXTexture, types.TypeKTX, 0, []byte{0xab, 'K', 'T', 'X', ' ', '1', '1', 0xbb, 0x0d, 0x0a, 0x1a, 0x0a})
-	types.RegisterSignature(types.KindKTXTexture, types.TypeKTX2, 0, []byte{0xab, 'K', 'T', 'X', ' ', '2', '0', 0xbb, 0x0d, 0x0a, 0x1a, 0x0a})
+	types.RegisterSignature(types.KindKTXTexture, types.TypeVersion1, 0, []byte{0xab, 'K', 'T', 'X', ' ', '1', '1', 0xbb, 0x0d, 0x0a, 0x1a, 0x0a})
+	types.RegisterSignature(types.KindKTXTexture, types.TypeVersion2, 0, []byte{0xab, 'K', 'T', 'X', ' ', '2', '0', 0xbb, 0x0d, 0x0a, 0x1a, 0x0a})
 	types.RegisterSignature(types.KindLytroLightField, types.TypeNone, 0, []byte("\x89LFP\x0d\x0a\x1a\x0a"))
 	types.RegisterSignature(types.KindMagicaVoxel, types.TypeNone, 0, []byte("VOX "))
 	types.RegisterSignature(types.KindMetafileImage, types.TypeWindowsMetafileWMF, 0, []byte{0xd7, 0xcd, 0xc6, 0x9a})
@@ -117,9 +117,9 @@ func init() {
 	types.RegisterMaskedSignature(types.KindDjVuDocument, types.TypeNone, 0, []byte("FORM\x00\x00\x00\x00DJVU"), []byte{0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindDjVuDocument, types.TypeNone, 0, []byte("FORM\x00\x00\x00\x00THUM"), []byte{0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindIFFContainer, types.TypeILBMImage, 0, []byte("FORM\x00\x00\x00\x00ILBM"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
-	types.RegisterMaskedSignature(types.KindMetafileImage, types.TypeEnhancedMetafileEMF, 0, []byte{0x01, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0x45, 0x4d, 0x46}, []byte{0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
+	types.RegisterMaskedSignature(types.KindMetafileImage, types.TypeEnhancedMetafile, 0, []byte{0x01, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0x45, 0x4d, 0x46}, []byte{0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeRIFFPalette, 0, []byte("RIFF\x00\x00\x00\x00PAL "), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeWebPImage, 0, []byte("RIFF\x00\x00\x00\x00WEBP"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 
-	types.RegisterWeakSignature(types.KindFLICAnimation, types.TypeFLI, 0, []byte{0x00, 0x11})
+	types.RegisterWeakSignature(types.KindFLICAnimation, types.TypeNone, 0, []byte{0x00, 0x11})
 }
