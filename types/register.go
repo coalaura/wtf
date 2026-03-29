@@ -15,5 +15,8 @@ func RegisterSignature(kind KindID, typ TypeID, offset int, magic []byte) {}
 // RegisterMaskedSignature adds a magic byte signature with a bitmask.
 func RegisterMaskedSignature(kind KindID, typ TypeID, offset int, magic []byte, mask []byte) {}
 
+// RegisterMaskedSignature adds a magic byte signature with a bitmask that is prone to false positives.
+func RegisterWeakMaskedSignature(kind KindID, typ TypeID, offset int, magic []byte, mask []byte) {}
+
 // RegisterWeakSignature adds a magic byte signature that is prone to false positives.
 func RegisterWeakSignature(kind KindID, typ TypeID, offset int, magic []byte) {}

@@ -12,6 +12,7 @@ var (
 	oleBook               = []byte{'B', 0, 'o', 0, 'o', 0, 'k', 0, 0, 0}
 	olePowerPointDocument = []byte{'P', 0, 'o', 0, 'w', 0, 'e', 0, 'r', 0, 'P', 0, 'o', 0, 'i', 0, 'n', 0, 't', 0, ' ', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0, 0, 0}
 	oleMSI                = []byte{0x84, 0x10, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}
+	oleMSP                = []byte{'M', 0, 'S', 0, 'P', 0}
 	oleOutlookMessage     = []byte{'_', 0, '_', 0, 's', 0, 'u', 0, 'b', 0, 's', 0, 't', 0, 'g', 0, '1', 0, '.', 0, '0', 0, '_', 0}
 	oleVisioDocument      = []byte{'V', 0, 'i', 0, 's', 0, 'i', 0, 'o', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0}
 	oleProject            = []byte{'M', 0, 'S', 0, 'P', 0, 'r', 0, 'o', 0, 'j', 0, 'e', 0, 'c', 0, 't', 0, '.', 0, 'P', 0, 'r', 0, 'o', 0, 'j', 0, 'e', 0, 'c', 0, 't', 0}
@@ -37,6 +38,10 @@ func DetectOLE(b types.Buffer) *types.Metadata {
 
 	if bytes.Contains(b, oleMSI) {
 		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftInstallerMSI}
+	}
+
+	if bytes.Contains(b, oleMSP) {
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMSP}
 	}
 
 	if bytes.Contains(b, oleOutlookMessage) {

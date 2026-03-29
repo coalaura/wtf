@@ -22,6 +22,9 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 		hasWord             bool
 		hasExcel            bool
 		hasPowerPoint       bool
+		hasWordVBA          bool
+		hasExcelVBA         bool
+		hasPowerPointVBA    bool
 		hasManifestMF       bool
 		hasWebXML           bool
 		hasAppXML           bool
@@ -174,11 +177,32 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 			hasPowerPoint = true
 		}
 
+		if matchASCII(name, "word/vbaproject.bin") {
+			hasWordVBA = true
+		} else if matchASCII(name, "xl/vbaproject.bin") {
+			hasExcelVBA = true
+		} else if matchASCII(name, "ppt/vbaproject.bin") {
+			hasPowerPointVBA = true
+		}
+
 		i += 30 + int(nameLen)
 	}
 
 	limitSearch := min(b.Len(), 32768)
 	searchArea := b[:limitSearch]
+
+	// Macro-enabled detection via vbaProject.bin
+	if hasWordVBA {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftWordMacroEnabledDocumentDOCM}
+	}
+
+	if hasExcelVBA {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftExcelMacroEnabledWorkbookXLSM}
+	}
+
+	if hasPowerPointVBA {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointMacroEnabledPresentationPPTM}
+	}
 
 	// Word
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.document.macroEnabled.main+xml")) {

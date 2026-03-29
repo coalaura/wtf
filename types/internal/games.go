@@ -42,7 +42,6 @@ func init() {
 	types.RegisterSignature(types.KindPlayStation2MemoryCard, types.TypeNone, 0, []byte("Sony PS2 Memory Card Format "))
 	types.RegisterSignature(types.KindPlayStationExecutable, types.TypeNone, 0, []byte("SCE\x00"))
 	types.RegisterSignature(types.KindPlayStationPortableExecutable, types.TypeNone, 0, []byte("\x00PBP"))
-	types.RegisterSignature(types.KindQuakePAK, types.TypeNone, 0, []byte("PACK"))
 	types.RegisterSignature(types.KindRenPyArchive, types.TypeNone, 0, []byte("RPA-3.0 "))
 	types.RegisterSignature(types.KindRPGMakerArchive, types.TypeNone, 0, []byte("RGSSAD\x00"))
 	types.RegisterSignature(types.KindSegaCDImage, types.TypeNone, 0, []byte("SEGADISCSYSTEM"))

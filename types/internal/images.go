@@ -19,6 +19,7 @@ func init() {
 	types.RegisterSignature(types.KindChromaGraphBitmap, types.TypeNone, 0, []byte("PICT\x00\x08"))
 	types.RegisterSignature(types.KindCineonImage, types.TypeNone, 0, []byte{0x80, 0x2a, 0x5f, 0xd7})
 	types.RegisterSignature(types.KindCorelBinaryMetafile, types.TypeNone, 0, []byte("CMX1"))
+	types.RegisterSignature(types.KindCorelPhotoPaintImage, types.TypeNone, 0, []byte("CPT7FILE"))
 	types.RegisterSignature(types.KindCorelPhotoPaintImage, types.TypeNone, 0, []byte("CPTFILE"))
 	types.RegisterSignature(types.KindDDSImage, types.TypeNone, 0, []byte("DDS "))
 	types.RegisterSignature(types.KindDeluxePaintAnimation, types.TypeNone, 0, []byte("LPF \x00\x01"))
@@ -87,6 +88,7 @@ func init() {
 	types.RegisterSignature(types.KindRadianceHDRImage, types.TypeNone, 0, []byte("#?RADIANCE"))
 	types.RegisterSignature(types.KindRadianceHDRImage, types.TypeNone, 0, []byte("#?RGBE"))
 	types.RegisterSignature(types.KindREDRAWImage, types.TypeNone, 4, []byte("RED2"))
+	types.RegisterSignature(types.KindSGIImage, types.TypeNone, 0, []byte{0x01, 0xda, 0x01, 0x01, 0x00, 0x03})
 	types.RegisterSignature(types.KindSGIImage, types.TypeNone, 0, []byte{0x01, 0xda})
 	types.RegisterSignature(types.KindShareazaThumbnail, types.TypeNone, 0, []byte("RAZATDB1"))
 	types.RegisterSignature(types.KindShowPartnerGraphics, types.TypeNone, 0, []byte("GX2"))
@@ -94,6 +96,7 @@ func init() {
 	types.RegisterSignature(types.KindSunRasterImage, types.TypeNone, 0, []byte{0x59, 0xa6, 0x6a, 0x95})
 	types.RegisterSignature(types.KindTajimaEmbroidery, types.TypeNone, 0, []byte("LA:"))
 	types.RegisterSignature(types.KindTIFFImage, types.TypeBigEndian, 0, []byte{'M', 'M', 0x00, 0x2a})
+	types.RegisterSignature(types.KindTIFFImage, types.TypeBigTIFF, 0, []byte{'I', 'I', 0x2b, 0x00})
 	types.RegisterSignature(types.KindTIFFImage, types.TypeBigTIFF, 0, []byte{'M', 'M', 0x00, '+'})
 	types.RegisterSignature(types.KindTIFFImage, types.TypeLittleEndian, 0, []byte{'I', 'I', 0x2a, 0x00})
 	types.RegisterSignature(types.KindUniversalSceneDescription, types.TypeNone, 0, []byte("PXR-USDC"))
@@ -117,4 +120,6 @@ func init() {
 	types.RegisterMaskedSignature(types.KindMetafileImage, types.TypeEnhancedMetafileEMF, 0, []byte{0x01, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0x45, 0x4d, 0x46}, []byte{0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeRIFFPalette, 0, []byte("RIFF\x00\x00\x00\x00PAL "), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeWebPImage, 0, []byte("RIFF\x00\x00\x00\x00WEBP"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
+
+	types.RegisterWeakSignature(types.KindFLICAnimation, types.TypeFLI, 0, []byte{0x00, 0x11})
 }

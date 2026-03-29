@@ -84,6 +84,7 @@ func init() {
 	types.RegisterSignature(types.KindRubyMarshal, types.TypeNone, 0, []byte{0x04, 0x08})
 	types.RegisterSignature(types.KindSASData, types.TypeNone, 0, []byte("HEADER RECORD***"))
 	types.RegisterSignature(types.KindSASData, types.TypeNone, 12, []byte{0xc2, 0xea, 0x81, 0x60, 0xb3, 0x14, 0x11, 0xcf, 0xbd, 0x92, 0x08, 0x00, 0x09, 0xc7, 0x31, 0x8c, 0x18, 0x1f, 0x10, 0x11})
+	types.RegisterSignature(types.KindSkypeLocalization, types.TypeNone, 0, []byte("MLSW"))
 	types.RegisterSignature(types.KindSPSSData, types.TypeNone, 0, []byte("$FL2"))
 	types.RegisterSignature(types.KindSPSSPortableData, types.TypeNone, 0, []byte("SPSSPORT"))
 	types.RegisterSignature(types.KindStataData, types.TypeNone, 0, []byte("<stata_dta>"))

@@ -31,6 +31,14 @@ type Pair struct {
 	Type string
 }
 
+type SignatureKey struct {
+	Offset int
+	Magic  string
+	Mask   string
+	Kind   string
+	Typ    string
+}
+
 type Generator struct {
 	StrongSigs []Sig
 	WeakSigs   []Sig
@@ -42,6 +50,12 @@ type Generator struct {
 func main() {
 	log.Println("Parsing signatures and detectors for Radix Trie optimization...")
 	gen := parseSignatures("./internal")
+
+	log.Println("Checking for duplicate signatures...")
+	checkDuplicateSignatures(gen.StrongSigs, gen.WeakSigs)
+
+	log.Println("Checking for unused Kind/Type IDs...")
+	checkUnusedIDs("./ids.go", "./internal", "./custom")
 
 	log.Println("Generating optimized jump table (gen_signatures.go)...")
 	generateOptimizedCode(gen, "./gen_signatures.go")
@@ -100,7 +114,7 @@ func parseSignatures(dir string) *Generator {
 				funcName := sel.Sel.Name
 
 				switch funcName {
-				case "RegisterSignature", "RegisterMaskedSignature", "RegisterWeakSignature":
+				case "RegisterSignature", "RegisterMaskedSignature", "RegisterWeakSignature", "RegisterWeakMaskedSignature":
 					kind := strings.TrimPrefix(extractSelector(call.Args[0]), "types.")
 					typ := strings.TrimPrefix(extractSelector(call.Args[1]), "types.")
 					offset := extractInt(call.Args[2])
@@ -108,7 +122,7 @@ func parseSignatures(dir string) *Generator {
 
 					var mask []byte
 
-					isMask := funcName == "RegisterMaskedSignature"
+					isMask := funcName == "RegisterMaskedSignature" || funcName == "RegisterWeakMaskedSignature"
 					if isMask {
 						mask = extractBytes(call.Args[4])
 					}
@@ -120,7 +134,7 @@ func parseSignatures(dir string) *Generator {
 						Magic:  magic,
 						Mask:   mask,
 						IsMask: isMask,
-						IsWeak: funcName == "RegisterWeakSignature",
+						IsWeak: funcName == "RegisterWeakSignature" || funcName == "RegisterWeakMaskedSignature",
 					}
 
 					if sig.IsWeak {
@@ -159,6 +173,172 @@ func parseSignatures(dir string) *Generator {
 	}
 
 	return gen
+}
+
+func checkDuplicateSignatures(strongSigs, weakSigs []Sig) {
+	seen := make(map[SignatureKey]SignatureKey)
+
+	check := func(sigs []Sig, category string) {
+		for _, sig := range sigs {
+			key := SignatureKey{
+				Offset: sig.Offset,
+				Magic:  string(sig.Magic),
+				Mask:   string(sig.Mask),
+			}
+
+			if prev, exists := seen[key]; exists {
+				log.Fatalf("DUPLICATE SIGNATURE in %s:\n"+
+					"  Existing: %s.%s at offset %d, magic=%q, mask=%q\n"+
+					"  Duplicate: %s.%s at offset %d, magic=%q, mask=%q",
+					category,
+					prev.Kind, prev.Typ, prev.Offset, prev.Magic, prev.Mask,
+					sig.Kind, sig.Type, sig.Offset, string(sig.Magic), string(sig.Mask))
+			}
+
+			seen[key] = SignatureKey{
+				Offset: sig.Offset,
+				Magic:  string(sig.Magic),
+				Mask:   string(sig.Mask),
+				Kind:   sig.Kind,
+				Typ:    sig.Type,
+			}
+		}
+	}
+
+	check(strongSigs, "strong signatures")
+	check(weakSigs, "weak signatures")
+}
+
+func checkUnusedIDs(idsPath string, internalDir string, customDir string) {
+	definedKinds := parseDefinedIDs(idsPath, "Kind")
+	definedTypes := parseDefinedIDs(idsPath, "Type")
+
+	usedKinds := make(map[string]bool)
+	usedTypes := make(map[string]bool)
+
+	collectUsedIDs := func(dir string) {
+		fset := token.NewFileSet()
+
+		files, err := os.ReadDir(dir)
+		if err != nil {
+			return
+		}
+
+		for _, entry := range files {
+			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") {
+				continue
+			}
+
+			path := filepath.Join(dir, entry.Name())
+
+			node, err := parser.ParseFile(fset, path, nil, 0)
+			if err != nil {
+				continue
+			}
+
+			ast.Inspect(node, func(n ast.Node) bool {
+				if sel, ok := n.(*ast.SelectorExpr); ok {
+					if ident, ok := sel.X.(*ast.Ident); ok && ident.Name == "types" {
+						name := sel.Sel.Name
+						if strings.HasPrefix(name, "Kind") {
+							usedKinds[name] = true
+						} else if strings.HasPrefix(name, "Type") {
+							usedTypes[name] = true
+						}
+					}
+				}
+
+				return true
+			})
+		}
+	}
+
+	collectUsedIDs(internalDir)
+	collectUsedIDs(customDir)
+
+	collectUsedIDs(".")
+	collectUsedIDs("..")
+
+	var (
+		unusedKinds []string
+		unusedTypes []string
+	)
+
+	for k := range definedKinds {
+		if k == "KindUnknown" {
+			continue
+		}
+
+		if !usedKinds[k] {
+			unusedKinds = append(unusedKinds, k)
+		}
+	}
+
+	for t := range definedTypes {
+		if t == "TypeNone" {
+			continue
+		}
+
+		if !usedTypes[t] {
+			unusedTypes = append(unusedTypes, t)
+		}
+	}
+
+	sort.Strings(unusedKinds)
+	sort.Strings(unusedTypes)
+
+	if len(unusedKinds) > 0 {
+		log.Println("UNUSED KIND IDs:")
+
+		for _, k := range unusedKinds {
+			log.Printf("  %s", k)
+		}
+	}
+
+	if len(unusedTypes) > 0 {
+		log.Println("UNUSED TYPE IDs:")
+
+		for _, t := range unusedTypes {
+			log.Printf("  %s", t)
+		}
+	}
+
+	if len(unusedKinds) > 0 || len(unusedTypes) > 0 {
+		log.Fatalf("Found %d unused Kind IDs and %d unused Type IDs", len(unusedKinds), len(unusedTypes))
+	}
+}
+
+func parseDefinedIDs(path string, prefix string) map[string]bool {
+	fset := token.NewFileSet()
+
+	node, err := parser.ParseFile(fset, path, nil, 0)
+	if err != nil {
+		log.Fatalf("failed to parse %s: %v", path, err)
+	}
+
+	result := make(map[string]bool)
+
+	for _, decl := range node.Decls {
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok || genDecl.Tok != token.CONST {
+			continue
+		}
+
+		for _, spec := range genDecl.Specs {
+			vs, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				continue
+			}
+
+			for _, name := range vs.Names {
+				if strings.HasPrefix(name.Name, prefix) {
+					result[name.Name] = true
+				}
+			}
+		}
+	}
+
+	return result
 }
 
 func generateOptimizedCode(gen *Generator, outPath string) {
@@ -390,7 +570,7 @@ func generateFormatList(gen *Generator, outPath string) {
 	buf.WriteString("func ListFormats() []FormatInfo {\n")
 	buf.WriteString("\tlist := make([]FormatInfo, 0, 256)\n\n")
 
-	buf.WriteString("\tfor i := KindID(0); i < KindID(len(kindNames)); i++ {\n")
+	buf.WriteString("\tfor i := range KindID(len(kindNames)) {\n")
 	buf.WriteString("\t\tname := kindNames[i]\n")
 	buf.WriteString("\t\tif name == \"\" || name == \"Unknown\" {\n")
 	buf.WriteString("\t\t\tcontinue\n")

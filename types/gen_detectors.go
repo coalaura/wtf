@@ -690,6 +690,7 @@ var (
 	oleBook               = []byte{'B', 0, 'o', 0, 'o', 0, 'k', 0, 0, 0}
 	olePowerPointDocument = []byte{'P', 0, 'o', 0, 'w', 0, 'e', 0, 'r', 0, 'P', 0, 'o', 0, 'i', 0, 'n', 0, 't', 0, ' ', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0, 0, 0}
 	oleMSI                = []byte{0x84, 0x10, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}
+	oleMSP                = []byte{'M', 0, 'S', 0, 'P', 0}
 	oleOutlookMessage     = []byte{'_', 0, '_', 0, 's', 0, 'u', 0, 'b', 0, 's', 0, 't', 0, 'g', 0, '1', 0, '.', 0, '0', 0, '_', 0}
 	oleVisioDocument      = []byte{'V', 0, 'i', 0, 's', 0, 'i', 0, 'o', 0, 'D', 0, 'o', 0, 'c', 0, 'u', 0, 'm', 0, 'e', 0, 'n', 0, 't', 0}
 	oleProject            = []byte{'M', 0, 'S', 0, 'P', 0, 'r', 0, 'o', 0, 'j', 0, 'e', 0, 'c', 0, 't', 0, '.', 0, 'P', 0, 'r', 0, 'o', 0, 'j', 0, 'e', 0, 'c', 0, 't', 0}
@@ -715,6 +716,10 @@ func DetectOLE(b Buffer) *Metadata {
 
 	if bytes.Contains(b, oleMSI) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstallerMSI}
+	}
+
+	if bytes.Contains(b, oleMSP) {
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMSP}
 	}
 
 	if bytes.Contains(b, oleOutlookMessage) {
@@ -1391,7 +1396,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	if b.Has(0, []byte{'I', 'I', 0x2a, 0x00, 0x10, 0x00, 0x00, 0x00, 'C', 'R'}) {
-		return &Metadata{Kind: KindCanonRAWImage}
+		return &Metadata{Kind: KindCanonRAWImage, Type: TypeCanonRAWHE}
 	}
 
 	order, ifd0, ok := tiffHeaderInfo(b)
@@ -1675,6 +1680,9 @@ func DetectZIPContainer(b Buffer) *Metadata {
 		hasWord             bool
 		hasExcel            bool
 		hasPowerPoint       bool
+		hasWordVBA          bool
+		hasExcelVBA         bool
+		hasPowerPointVBA    bool
 		hasManifestMF       bool
 		hasWebXML           bool
 		hasAppXML           bool
@@ -1827,11 +1835,31 @@ func DetectZIPContainer(b Buffer) *Metadata {
 			hasPowerPoint = true
 		}
 
+		if matchASCII(name, "word/vbaproject.bin") {
+			hasWordVBA = true
+		} else if matchASCII(name, "xl/vbaproject.bin") {
+			hasExcelVBA = true
+		} else if matchASCII(name, "ppt/vbaproject.bin") {
+			hasPowerPointVBA = true
+		}
+
 		i += 30 + int(nameLen)
 	}
 
 	limitSearch := min(b.Len(), 32768)
 	searchArea := b[:limitSearch]
+
+	if hasWordVBA {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocumentDOCM}
+	}
+
+	if hasExcelVBA {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledWorkbookXLSM}
+	}
+
+	if hasPowerPointVBA {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledPresentationPPTM}
+	}
 
 	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.document.macroEnabled.main+xml")) {
 		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocumentDOCM}

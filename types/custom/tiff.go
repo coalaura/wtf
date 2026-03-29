@@ -27,7 +27,7 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 	}
 
 	if b.Has(0, []byte{'I', 'I', 0x2a, 0x00, 0x10, 0x00, 0x00, 0x00, 'C', 'R'}) {
-		return &types.Metadata{Kind: types.KindCanonRAWImage}
+		return &types.Metadata{Kind: types.KindCanonRAWImage, Type: types.TypeCanonRAWHE}
 	}
 
 	order, ifd0, ok := tiffHeaderInfo(b)

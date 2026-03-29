@@ -3,6 +3,7 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
+	types.RegisterSignature(types.Kind1PasswordCloudKeychain, types.TypeOpdata01, 0, []byte("opdata01"))
 	types.RegisterSignature(types.KindAmigaHunkExecutable, types.TypeNone, 0, []byte{0x00, 0x00, 0x03, 0xf3})
 	types.RegisterSignature(types.KindAmigaIcon, types.TypeNone, 0, []byte{0xe3, 0x10, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00})
 	types.RegisterSignature(types.KindAndroidART, types.TypeNone, 0, []byte("art\n"))
@@ -15,6 +16,7 @@ func init() {
 	types.RegisterSignature(types.KindAndroidVDEX, types.TypeNone, 0, []byte("vdex"))
 	types.RegisterSignature(types.KindAppleBillOfMaterials, types.TypeNone, 0, []byte("BOMStore"))
 	types.RegisterSignature(types.KindAppleBinaryCrashReport, types.TypeNone, 0, []byte("CRAS"))
+	types.RegisterSignature(types.KindAppleBinaryPropertyList, types.TypeNone, 0, []byte("bplist"))
 	types.RegisterSignature(types.KindAppleDouble, types.TypeNone, 0, []byte{0x00, 0x05, 0x16, 0x07})
 	types.RegisterSignature(types.KindAppleKeychain, types.TypeNone, 0, []byte("kych"))
 	types.RegisterSignature(types.KindAppleSingle, types.TypeNone, 0, []byte{0x00, 0x05, 0x16, 0x00})
@@ -83,6 +85,7 @@ func init() {
 	types.RegisterSignature(types.KindNovellLANalyzerCapture, types.TypeNone, 0, []byte{0x01, 0x10})
 	types.RegisterSignature(types.KindNVIDIASceneGraph, types.TypeNone, 0, []byte("#NBF"))
 	types.RegisterSignature(types.KindOpenSSHPrivateKey, types.TypeNone, 0, []byte("openssh-key-v1\x00"))
+	types.RegisterSignature(types.KindOpenTypeFont, types.TypeNone, 0, []byte("OTTO\x00"))
 	types.RegisterSignature(types.KindPacketSnifferXCP, types.TypeNone, 0, []byte("XCP\x00"))
 	types.RegisterSignature(types.KindPathWayMap, types.TypeNone, 60, []byte("tBMPKnWr"))
 	types.RegisterSignature(types.KindPCAPCapture, types.TypeBigEndian, 0, []byte{0xa1, 0xb2, 0xc3, 0xd4})
@@ -100,7 +103,6 @@ func init() {
 	types.RegisterSignature(types.KindPestPatrolData, types.TypeNone, 0, []byte("PEST"))
 	types.RegisterSignature(types.KindPlayStationPortableISO, types.TypeNone, 0, []byte("CISO"))
 	types.RegisterSignature(types.KindPowerBASICDebugger, types.TypeNone, 0, []byte("szez"))
-	types.RegisterSignature(types.KindPowerBuilderIDE, types.TypeNone, 0, []byte("HDR*PowerBuilder"))
 	types.RegisterSignature(types.KindPuttyPrivateKey, types.TypeNone, 0, []byte("PuTTY-User-Key-File-"))
 	types.RegisterSignature(types.KindQuickBooksBackup, types.TypeNone, 0, []byte{0x45, 0x86, 0x00, 0x00, 0x06, 0x00})
 	types.RegisterSignature(types.KindSegaMegaDriveROM, types.TypeNone, 0x100, []byte("SEGA"))
@@ -121,6 +123,7 @@ func init() {
 	types.RegisterSignature(types.KindTargetExpress, types.TypeNone, 0, []byte("MCW Technogolies"))
 	types.RegisterSignature(types.KindTomTomTraffic, types.TypeNone, 0, []byte("NAVTRAFF"))
 	types.RegisterSignature(types.KindUBootImage, types.TypeNone, 0, []byte{0x27, 0x05, 0x19, 0x56})
+	types.RegisterSignature(types.KindUnicodeExtensions, types.TypeUCE, 0, []byte("UCEX"))
 	types.RegisterSignature(types.KindVBScriptEncoded, types.TypeNone, 0, []byte("#@~^"))
 	types.RegisterSignature(types.KindVisualCWorkbenchInfo, types.TypeNone, 0, []byte("[MSVC"))
 	types.RegisterSignature(types.KindVisualStudioSolution, types.TypeNone, 0, []byte("Microsoft Visual"))
@@ -149,6 +152,7 @@ func init() {
 	types.RegisterSignature(types.KindWindowsMinidump, types.TypeNone, 0, []byte("MDMP\x93\xa7"))
 	types.RegisterSignature(types.KindWindowsPrecompiledHeader, types.TypeNone, 0, []byte("VCPCH0"))
 	types.RegisterSignature(types.KindWindowsPrefetch, types.TypeNone, 0, []byte("MAM\x04"))
+	types.RegisterSignature(types.KindWindowsPrefetch, types.TypeNone, 0, []byte{0x11, 0x00, 0x00, 0x00, 'S', 'C', 'C', 'A'})
 	types.RegisterSignature(types.KindWindowsPrefetch, types.TypeNone, 4, []byte("SCCA"))
 	types.RegisterSignature(types.KindWindowsProgramManagerGroup, types.TypeNone, 0, []byte("PMCC"))
 	types.RegisterSignature(types.KindWindowsResourceFile, types.TypeNone, 0, []byte{0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00})
@@ -165,4 +169,6 @@ func init() {
 	types.RegisterSignature(types.KindZXTape, types.TypeNone, 0, []byte("ZXTape!"))
 
 	types.RegisterMaskedSignature(types.KindErlangBEAM, types.TypeNone, 0, []byte("FOR1\x00\x00\x00\x00BEAM"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
+
+	types.RegisterWeakSignature(types.KindMSDOSCOFFObject, types.TypeOBJ, 0, []byte{0x4c, 0x01})
 }

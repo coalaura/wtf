@@ -7,7 +7,6 @@ const (
 	KindUnknown KindID = iota
 	Kind1PasswordCloudKeychain
 	Kind1PasswordKeychain
-	Kind1PasswordKeychainCloud
 	Kind7ZipArchive
 	KindAACAudio
 	KindAccessDataFTK
@@ -109,8 +108,6 @@ const (
 	KindCALSImage
 	KindCanonRAWImage
 	KindCBORData
-	KindCDStomperLabel
-	KindCerius2File
 	KindCHMDocument
 	KindChromaGraphBitmap
 	KindChromiumPatch
@@ -132,6 +129,7 @@ const (
 	KindCramFS
 	KindCrushArchive
 	KindCRXBrowserExtension
+	KindCSOArchive
 	KindCsoundMusic
 	KindDalvikExecutable
 	KindDAXArchive
@@ -156,10 +154,7 @@ const (
 	KindDSFAudio
 	KindDSTCompression
 	KindDTSAudio
-	KindDVDInfoFile
 	KindDVRMSVideo
-	KindDVRStudioStream
-	KindEasyRecoverySavedState
 	KindEasyStreetDraw
 	KindEBMLContainer
 	KindEFaxFile
@@ -192,6 +187,7 @@ const (
 	KindFITActivity
 	KindFITSAstronomicalImage
 	KindFLACAudio
+	KindFLICAnimation
 	KindFLIFImage
 	KindFlightSimulatorConfig
 	KindFLStudioProject
@@ -228,7 +224,6 @@ const (
 	KindGodotPackage
 	KindGoogleChromeDictionary
 	KindGoogleDriveDrawing
-	KindGoogleEarthETA
 	KindGoogleEarthPlacemark
 	KindGPSExchangeFormat
 	KindGRIBData
@@ -251,8 +246,6 @@ const (
 	KindICNSIcon
 	KindICOCURImage
 	KindIEHistory
-	KindIETPL
-	KindIETrackingProtectionList
 	KindIFFContainer
 	KindImgSoftwareBitmap
 	KindImpulseTrackerInstrument
@@ -291,7 +284,6 @@ const (
 	KindKorgAudio
 	KindKTXTexture
 	KindKyotoCabinetDatabase
-	KindLevelDB
 	KindLHAArchive
 	KindLidarData
 	KindLightWaveScene
@@ -326,8 +318,6 @@ const (
 	KindMacriumReflectImage
 	KindMagicaVoxel
 	KindMAMECHD
-	KindMapInfoInterchange
-	KindMapInfoSeaChart
 	KindMArArchive
 	KindMaterialExchangeFormat
 	KindMATLABData
@@ -342,19 +332,15 @@ const (
 	KindMetafileImage
 	KindMicrografxDrawing
 	KindMicrosoftAccessDatabase
-	KindMicrosoftAgentCharacter
 	KindMicrosoftAnswerWizard
 	KindMicrosoftCodePageTranslation
 	KindMicrosoftCompress
-	KindMicrosoftCPlusPlusSymbols
 	KindMicrosoftDeveloperStudioProject
 	KindMicrosoftExchangeConfig
-	KindMicrosoftFaxCover
 	KindMicrosoftInfo
 	KindMicrosoftJournal
 	KindMicrosoftMoney
 	KindMicrosoftNetworkMonitor
-	KindMicrosoftOneNote
 	KindMicrosoftOneNoteNote
 	KindMicrosoftOutlookEmailFolder
 	KindMicrosoftProgramDatabase
@@ -380,6 +366,7 @@ const (
 	KindMPEGProgramStream
 	KindMPEGTransportStream
 	KindMPEGVideo
+	KindMSDOSCOFFObject
 	KindMUGENSound
 	KindMUGENSprite
 	KindMultiBitBlockchain
@@ -419,7 +406,6 @@ const (
 	KindNISTSPHEREAudio
 	KindNOAARasterChart
 	KindNokiaPhoneBackup
-	KindNortonDiskDoctorUndo
 	KindNovellLANalyzerCapture
 	KindNTFSFilesystem
 	KindNullsoftVideo
@@ -434,14 +420,12 @@ const (
 	KindOpenTypeFont
 	KindOptimFROGAudio
 	KindORCColumnarData
-	KindOutlookAddressBook
 	KindOutlookAddressFile
 	KindOutlookExpressAddressBook
 	KindOutlookExpressDatabase
 	KindPacketSnifferXCP
 	KindPaintShopProImage
 	KindPalmData
-	KindPalmOSSuperMemo
 	KindParallelsDiskImage
 	KindParrotVideoEncapsulation
 	KindPathWayMap
@@ -471,7 +455,6 @@ const (
 	KindPKCS12
 	KindPKLITEArchive
 	KindPKSFXArchive
-	KindPlaylistFile
 	KindPlayStation1Executable
 	KindPlayStation2MemoryCard
 	KindPlayStationExecutable
@@ -500,7 +483,6 @@ const (
 	KindQEMUQEDDiskImage
 	KindQimageFilter
 	KindQOIImage
-	KindQuakePAK
 	KindQuarkExpress
 	KindQuattroPro
 	KindQuickBooksBackup
@@ -616,7 +598,6 @@ const (
 	KindUBIFSFilesystem
 	KindUBootImage
 	KindUFAArchive
-	KindUFOCaptureMap
 	KindUHAArchive
 	KindUndergroundAudio
 	KindUnicodeExtensions
@@ -628,7 +609,6 @@ const (
 	KindUUencodedArchive
 	KindValvePak
 	KindValveTextureFormat
-	KindVBScript
 	KindVBScriptEncoded
 	KindVCard
 	KindVeeamBackup
@@ -638,8 +618,6 @@ const (
 	KindVideoVCD
 	KindVirtualBoxDiskImage
 	KindVirtualBoxSavedState
-	KindVisualBasicControl
-	KindVisualCPreCompiledHeader
 	KindVisualCWorkbenchInfo
 	KindVisualStudioSolution
 	KindVMapSourceWaypoint
@@ -670,6 +648,8 @@ const (
 	KindWin9xPassword
 	KindWin9xPrinterSpool
 	KindWin9xRegistryHive
+	KindWinAmpPlaylist
+	KindWindowsApplicationLog
 	KindWindowsCalendar
 	KindWindowsEventLog
 	KindWindowsEventViewer
@@ -743,8 +723,6 @@ const (
 	Type64BitBigEndian
 	Type64BitLittleEndian
 	TypeAC3
-	TypeAcronisB4
-	TypeAcronisCE
 	TypeAdobeDNGDNG
 	TypeADTS
 	TypeAfterEffectsProjectAEP
@@ -777,8 +755,6 @@ const (
 	TypeCanonRAW3CR3
 	TypeCanonRAWHE
 	TypeCAT
-	TypeCB7
-	TypeCBR
 	TypeCBT
 	TypeCBZ
 	TypeCDAAudio
@@ -793,6 +769,7 @@ const (
 	TypeCRXVersion2
 	TypeCRXVersion3
 	TypeCSharp
+	TypeCSO
 	TypeCSS
 	TypeCubaseProjectCPR
 	TypeCwtfPackage
@@ -808,6 +785,7 @@ const (
 	TypeDocker
 	TypeDownloadableSounds
 	TypeDSAPrivateKey
+	TypeDSW
 	TypeEAC3
 	TypeECPrivateKey
 	TypeELF
@@ -830,6 +808,7 @@ const (
 	TypeFAT32
 	TypeFirefoxExtensionXPI
 	TypeFLACAudio
+	TypeFLI
 	TypeForgeMod
 	TypeGIF87a
 	TypeGIF89a
@@ -857,6 +836,7 @@ const (
 	TypeKritaDocumentKRA
 	TypeKTX
 	TypeKTX2
+	TypeLGC
 	TypeLIST
 	TypeLittleEndian
 	TypeLN
@@ -864,7 +844,6 @@ const (
 	TypeLua
 	TypeLZ4Legacy
 	TypeLZMACompressed
-	TypeM2TS
 	TypeM2TSBDAV
 	TypeM4VVideo
 	TypeMakefile
@@ -896,7 +875,6 @@ const (
 	TypeMicrosoftWordTemplateDOTX
 	TypeMinecraftResourcePack
 	TypeMotionJPEG2000
-	TypeMP3
 	TypeMP3ID3Tagged
 	TypeMP4Video
 	TypeMPEG12Video
@@ -905,6 +883,7 @@ const (
 	TypeMPEGLayer2
 	TypeMPEGLayer3
 	TypeMSIXPackage
+	TypeMSP
 	TypeNamedPipe
 	TypeNanosecondBigEndian
 	TypeNanosecondLittleEndian
@@ -912,12 +891,15 @@ const (
 	TypeNewASCII
 	TypeNewASCIIWithCRC
 	TypeNikonRAWNEF
+	TypeNITF
 	TypeNpmPackageTarball
 	TypeNuGetPackageNUPKG
+	TypeOBJ
 	TypeObjectiveC
 	TypeOCIImageLayoutTar
 	TypeOldASCII
 	TypeOlympusRAWORF
+	TypeOpdata01
 	TypeOpenDocumentChartODC
 	TypeOpenDocumentDatabaseODB
 	TypeOpenDocumentFormulaODF
@@ -964,8 +946,8 @@ const (
 	TypeQCPAudio
 	TypeQuickTimeMovie
 	TypeR
-	TypeRAR4
 	TypeRAR5
+	TypeRARLegacy
 	TypeReturnPath
 	TypeRIFFMIDI
 	TypeRIFFPalette
@@ -994,10 +976,12 @@ const (
 	TypeTrue
 	TypeTS
 	TypeTypeScript
+	TypeUCE
 	TypeUncompressed
 	TypeUTF8Text
 	TypeVagrantBox
 	TypeVisualStudioExtensionVSIX
+	TypeVMD
 	TypeVMDK
 	TypeVMDKDescription
 	TypeVorbisAudio
@@ -1013,6 +997,7 @@ const (
 	TypeWindowsNE
 	TypeWrapper
 	TypeXMLPaperSpecificationXPS
+	TypeXPS
 	TypeXSLTStylesheet
 	TypeYAML
 	TypeZlibCompressed
@@ -1023,7 +1008,6 @@ var kindNames = [...]string{
 	KindUnknown:                             "Unknown",
 	Kind1PasswordCloudKeychain:              "1Password Cloud Keychain",
 	Kind1PasswordKeychain:                   "1Password Keychain",
-	Kind1PasswordKeychainCloud:              "1Password Keychain (Cloud)",
 	Kind7ZipArchive:                         "7-Zip Archive",
 	KindAACAudio:                            "AAC Audio",
 	KindAccessDataFTK:                       "AccessData FTK Evidence",
@@ -1125,9 +1109,7 @@ var kindNames = [...]string{
 	KindCALSImage:                           "CALS Raster Image",
 	KindCanonRAWImage:                       "Canon RAW Image",
 	KindCBORData:                            "CBOR Data",
-	KindCDStomperLabel:                      "CD Stomper Label",
-	KindCerius2File:                         "Cerius2 File",
-	KindCHMDocument:                         "CHM Document",
+	KindCHMDocument:                         "Compiled HTML Help (CHM)",
 	KindChromaGraphBitmap:                   "ChromaGraph Bitmap",
 	KindChromiumPatch:                       "Chromium Patch",
 	KindCinema4DModel:                       "Cinema 4D Model",
@@ -1148,6 +1130,7 @@ var kindNames = [...]string{
 	KindCramFS:                              "CramFS",
 	KindCrushArchive:                        "Crush Archive",
 	KindCRXBrowserExtension:                 "CRX Browser Extension",
+	KindCSOArchive:                          "CSO Compressed ISO",
 	KindCsoundMusic:                         "Csound Music",
 	KindDalvikExecutable:                    "Dalvik Executable",
 	KindDAXArchive:                          "DAX Archive",
@@ -1172,10 +1155,7 @@ var kindNames = [...]string{
 	KindDSFAudio:                            "DSF Audio",
 	KindDSTCompression:                      "DST Compression",
 	KindDTSAudio:                            "DTS Audio",
-	KindDVDInfoFile:                         "DVD Info File",
 	KindDVRMSVideo:                          "DVR-MS Video",
-	KindDVRStudioStream:                     "DVR-Studio Stream",
-	KindEasyRecoverySavedState:              "EasyRecovery Saved State",
 	KindEasyStreetDraw:                      "Easy Street Draw",
 	KindEBMLContainer:                       "EBML Container",
 	KindEFaxFile:                            "eFax File",
@@ -1208,6 +1188,7 @@ var kindNames = [...]string{
 	KindFITActivity:                         "FIT Activity",
 	KindFITSAstronomicalImage:               "FITS Astronomical Image",
 	KindFLACAudio:                           "FLAC Audio",
+	KindFLICAnimation:                       "FLIC Animation",
 	KindFLIFImage:                           "FLIF Image",
 	KindFlightSimulatorConfig:               "Flight Simulator Config",
 	KindFLStudioProject:                     "FL Studio Project",
@@ -1244,7 +1225,6 @@ var kindNames = [...]string{
 	KindGodotPackage:                        "Godot Engine Package",
 	KindGoogleChromeDictionary:              "Google Chrome Dictionary",
 	KindGoogleDriveDrawing:                  "Google Drive Drawing",
-	KindGoogleEarthETA:                      "Google Earth ETA",
 	KindGoogleEarthPlacemark:                "Google Earth Placemark",
 	KindGPSExchangeFormat:                   "GPS Exchange Format",
 	KindGRIBData:                            "GRIB Data",
@@ -1267,8 +1247,6 @@ var kindNames = [...]string{
 	KindICNSIcon:                            "ICNS Icon",
 	KindICOCURImage:                         "ICO/CUR Image",
 	KindIEHistory:                           "IE History",
-	KindIETPL:                               "IE TPL",
-	KindIETrackingProtectionList:            "IE Tracking Protection List",
 	KindIFFContainer:                        "IFF Container",
 	KindImgSoftwareBitmap:                   "Img Software Bitmap",
 	KindImpulseTrackerInstrument:            "Impulse Tracker Instrument",
@@ -1307,7 +1285,6 @@ var kindNames = [...]string{
 	KindKorgAudio:                           "Korg Audio",
 	KindKTXTexture:                          "KTX Texture",
 	KindKyotoCabinetDatabase:                "Kyoto Cabinet Database",
-	KindLevelDB:                             "LevelDB/RocksDB",
 	KindLHAArchive:                          "LHA Archive",
 	KindLidarData:                           "LiDAR Data (LAS)",
 	KindLightWaveScene:                      "LightWave Scene",
@@ -1342,8 +1319,6 @@ var kindNames = [...]string{
 	KindMacriumReflectImage:                 "Macrium Reflect Image",
 	KindMagicaVoxel:                         "MagicaVoxel Model",
 	KindMAMECHD:                             "MAME Compressed Hunks of Data",
-	KindMapInfoInterchange:                  "MapInfo Interchange",
-	KindMapInfoSeaChart:                     "MapInfo Sea Chart",
 	KindMArArchive:                          "MAr Archive",
 	KindMaterialExchangeFormat:              "Material Exchange Format",
 	KindMATLABData:                          "MATLAB Data",
@@ -1358,19 +1333,15 @@ var kindNames = [...]string{
 	KindMetafileImage:                       "Metafile Image",
 	KindMicrografxDrawing:                   "Micrografx Drawing",
 	KindMicrosoftAccessDatabase:             "Microsoft Access Database",
-	KindMicrosoftAgentCharacter:             "Microsoft Agent Character",
 	KindMicrosoftAnswerWizard:               "Microsoft Answer Wizard",
 	KindMicrosoftCodePageTranslation:        "Microsoft Code Page Translation",
 	KindMicrosoftCompress:                   "Microsoft Compress Archive",
-	KindMicrosoftCPlusPlusSymbols:           "Microsoft C++ Symbols",
 	KindMicrosoftDeveloperStudioProject:     "Microsoft Developer Studio Project",
 	KindMicrosoftExchangeConfig:             "Microsoft Exchange Config",
-	KindMicrosoftFaxCover:                   "Microsoft Fax Cover",
 	KindMicrosoftInfo:                       "Microsoft Info",
 	KindMicrosoftJournal:                    "Microsoft Journal",
 	KindMicrosoftMoney:                      "Microsoft Money",
 	KindMicrosoftNetworkMonitor:             "Microsoft Network Monitor Capture",
-	KindMicrosoftOneNote:                    "Microsoft OneNote",
 	KindMicrosoftOneNoteNote:                "Microsoft OneNote Note",
 	KindMicrosoftOutlookEmailFolder:         "Microsoft Outlook Email Folder",
 	KindMicrosoftProgramDatabase:            "Microsoft Program Database (PDB)",
@@ -1396,6 +1367,7 @@ var kindNames = [...]string{
 	KindMPEGProgramStream:                   "MPEG Program Stream",
 	KindMPEGTransportStream:                 "MPEG Transport Stream",
 	KindMPEGVideo:                           "MPEG Video",
+	KindMSDOSCOFFObject:                     "MS-DOS COFF Object",
 	KindMUGENSound:                          "M.U.G.E.N Sound",
 	KindMUGENSprite:                         "M.U.G.E.N Sprite",
 	KindMultiBitBlockchain:                  "MultiBit Blockchain",
@@ -1435,7 +1407,6 @@ var kindNames = [...]string{
 	KindNISTSPHEREAudio:                     "NIST SPHERE Audio",
 	KindNOAARasterChart:                     "NOAA Raster Chart",
 	KindNokiaPhoneBackup:                    "Nokia Phone Backup",
-	KindNortonDiskDoctorUndo:                "Norton Disk Doctor Undo",
 	KindNovellLANalyzerCapture:              "Novell LANalyzer Capture",
 	KindNTFSFilesystem:                      "NTFS Filesystem",
 	KindNullsoftVideo:                       "Nullsoft Video",
@@ -1450,14 +1421,12 @@ var kindNames = [...]string{
 	KindOpenTypeFont:                        "OpenType Font",
 	KindOptimFROGAudio:                      "OptimFROG Audio",
 	KindORCColumnarData:                     "ORC Columnar Data",
-	KindOutlookAddressBook:                  "Outlook Address Book",
 	KindOutlookAddressFile:                  "Outlook Address File",
 	KindOutlookExpressAddressBook:           "Outlook Express Address Book",
 	KindOutlookExpressDatabase:              "Outlook Express Database",
 	KindPacketSnifferXCP:                    "Packet Sniffer XCP",
 	KindPaintShopProImage:                   "PaintShop Pro Image",
 	KindPalmData:                            "Palm Data",
-	KindPalmOSSuperMemo:                     "PalmOS SuperMemo",
 	KindParallelsDiskImage:                  "Parallels Disk Image",
 	KindParrotVideoEncapsulation:            "Parrot Video Encapsulation",
 	KindPathWayMap:                          "PathWay Map",
@@ -1487,7 +1456,6 @@ var kindNames = [...]string{
 	KindPKCS12:                              "PKCS#12",
 	KindPKLITEArchive:                       "PKLITE Archive",
 	KindPKSFXArchive:                        "PKSFX Archive",
-	KindPlaylistFile:                        "Playlist File",
 	KindPlayStation1Executable:              "PlayStation 1 Executable",
 	KindPlayStation2MemoryCard:              "PlayStation 2 Memory Card",
 	KindPlayStationExecutable:               "PlayStation Executable",
@@ -1516,7 +1484,6 @@ var kindNames = [...]string{
 	KindQEMUQEDDiskImage:                    "QEMU QED Disk Image",
 	KindQimageFilter:                        "Qimage Filter",
 	KindQOIImage:                            "QOI Image",
-	KindQuakePAK:                            "Quake PAK Archive",
 	KindQuarkExpress:                        "Quark Express",
 	KindQuattroPro:                          "Quattro Pro",
 	KindQuickBooksBackup:                    "QuickBooks Backup",
@@ -1632,7 +1599,6 @@ var kindNames = [...]string{
 	KindUBIFSFilesystem:                     "UBIFS Filesystem",
 	KindUBootImage:                          "U-Boot Image",
 	KindUFAArchive:                          "UFA Archive",
-	KindUFOCaptureMap:                       "UFO Capture Map",
 	KindUHAArchive:                          "UHA Archive",
 	KindUndergroundAudio:                    "Underground Audio",
 	KindUnicodeExtensions:                   "Unicode Extensions",
@@ -1644,7 +1610,6 @@ var kindNames = [...]string{
 	KindUUencodedArchive:                    "UUencoded Archive",
 	KindValvePak:                            "Valve Pak",
 	KindValveTextureFormat:                  "Valve Texture Format",
-	KindVBScript:                            "VBScript",
 	KindVBScriptEncoded:                     "VBScript Encoded",
 	KindVCard:                               "vCard",
 	KindVeeamBackup:                         "Veeam Backup",
@@ -1654,8 +1619,6 @@ var kindNames = [...]string{
 	KindVideoVCD:                            "Video VCD",
 	KindVirtualBoxDiskImage:                 "VirtualBox Disk Image",
 	KindVirtualBoxSavedState:                "VirtualBox Saved State",
-	KindVisualBasicControl:                  "Visual Basic Control",
-	KindVisualCPreCompiledHeader:            "Visual C PreCompiled Header",
 	KindVisualCWorkbenchInfo:                "Visual C++ Workbench Info",
 	KindVisualStudioSolution:                "Visual Studio Solution",
 	KindVMapSourceWaypoint:                  "VMapSource Waypoint",
@@ -1686,6 +1649,8 @@ var kindNames = [...]string{
 	KindWin9xPassword:                       "Win9x Password",
 	KindWin9xPrinterSpool:                   "Win9x Printer Spool",
 	KindWin9xRegistryHive:                   "Win9x Registry Hive",
+	KindWinAmpPlaylist:                      "WinAmp Playlist",
+	KindWindowsApplicationLog:               "Windows Application Log",
 	KindWindowsCalendar:                     "Windows Calendar",
 	KindWindowsEventLog:                     "Windows Event Log",
 	KindWindowsEventViewer:                  "Windows Event Viewer",
@@ -1759,8 +1724,6 @@ var typeNames = [...]string{
 	Type64BitBigEndian:           "64-bit Big-Endian",
 	Type64BitLittleEndian:        "64-bit Little-Endian",
 	TypeAC3:                      "AC-3",
-	TypeAcronisB4:                "Acronis B4",
-	TypeAcronisCE:                "Acronis CE",
 	TypeAdobeDNGDNG:              "Adobe DNG (DNG)",
 	TypeADTS:                     "ADTS",
 	TypeAfterEffectsProjectAEP:   "After Effects Project (AEP)",
@@ -1793,8 +1756,6 @@ var typeNames = [...]string{
 	TypeCanonRAW3CR3:             "Canon RAW 3 (CR3)",
 	TypeCanonRAWHE:               "Canon RAW HE",
 	TypeCAT:                      "CAT",
-	TypeCB7:                      "CB7",
-	TypeCBR:                      "CBR",
 	TypeCBT:                      "CBT",
 	TypeCBZ:                      "CBZ",
 	TypeCDAAudio:                 "CD Audio",
@@ -1809,6 +1770,7 @@ var typeNames = [...]string{
 	TypeCRXVersion2:              "Version 2",
 	TypeCRXVersion3:              "Version 3",
 	TypeCSharp:                   "C# Source",
+	TypeCSO:                      "CSO",
 	TypeCSS:                      "Cascading Style Sheets (CSS)",
 	TypeCubaseProjectCPR:         "Cubase Project (CPR)",
 	TypeCwtfPackage:              "Cwtf Package",
@@ -1824,6 +1786,7 @@ var typeNames = [...]string{
 	TypeDocker:                   "Dockerfile",
 	TypeDownloadableSounds:       "Downloadable Sounds",
 	TypeDSAPrivateKey:            "DSA Private Key",
+	TypeDSW:                      "Visual Studio Workspace (DSW)",
 	TypeEAC3:                     "E-AC-3",
 	TypeECPrivateKey:             "EC Private Key",
 	TypeELF:                      "ELF",
@@ -1846,6 +1809,7 @@ var typeNames = [...]string{
 	TypeFAT32:                    "FAT32",
 	TypeFirefoxExtensionXPI:      "Firefox Extension (XPI)",
 	TypeFLACAudio:                "FLAC Audio",
+	TypeFLI:                      "FLI",
 	TypeForgeMod:                 "Forge Mod",
 	TypeGIF87a:                   "GIF87a",
 	TypeGIF89a:                   "GIF89a",
@@ -1873,6 +1837,7 @@ var typeNames = [...]string{
 	TypeKritaDocumentKRA:         "Krita Document (KRA)",
 	TypeKTX:                      "KTX",
 	TypeKTX2:                     "KTX2",
+	TypeLGC:                      "Application Log (LGC)",
 	TypeLIST:                     "LIST",
 	TypeLittleEndian:             "Little-Endian",
 	TypeLN:                       "LN",
@@ -1880,7 +1845,6 @@ var typeNames = [...]string{
 	TypeLua:                      "Lua Script",
 	TypeLZ4Legacy:                "LZ4 Legacy",
 	TypeLZMACompressed:           "LZMA Compressed",
-	TypeM2TS:                     "M2TS",
 	TypeM2TSBDAV:                 "M2TS/BDAV",
 	TypeM4VVideo:                 "M4V Video",
 	TypeMakefile:                 "Makefile",
@@ -1912,7 +1876,6 @@ var typeNames = [...]string{
 	TypeMicrosoftWordTemplateDOTX:                       "Microsoft Word Template (DOTX)",
 	TypeMinecraftResourcePack:                           "Minecraft Resource Pack",
 	TypeMotionJPEG2000:                                  "Motion JPEG 2000",
-	TypeMP3:                                             "MP3",
 	TypeMP3ID3Tagged:                                    "MP3 (ID3 Tagged)",
 	TypeMP4Video:                                        "MP4 Video",
 	TypeMPEG12Video:                                     "MPEG-1/2 Video",
@@ -1921,6 +1884,7 @@ var typeNames = [...]string{
 	TypeMPEGLayer2:                                      "MPEG Layer II",
 	TypeMPEGLayer3:                                      "MPEG Layer III",
 	TypeMSIXPackage:                                     "MSIX Package",
+	TypeMSP:                                             "Microsoft Installer Patch (MSP)",
 	TypeNamedPipe:                                       "Named Pipe",
 	TypeNanosecondBigEndian:                             "Nanosecond Big-Endian",
 	TypeNanosecondLittleEndian:                          "Nanosecond Little-Endian",
@@ -1928,12 +1892,15 @@ var typeNames = [...]string{
 	TypeNewASCII:                                        "New ASCII",
 	TypeNewASCIIWithCRC:                                 "New ASCII with CRC",
 	TypeNikonRAWNEF:                                     "Nikon RAW (NEF)",
+	TypeNITF:                                            "NITF",
 	TypeNpmPackageTarball:                               "npm Package Tarball",
 	TypeNuGetPackageNUPKG:                               "NuGet Package (NUPKG)",
+	TypeOBJ:                                             "COFF Object (OBJ)",
 	TypeObjectiveC:                                      "Objective-C Source",
 	TypeOCIImageLayoutTar:                               "OCI Image Layout (TAR)",
 	TypeOldASCII:                                        "Old ASCII",
 	TypeOlympusRAWORF:                                   "Olympus RAW (ORF)",
+	TypeOpdata01:                                        "opdata01",
 	TypeOpenDocumentChartODC:                            "OpenDocument Chart (ODC)",
 	TypeOpenDocumentDatabaseODB:                         "OpenDocument Database (ODB)",
 	TypeOpenDocumentFormulaODF:                          "OpenDocument Formula (ODF)",
@@ -1980,8 +1947,8 @@ var typeNames = [...]string{
 	TypeQCPAudio:                                        "QCP Audio",
 	TypeQuickTimeMovie:                                  "QuickTime Movie",
 	TypeR:                                               "R Script",
-	TypeRAR4:                                            "RAR4",
 	TypeRAR5:                                            "RAR5",
+	TypeRARLegacy:                                       "RAR (Legacy)",
 	TypeReturnPath:                                      "Return Path",
 	TypeRIFFMIDI:                                        "MIDI",
 	TypeRIFFPalette:                                     "Palette",
@@ -2010,10 +1977,12 @@ var typeNames = [...]string{
 	TypeTrue:                                            "True",
 	TypeTS:                                              "TS",
 	TypeTypeScript:                                      "TypeScript Source",
+	TypeUCE:                                             "Unicode Extensions",
 	TypeUncompressed:                                    "Uncompressed",
 	TypeUTF8Text:                                        "UTF-8 Text",
 	TypeVagrantBox:                                      "Vagrant Box",
 	TypeVisualStudioExtensionVSIX:                       "Visual Studio Extension (VSIX)",
+	TypeVMD:                                             "VocalTec Media (VMD)",
 	TypeVMDK:                                            "VMDK",
 	TypeVMDKDescription:                                 "VMDK Description",
 	TypeVorbisAudio:                                     "Vorbis Audio",
@@ -2029,6 +1998,7 @@ var typeNames = [...]string{
 	TypeWindowsNE:                                       "16-bit New Executable (NE)",
 	TypeWrapper:                                         "Wrapper",
 	TypeXMLPaperSpecificationXPS:                        "XML Paper Specification (XPS)",
+	TypeXPS:                                             "XML Paper Specification (XPS)",
 	TypeXSLTStylesheet:                                  "XSLT Stylesheet",
 	TypeYAML:                                            "YAML Configuration",
 	TypeZlibCompressed:                                  "Zlib Compressed",
