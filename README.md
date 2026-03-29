@@ -50,7 +50,9 @@ wtf [flags] <file>
 ```
 
 **Flags:**
+- `-l`, `--list`: List all supported formats and sub-formats
 - `-p`, `--porcelain`: Print easily parseable output (tab-separated: `Kind\tType\tConfidence`)
+- `-t`, `--time`: Print time taken (read / sniff; disabled by `-p`)
 - `-v`, `--version`: Print version information
 - `-h`, `--help`: Print this help message
 
@@ -59,6 +61,8 @@ wtf [flags] <file>
 ```bash
 wtf sample.png
 wtf --porcelain sample.png
+wtf --time sample.png
+wtf --list
 ```
 
 ## Go package
