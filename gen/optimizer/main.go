@@ -35,8 +35,6 @@ type SignatureKey struct {
 	Offset int
 	Magic  string
 	Mask   string
-	Kind   string
-	Typ    string
 }
 
 type Generator struct {
@@ -176,7 +174,7 @@ func parseSignatures(dir string) *Generator {
 }
 
 func checkDuplicateSignatures(strongSigs, weakSigs []Sig) {
-	seen := make(map[SignatureKey]SignatureKey)
+	seen := make(map[SignatureKey]Sig)
 
 	check := func(sigs []Sig, category string) {
 		for _, sig := range sigs {
@@ -189,19 +187,15 @@ func checkDuplicateSignatures(strongSigs, weakSigs []Sig) {
 			if prev, exists := seen[key]; exists {
 				log.Fatalf("DUPLICATE SIGNATURE in %s:\n"+
 					"  Existing: %s.%s at offset %d, magic=%q, mask=%q\n"+
-					"  Duplicate: %s.%s at offset %d, magic=%q, mask=%q",
+					"  Duplicate: %s.%s at offset %d, magic=%q, mask=%q\n"+
+					"  (Signatures evaluate to the exact same bytes and will fight each other)",
 					category,
-					prev.Kind, prev.Typ, prev.Offset, prev.Magic, prev.Mask,
-					sig.Kind, sig.Type, sig.Offset, string(sig.Magic), string(sig.Mask))
+					prev.Kind, prev.Type, prev.Offset, string(prev.Magic), string(prev.Mask),
+					sig.Kind, sig.Type, sig.Offset, string(sig.Magic), string(sig.Mask),
+				)
 			}
 
-			seen[key] = SignatureKey{
-				Offset: sig.Offset,
-				Magic:  string(sig.Magic),
-				Mask:   string(sig.Mask),
-				Kind:   sig.Kind,
-				Typ:    sig.Type,
-			}
+			seen[key] = sig
 		}
 	}
 
