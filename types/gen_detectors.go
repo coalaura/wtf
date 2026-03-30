@@ -97,23 +97,23 @@ func elfType(class byte, data byte) TypeID {
 	case 1:
 		switch data {
 		case 1:
-			return TypeELF32LittleEndian
+			return Type32BitLittleEndian
 		case 2:
-			return TypeELF32BigEndian
+			return Type32BitBigEndian
 		default:
-			return TypeELF32
+			return Type32Bit
 		}
 	case 2:
 		switch data {
 		case 1:
-			return TypeELF64LittleEndian
+			return Type64BitLittleEndian
 		case 2:
-			return TypeELF64BigEndian
+			return Type64BitBigEndian
 		default:
-			return TypeELF64
+			return Type64Bit
 		}
 	default:
-		return TypeELF
+		return TypeNone
 	}
 }
 

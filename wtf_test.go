@@ -31,7 +31,7 @@ func TestDetectFixtures(t *testing.T) {
 		{file: "dng.dng", kind: types.KindTIFFImage, typ: types.TypeAdobeDNG},
 		{file: "document.doc", kind: types.KindOLECompoundDocument, typ: types.TypeMicrosoftWordDocument},
 		{file: "dp3_icc.icc", kind: types.KindICCProfile, typ: types.TypeNone},
-		{file: "elf_x64", kind: types.KindExecutableAndLinkableFormat, typ: types.TypeELF64LittleEndian},
+		{file: "elf_x64", kind: types.KindExecutableAndLinkableFormat, typ: types.Type64BitLittleEndian},
 		{file: "epub.epub", kind: types.KindZIPArchive, typ: types.TypeEPUBDocument},
 		{file: "excel.xls", kind: types.KindOLECompoundDocument, typ: types.TypeMicrosoftExcelWorkbook},
 		{file: "excel.xlsx", kind: types.KindZIPArchive, typ: types.TypeMicrosoftExcelWorkbook},

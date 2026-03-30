@@ -784,13 +784,6 @@ const (
 	TypeDSAPrivateKey
 	TypeEAC3
 	TypeECPrivateKey
-	TypeELF
-	TypeELF32
-	TypeELF32BigEndian
-	TypeELF32LittleEndian
-	TypeELF64
-	TypeELF64BigEndian
-	TypeELF64LittleEndian
 	TypeEmpty
 	TypeEnhancedMetafile
 	TypeEPUBDocument
@@ -1765,13 +1758,6 @@ var typeNames = [...]string{
 	TypeDSAPrivateKey:                      "DSA Private Key",
 	TypeEAC3:                               "E-AC-3",
 	TypeECPrivateKey:                       "EC Private Key",
-	TypeELF:                                "ELF",
-	TypeELF32:                              "ELF32",
-	TypeELF32BigEndian:                     "ELF32 Big-Endian",
-	TypeELF32LittleEndian:                  "ELF32 Little-Endian",
-	TypeELF64:                              "ELF64",
-	TypeELF64BigEndian:                     "ELF64 Big-Endian",
-	TypeELF64LittleEndian:                  "ELF64 Little-Endian",
 	TypeEmpty:                              "Empty",
 	TypeEnhancedMetafile:                   "Enhanced Metafile",
 	TypeEPUBDocument:                       "EPUB Document",
