@@ -6,7 +6,7 @@ func init() {
 	types.RegisterSignature(types.KindAccessDataFTK, types.TypeNone, 0, []byte{0xa9, 0x0d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 	types.RegisterSignature(types.KindAdvancedForensicFormat, types.TypeNone, 0, []byte("AFF\x00"))
 	types.RegisterSignature(types.KindBluetoothSnoop, types.TypeNone, 0, []byte("btsnoop\x00"))
-	types.RegisterSignature(types.KindEnCaseCaseFile, types.TypeNone, 0, []byte("_CASE_"))
+	types.RegisterSignature(types.KindEnCaseCase, types.TypeNone, 0, []byte("_CASE_"))
 	types.RegisterSignature(types.KindEnCaseEvidenceV2, types.TypeNone, 0, []byte("EVF2\r\n\x81"))
 	types.RegisterSignature(types.KindEnCaseImage, types.TypeNone, 0, []byte("EVF\x09\x0d\x0a\xff\x00"))
 	types.RegisterSignature(types.KindExpertWitnessFormat, types.TypeNone, 0, []byte("EVF\x09\x0d\x0a\x81"))

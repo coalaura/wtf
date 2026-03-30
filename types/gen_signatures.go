@@ -102,7 +102,7 @@ func detectOptimized(b Buffer) *Metadata {
 											}
 										case 0x20:
 											if len(b) >= 16 && string(b[:16]) == "\x00\x00\x00\x00 \x00\x00\x00\xff\xff\x00\x00\xff\xff\x00\x00" {
-												return &Metadata{Kind: KindWindowsResourceFile}
+												return &Metadata{Kind: KindWindowsResource}
 											}
 										}
 									}
@@ -816,11 +816,11 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[7] {
 						case 0x0a:
 							if len(b) >= 8 && string(b[:8]) == "(module\n" {
-								return &Metadata{Kind: KindWebAssemblyModule, Type: TypeASCIIText}
+								return &Metadata{Kind: KindWebAssemblyModule, Type: TypeASCII}
 							}
 						case 0x20:
 							if len(b) >= 8 && string(b[:8]) == "(module " {
-								return &Metadata{Kind: KindWebAssemblyModule, Type: TypeASCIIText}
+								return &Metadata{Kind: KindWebAssemblyModule, Type: TypeASCII}
 							}
 						}
 					}
@@ -846,11 +846,11 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x44:
 							if len(b) >= 31 && string(b[:31]) == "-----BEGIN DSA PRIVATE KEY-----" {
-								return &Metadata{Kind: KindPEMPrivateKey, Type: TypeDSAPrivateKey}
+								return &Metadata{Kind: KindPEMPrivateKey, Type: TypeDSA}
 							}
 						case 0x45:
 							if len(b) >= 30 && string(b[:30]) == "-----BEGIN EC PRIVATE KEY-----" {
-								return &Metadata{Kind: KindPEMPrivateKey, Type: TypeECPrivateKey}
+								return &Metadata{Kind: KindPEMPrivateKey, Type: TypeEC}
 							}
 						case 0x4f:
 							if len(b) >= 35 && string(b[:35]) == "-----BEGIN OPENSSH PRIVATE KEY-----" {
@@ -871,7 +871,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x52:
 							if len(b) >= 31 && string(b[:31]) == "-----BEGIN RSA PRIVATE KEY-----" {
-								return &Metadata{Kind: KindPEMPrivateKey, Type: TypeRSAPrivateKey}
+								return &Metadata{Kind: KindPEMPrivateKey, Type: TypeRSA}
 							}
 						}
 					}
@@ -1242,7 +1242,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x4f:
 							if len(b) >= 6 && string(b[:6]) == "ARROW1" {
-								return &Metadata{Kind: KindApacheArrowFile}
+								return &Metadata{Kind: KindApacheArrow}
 							}
 						}
 					}
@@ -1366,7 +1366,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x45:
 							if len(b) >= 7 && string(b[:7]) == "BLENDER" {
-								return &Metadata{Kind: KindBlenderFile}
+								return &Metadata{Kind: KindBlender}
 							}
 						case 0x49:
 							if len(b) >= 6 && string(b[:6]) == "BLI223" {
@@ -1677,19 +1677,19 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[3] {
 								case 0x00:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x00" {
-										return &Metadata{Kind: KindAmigaDiskFile}
+										return &Metadata{Kind: KindAmigaDisk}
 									}
 								case 0x01:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x01" {
-										return &Metadata{Kind: KindAmigaDiskFile}
+										return &Metadata{Kind: KindAmigaDisk}
 									}
 								case 0x02:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x02" {
-										return &Metadata{Kind: KindAmigaDiskFile}
+										return &Metadata{Kind: KindAmigaDisk}
 									}
 								case 0x03:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x03" {
-										return &Metadata{Kind: KindAmigaDiskFile}
+										return &Metadata{Kind: KindAmigaDisk}
 									}
 								}
 							}
@@ -2572,7 +2572,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x2a:
 					if len(b) >= 4 && string(b[:4]) == "P*M\x18" {
-						return &Metadata{Kind: KindZstandardArchive, Type: TypeZstandardSkinnableFrame}
+						return &Metadata{Kind: KindZstandardArchive, Type: TypeSkinnableFrame}
 					}
 				case 0x41:
 					if len(b) > 2 {
@@ -2805,14 +2805,14 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x43:
 					if len(b) >= 3 && string(b[:3]) == "RCF" {
-						return &Metadata{Kind: KindHadoopRCFile}
+						return &Metadata{Kind: KindHadoopRC}
 					}
 				case 0x44:
 					if len(b) > 2 {
 						switch b[2] {
 						case 0x53:
 							if len(b) >= 4 && string(b[:4]) == "RDSK" {
-								return &Metadata{Kind: KindAmigaHardDiskFile}
+								return &Metadata{Kind: KindAmigaHardDisk}
 							}
 						case 0x58:
 							if len(b) > 3 {
@@ -2972,11 +2972,11 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[6] {
 						case 0x00:
 							if len(b) >= 7 && string(b[:7]) == "Rar!\x1a\a\x00" {
-								return &Metadata{Kind: KindRARArchive, Type: TypeRARLegacy}
+								return &Metadata{Kind: KindRARArchive, Type: TypeLegacy}
 							}
 						case 0x01:
 							if len(b) >= 8 && string(b[:8]) == "Rar!\x1a\a\x01\x00" {
-								return &Metadata{Kind: KindRARArchive, Type: TypeRAR5}
+								return &Metadata{Kind: KindRARArchive, Type: TypeVersion5}
 							}
 						}
 					}
@@ -3036,7 +3036,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x51:
 							if len(b) >= 4 && string(b[:4]) == "SEQ6" {
-								return &Metadata{Kind: KindHadoopSequenceFile}
+								return &Metadata{Kind: KindHadoopSequence}
 							}
 						}
 					}
@@ -3208,7 +3208,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x43:
 					if len(b) >= 4 && string(b[:4]) == "UCEX" {
-						return &Metadata{Kind: KindUnicodeExtensions, Type: TypeUCE}
+						return &Metadata{Kind: KindUnicodeExtensions}
 					}
 				case 0x46:
 					if len(b) >= 6 && string(b[:6]) == "UFA\xc6\xd2\xc1" {
@@ -3345,7 +3345,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x41:
 					if len(b) >= 5 && string(b[:5]) == "WARC/" {
-						return &Metadata{Kind: KindWARCFile}
+						return &Metadata{Kind: KindWARC}
 					}
 				case 0x42:
 					if len(b) >= 4 && string(b[:4]) == "WBFS" {
@@ -3572,7 +3572,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x43:
 					if len(b) >= 6 && string(b[:6]) == "_CASE_" {
-						return &Metadata{Kind: KindEnCaseCaseFile}
+						return &Metadata{Kind: KindEnCaseCase}
 					}
 				}
 			}
@@ -3718,7 +3718,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x6e:
 					if len(b) >= 4 && string(b[:4]) == "dns." {
-						return &Metadata{Kind: KindAudacityBlockFile}
+						return &Metadata{Kind: KindAudacityBlock}
 					}
 				case 0x73:
 					if len(b) >= 11 && string(b[:11]) == "dsworkspace" {
@@ -4220,7 +4220,7 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0x9c:
 			if len(b) >= 8 && string(b[:8]) == "\x9c\xcbˍ\x13u\xd2\x11" {
-				return &Metadata{Kind: KindOutlookAddressFile}
+				return &Metadata{Kind: KindOutlookAddress}
 			}
 		case 0xa1:
 			if len(b) > 2 {
@@ -4427,7 +4427,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0xfe:
 					if len(b) >= 2 && string(b[:2]) == "\xdc\xfe" {
-						return &Metadata{Kind: KindEFaxFile}
+						return &Metadata{Kind: KindEFax}
 					}
 				}
 			}

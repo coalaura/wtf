@@ -44,19 +44,19 @@ func DetectText(b types.Buffer) *types.Metadata {
 
 	if subtype != types.TypeNone {
 		return &types.Metadata{
-			Kind:       types.KindTextFile,
+			Kind:       types.KindText,
 			Type:       subtype,
 			Confidence: types.ConfidenceMedium,
 		}
 	}
 
-	fallbackType := types.TypeUTF8Text
+	fallbackType := types.TypeUTF8
 	if isASCII {
-		fallbackType = types.TypeASCIIText
+		fallbackType = types.TypeASCII
 	}
 
 	return &types.Metadata{
-		Kind:       types.KindTextFile,
+		Kind:       types.KindText,
 		Type:       fallbackType,
 		Confidence: types.ConfidenceLow,
 	}

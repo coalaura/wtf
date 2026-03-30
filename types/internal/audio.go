@@ -15,7 +15,7 @@ func init() {
 	types.RegisterSignature(types.KindAMRWBAudio, types.TypeNone, 0, []byte("#!AMR-WB\n"))
 	types.RegisterSignature(types.KindAnalogBox, types.TypeNone, 0, []byte("ABox"))
 	types.RegisterSignature(types.KindAUAudio, types.TypeNone, 0, []byte(".snd"))
-	types.RegisterSignature(types.KindAudacityBlockFile, types.TypeNone, 0, []byte("dns."))
+	types.RegisterSignature(types.KindAudacityBlock, types.TypeNone, 0, []byte("dns."))
 	types.RegisterSignature(types.KindCAFAudio, types.TypeNone, 0, []byte("caff"))
 	types.RegisterSignature(types.KindCommodoreSID, types.TypeNone, 0, []byte("PSID"))
 	types.RegisterSignature(types.KindCommodoreSID, types.TypeNone, 0, []byte("RSID"))

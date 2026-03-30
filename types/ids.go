@@ -19,9 +19,9 @@ const (
 	KindAINArchive
 	KindAllegroPackfile
 	KindALZArchive
-	KindAmigaDiskFile
+	KindAmigaDisk
 	KindAmigaDiskMasher
-	KindAmigaHardDiskFile
+	KindAmigaHardDisk
 	KindAmigaHunkExecutable
 	KindAmigaIcon
 	KindAmigaOctaMED
@@ -42,7 +42,7 @@ const (
 	KindAOLData
 	KindAOLHistory
 	KindAOLParameterInfo
-	KindApacheArrowFile
+	KindApacheArrow
 	KindApacheParquet
 	KindAPFSFilesystem
 	KindAppImage
@@ -71,7 +71,7 @@ const (
 	KindAtariLynxROM
 	KindAtomFeed
 	KindAUAudio
-	KindAudacityBlockFile
+	KindAudacityBlock
 	KindAutoCADDrawing
 	KindAutoCADDXF
 	KindAVG6IntegrityDatabase
@@ -88,7 +88,7 @@ const (
 	KindBitcoinWallet
 	KindBitLockerDiskEncryption
 	KindBlackBerryBackup
-	KindBlenderFile
+	KindBlender
 	KindBlinkArchive
 	KindBlizzardTexture
 	KindBluetoothSnoop
@@ -157,11 +157,11 @@ const (
 	KindDVRMSVideo
 	KindEasyStreetDraw
 	KindEBMLContainer
-	KindEFaxFile
+	KindEFax
 	KindEGGArchive
 	KindElitePlusCommander
 	KindEncapsulatedPostScript
-	KindEnCaseCaseFile
+	KindEnCaseCase
 	KindEnCaseEvidenceV2
 	KindEnCaseImage
 	KindEndNoteLibrary
@@ -230,8 +230,8 @@ const (
 	KindGUIDPartitionTable
 	KindGzipArchive
 	KindGzipData
-	KindHadoopRCFile
-	KindHadoopSequenceFile
+	KindHadoopRC
+	KindHadoopSequence
 	KindHamarsoftArchive
 	KindHarvardGraphics
 	KindHDF4Data
@@ -420,7 +420,7 @@ const (
 	KindOpenTypeFont
 	KindOptimFROGAudio
 	KindORCColumnarData
-	KindOutlookAddressFile
+	KindOutlookAddress
 	KindOutlookExpressAddressBook
 	KindOutlookExpressDatabase
 	KindPacketSnifferXCP
@@ -582,14 +582,14 @@ const (
 	KindTargetExpress
 	KindTensorFlowLiteModel
 	KindTeraByteImage
-	KindTextFile
+	KindText
 	KindTheBatIndex
 	KindThunderbirdMailSummary
 	KindTIFFImage
 	KindTimezoneData
 	KindTokyoCabinetDatabase
 	KindTomTomTraffic
-	KindTorrentFile
+	KindTorrent
 	KindTransportNeutralEncapsulationFormat
 	KindTrueTypeCollection
 	KindTrueTypeFont
@@ -632,7 +632,7 @@ const (
 	KindVulkanSPIRV
 	KindWADArchive
 	KindWalkmanMP3
-	KindWARCFile
+	KindWARC
 	KindWarcraftIIIReplay
 	KindWavPackAudio
 	KindWavPackCorrection
@@ -663,7 +663,7 @@ const (
 	KindWindowsPrefetch
 	KindWindowsProgramManagerGroup
 	KindWindowsRegistryHive
-	KindWindowsResourceFile
+	KindWindowsResource
 	KindWindowsShortcut
 	KindWindowsThumbnailCache
 	KindWindowsTypeLibrary
@@ -736,7 +736,7 @@ const (
 	TypeAndroidSystemPackage
 	TypeAPPXPackage
 	TypeArchLinuxPackage
-	TypeASCIIText
+	TypeASCII
 	TypeAVIFImage
 	TypeAVIFImageSequence
 	TypeAVIVideo
@@ -781,9 +781,9 @@ const (
 	TypeDirectory
 	TypeDocker
 	TypeDownloadableSounds
-	TypeDSAPrivateKey
+	TypeDSA
 	TypeEAC3
-	TypeECPrivateKey
+	TypeEC
 	TypeEmpty
 	TypeEnhancedMetafile
 	TypeEPUBDocument
@@ -822,6 +822,7 @@ const (
 	TypeKMZArchive
 	TypeKotlin
 	TypeKritaDocument
+	TypeLegacy
 	TypeLIST
 	TypeLittleEndian
 	TypeLOVEGame
@@ -923,14 +924,13 @@ const (
 	TypeQCPAudio
 	TypeQuickTimeMovie
 	TypeR
-	TypeRAR5
-	TypeRARLegacy
 	TypeRIFFMIDI
 	TypeRIFFPalette
-	TypeRSAPrivateKey
+	TypeRSA
 	TypeRuby
 	TypeRust
 	TypeScala
+	TypeSkinnableFrame
 	TypeSlackwarePackage
 	TypeSocket
 	TypeSonyRAW
@@ -945,13 +945,13 @@ const (
 	TypeTheoraVideo
 	TypeTOML
 	TypeTypeScript
-	TypeUCE
 	TypeUncompressed
-	TypeUTF8Text
+	TypeUTF8
 	TypeVagrantBox
 	TypeVersion1
 	TypeVersion2
 	TypeVersion3
+	TypeVersion5
 	TypeVersion7
 	TypeVersion8
 	TypeVisualStudioExtension
@@ -974,7 +974,6 @@ const (
 	TypeXSLTStylesheet
 	TypeYAML
 	TypeZlibCompressed
-	TypeZstandardSkinnableFrame
 )
 
 var kindNames = [...]string{
@@ -993,9 +992,9 @@ var kindNames = [...]string{
 	KindAINArchive:                          "AIN Archive",
 	KindAllegroPackfile:                     "Allegro Packfile",
 	KindALZArchive:                          "ALZ Archive",
-	KindAmigaDiskFile:                       "Amiga Disk File",
+	KindAmigaDisk:                           "Amiga Disk",
 	KindAmigaDiskMasher:                     "Amiga DiskMasher",
-	KindAmigaHardDiskFile:                   "Amiga Hard Disk File",
+	KindAmigaHardDisk:                       "Amiga Hard Disk",
 	KindAmigaHunkExecutable:                 "Amiga Hunk Executable",
 	KindAmigaIcon:                           "Amiga Icon",
 	KindAmigaOctaMED:                        "Amiga OctaMED Audio",
@@ -1016,7 +1015,7 @@ var kindNames = [...]string{
 	KindAOLData:                             "AOL Data",
 	KindAOLHistory:                          "AOL History",
 	KindAOLParameterInfo:                    "AOL Parameter Info",
-	KindApacheArrowFile:                     "Apache Arrow File",
+	KindApacheArrow:                         "Apache Arrow",
 	KindApacheParquet:                       "Apache Parquet",
 	KindAPFSFilesystem:                      "APFS Filesystem",
 	KindAppImage:                            "AppImage",
@@ -1026,11 +1025,11 @@ var kindNames = [...]string{
 	KindAppleBinaryPropertyList:             "Apple Binary Property List",
 	KindAppleDesktopServicesStore:           "Apple Desktop Services Store",
 	KindAppleDiskImage:                      "Apple Disk Image",
-	KindAppleDouble:                         "AppleDouble File",
+	KindAppleDouble:                         "AppleDouble",
 	KindAppleISOHybridCDImage:               "Apple ISO Hybrid CD Image",
 	KindAppleiWorkDocument:                  "Apple iWork Document",
 	KindAppleKeychain:                       "Apple Keychain",
-	KindAppleSingle:                         "AppleSingle File",
+	KindAppleSingle:                         "AppleSingle",
 	KindAppleSystemLog:                      "Apple System Log",
 	KindAppleTexture:                        "Apple Texture",
 	KindAppleXMLPropertyList:                "Apple XML Property List",
@@ -1045,13 +1044,13 @@ var kindNames = [...]string{
 	KindAtariLynxROM:                        "Atari Lynx ROM",
 	KindAtomFeed:                            "Atom Feed",
 	KindAUAudio:                             "AU Audio",
-	KindAudacityBlockFile:                   "Audacity Block File",
+	KindAudacityBlock:                       "Audacity Block",
 	KindAutoCADDrawing:                      "AutoCAD Drawing",
 	KindAutoCADDXF:                          "AutoCAD DXF",
 	KindAVG6IntegrityDatabase:               "AVG6 Integrity Database",
 	KindAvroObjectContainer:                 "Avro Object Container",
 	KindBAMData:                             "BAM Data",
-	KindBase85:                              "BASE85 File",
+	KindBase85:                              "BASE85",
 	KindBcachefsFilesystem:                  "Bcachefs Filesystem",
 	KindBCFData:                             "Binary Call Format",
 	KindBerkeleyDB:                          "Berkeley DB",
@@ -1062,7 +1061,7 @@ var kindNames = [...]string{
 	KindBitcoinWallet:                       "Bitcoin Wallet",
 	KindBitLockerDiskEncryption:             "BitLocker Disk Encryption",
 	KindBlackBerryBackup:                    "BlackBerry Backup",
-	KindBlenderFile:                         "Blender File",
+	KindBlender:                             "Blender",
 	KindBlinkArchive:                        "Blink Archive",
 	KindBlizzardTexture:                     "Blizzard Texture",
 	KindBluetoothSnoop:                      "Bluetooth Snoop Capture",
@@ -1087,7 +1086,7 @@ var kindNames = [...]string{
 	KindChromiumPatch:                       "Chromium Patch",
 	KindCinema4DModel:                       "Cinema 4D Model",
 	KindCineonImage:                         "Cineon Image",
-	KindCloneCDControl:                      "CloneCD Control File",
+	KindCloneCDControl:                      "CloneCD Control",
 	KindComicBookArchive:                    "Comic Book Archive",
 	KindCommodore64Tape:                     "Commodore 64 Tape",
 	KindCommodore64TapeRAW:                  "Commodore 64 Tape RAW",
@@ -1131,11 +1130,11 @@ var kindNames = [...]string{
 	KindDVRMSVideo:                          "DVR-MS Video",
 	KindEasyStreetDraw:                      "Easy Street Draw",
 	KindEBMLContainer:                       "EBML Container",
-	KindEFaxFile:                            "eFax File",
+	KindEFax:                                "eFax",
 	KindEGGArchive:                          "EGG Archive",
 	KindElitePlusCommander:                  "Elite Plus Commander",
 	KindEncapsulatedPostScript:              "Encapsulated PostScript",
-	KindEnCaseCaseFile:                      "EnCase Case File",
+	KindEnCaseCase:                          "EnCase Case",
 	KindEnCaseEvidenceV2:                    "EnCase Evidence V2",
 	KindEnCaseImage:                         "EnCase Image",
 	KindEndNoteLibrary:                      "EndNote Library",
@@ -1204,8 +1203,8 @@ var kindNames = [...]string{
 	KindGUIDPartitionTable:                  "GUID Partition Table",
 	KindGzipArchive:                         "Gzip Archive",
 	KindGzipData:                            "Gzip Data",
-	KindHadoopRCFile:                        "Hadoop RCFile",
-	KindHadoopSequenceFile:                  "Hadoop SequenceFile",
+	KindHadoopRC:                            "Hadoop RC",
+	KindHadoopSequence:                      "Hadoop Sequence",
 	KindHamarsoftArchive:                    "Hamarsoft Archive",
 	KindHarvardGraphics:                     "Harvard Graphics",
 	KindHDF4Data:                            "HDF4 Data",
@@ -1394,7 +1393,7 @@ var kindNames = [...]string{
 	KindOpenTypeFont:                        "OpenType Font",
 	KindOptimFROGAudio:                      "OptimFROG Audio",
 	KindORCColumnarData:                     "ORC Columnar Data",
-	KindOutlookAddressFile:                  "Outlook Address File",
+	KindOutlookAddress:                      "Outlook Address",
 	KindOutlookExpressAddressBook:           "Outlook Express Address Book",
 	KindOutlookExpressDatabase:              "Outlook Express Database",
 	KindPacketSnifferXCP:                    "Packet Sniffer XCP",
@@ -1416,7 +1415,7 @@ var kindNames = [...]string{
 	KindPerfectOfficeDocument:               "Perfect Office Document",
 	KindPestPatrolData:                      "PestPatrol Data",
 	KindPfaffEmbroidery:                     "Pfaff Embroidery",
-	KindPGFImage:                            "Progressive Graphics File",
+	KindPGFImage:                            "Progressive Graphics",
 	KindPGPDiskImage:                        "PGP Disk Image",
 	KindPGPMessage:                          "PGP Message",
 	KindPGPPublicKeyring:                    "PGP Public Keyring",
@@ -1556,14 +1555,14 @@ var kindNames = [...]string{
 	KindTargetExpress:                       "TargetExpress",
 	KindTensorFlowLiteModel:                 "TensorFlow Lite Model",
 	KindTeraByteImage:                       "TeraByte Image",
-	KindTextFile:                            "Text File",
+	KindText:                                "Text",
 	KindTheBatIndex:                         "The Bat! Index",
 	KindThunderbirdMailSummary:              "Thunderbird Mail Summary",
 	KindTIFFImage:                           "TIFF Image",
 	KindTimezoneData:                        "Timezone Data",
 	KindTokyoCabinetDatabase:                "Tokyo Cabinet Database",
 	KindTomTomTraffic:                       "TomTom Traffic",
-	KindTorrentFile:                         "Torrent File",
+	KindTorrent:                             "Torrent",
 	KindTransportNeutralEncapsulationFormat: "Transport Neutral Encapsulation Format",
 	KindTrueTypeCollection:                  "TrueType Collection",
 	KindTrueTypeFont:                        "TrueType Font",
@@ -1606,7 +1605,7 @@ var kindNames = [...]string{
 	KindVulkanSPIRV:                         "Vulkan SPIR-V",
 	KindWADArchive:                          "WAD Archive",
 	KindWalkmanMP3:                          "Walkman MP3",
-	KindWARCFile:                            "WARC File",
+	KindWARC:                                "WARC",
 	KindWarcraftIIIReplay:                   "Warcraft III Replay",
 	KindWavPackAudio:                        "WavPack Audio",
 	KindWavPackCorrection:                   "WavPack Correction",
@@ -1627,8 +1626,8 @@ var kindNames = [...]string{
 	KindWindowsCalendar:                     "Windows Calendar",
 	KindWindowsEventLog:                     "Windows Event Log",
 	KindWindowsEventViewer:                  "Windows Event Viewer",
-	KindWindowsHelp:                         "Windows Help File",
-	KindWindowsHibernation:                  "Windows Hibernation File",
+	KindWindowsHelp:                         "Windows Help",
+	KindWindowsHibernation:                  "Windows Hibernation",
 	KindWindowsImagingFormat:                "Windows Imaging Format",
 	KindWindowsInternationalCodePage:        "Windows International Code Page",
 	KindWindowsMemoryDump:                   "Windows Memory Dump",
@@ -1637,7 +1636,7 @@ var kindNames = [...]string{
 	KindWindowsPrefetch:                     "Windows Prefetch",
 	KindWindowsProgramManagerGroup:          "Windows Program Manager Group",
 	KindWindowsRegistryHive:                 "Windows Registry Hive",
-	KindWindowsResourceFile:                 "Windows Resource File",
+	KindWindowsResource:                     "Windows Resource",
 	KindWindowsShortcut:                     "Windows Shortcut",
 	KindWindowsThumbnailCache:               "Windows Thumbnail Cache",
 	KindWindowsTypeLibrary:                  "Windows Type Library",
@@ -1710,7 +1709,7 @@ var typeNames = [...]string{
 	TypeAndroidSystemPackage:               "Android System Package",
 	TypeAPPXPackage:                        "APPX Package",
 	TypeArchLinuxPackage:                   "Arch Linux Package",
-	TypeASCIIText:                          "ASCII Text",
+	TypeASCII:                              "ASCII",
 	TypeAVIFImage:                          "AVIF Image",
 	TypeAVIFImageSequence:                  "AVIF Image Sequence",
 	TypeAVIVideo:                           "AVI Video",
@@ -1736,7 +1735,7 @@ var typeNames = [...]string{
 	TypeCharacterDevice:                    "Character Device",
 	TypeCMake:                              "CMake Script",
 	TypeCodestream:                         "Codestream",
-	TypeCondaPackage:                       "Cwtf Package",
+	TypeCondaPackage:                       "Conda Package",
 	TypeContainer:                          "Container",
 	TypeCorelDRAWDocument:                  "CorelDRAW Document",
 	TypeCOWD:                               "COWD",
@@ -1755,9 +1754,9 @@ var typeNames = [...]string{
 	TypeDirectory:                          "Directory",
 	TypeDocker:                             "Dockerfile",
 	TypeDownloadableSounds:                 "Downloadable Sounds",
-	TypeDSAPrivateKey:                      "DSA Private Key",
+	TypeDSA:                                "DSA",
 	TypeEAC3:                               "E-AC-3",
-	TypeECPrivateKey:                       "EC Private Key",
+	TypeEC:                                 "EC",
 	TypeEmpty:                              "Empty",
 	TypeEnhancedMetafile:                   "Enhanced Metafile",
 	TypeEPUBDocument:                       "EPUB Document",
@@ -1796,6 +1795,7 @@ var typeNames = [...]string{
 	TypeKMZArchive:                         "KMZ Archive",
 	TypeKotlin:                             "Kotlin Source",
 	TypeKritaDocument:                      "Krita Document",
+	TypeLegacy:                             "Legacy",
 	TypeLIST:                               "LIST",
 	TypeLittleEndian:                       "Little-Endian",
 	TypeLOVEGame:                           "LÖVE Game",
@@ -1897,14 +1897,13 @@ var typeNames = [...]string{
 	TypeQCPAudio:                                    "QCP Audio",
 	TypeQuickTimeMovie:                              "QuickTime Movie",
 	TypeR:                                           "R Script",
-	TypeRAR5:                                        "RAR5",
-	TypeRARLegacy:                                   "RAR (Legacy)",
 	TypeRIFFMIDI:                                    "MIDI",
 	TypeRIFFPalette:                                 "Palette",
-	TypeRSAPrivateKey:                               "RSA Private Key",
+	TypeRSA:                                         "RSA",
 	TypeRuby:                                        "Ruby Script",
 	TypeRust:                                        "Rust Source",
 	TypeScala:                                       "Scala Source",
+	TypeSkinnableFrame:                              "Skinnable Frame",
 	TypeSlackwarePackage:                            "Slackware Package",
 	TypeSocket:                                      "Socket",
 	TypeSonyRAW:                                     "Sony RAW",
@@ -1919,13 +1918,13 @@ var typeNames = [...]string{
 	TypeTheoraVideo:                                 "Theora Video",
 	TypeTOML:                                        "TOML Configuration",
 	TypeTypeScript:                                  "TypeScript Source",
-	TypeUCE:                                         "Unicode Extensions",
 	TypeUncompressed:                                "Uncompressed",
-	TypeUTF8Text:                                    "UTF-8 Text",
+	TypeUTF8:                                        "UTF-8",
 	TypeVagrantBox:                                  "Vagrant Box",
 	TypeVersion1:                                    "Version 1",
 	TypeVersion2:                                    "Version 2",
 	TypeVersion3:                                    "Version 3",
+	TypeVersion5:                                    "Version 5",
 	TypeVersion7:                                    "Version 7",
 	TypeVersion8:                                    "Version 8",
 	TypeVisualStudioExtension:                       "Visual Studio Extension",
@@ -1948,7 +1947,6 @@ var typeNames = [...]string{
 	TypeXSLTStylesheet:                              "XSLT Stylesheet",
 	TypeYAML:                                        "YAML Configuration",
 	TypeZlibCompressed:                              "Zlib Compressed",
-	TypeZstandardSkinnableFrame:                     "Zstandard Skinnable Frame",
 }
 
 func (k KindID) String() string {

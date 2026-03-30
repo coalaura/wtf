@@ -18,5 +18,5 @@ func DetectTorrent(b types.Buffer) *types.Metadata {
 		return nil
 	}
 
-	return &types.Metadata{Kind: types.KindTorrentFile}
+	return &types.Metadata{Kind: types.KindTorrent}
 }

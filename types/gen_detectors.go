@@ -1071,19 +1071,19 @@ func DetectText(b Buffer) *Metadata {
 
 	if subtype != TypeNone {
 		return &Metadata{
-			Kind:       KindTextFile,
+			Kind:       KindText,
 			Type:       subtype,
 			Confidence: ConfidenceMedium,
 		}
 	}
 
-	fallbackType := TypeUTF8Text
+	fallbackType := TypeUTF8
 	if isASCII {
-		fallbackType = TypeASCIIText
+		fallbackType = TypeASCII
 	}
 
 	return &Metadata{
-		Kind:       KindTextFile,
+		Kind:       KindText,
 		Type:       fallbackType,
 		Confidence: ConfidenceLow,
 	}
@@ -1609,7 +1609,7 @@ func DetectTorrent(b Buffer) *Metadata {
 		return nil
 	}
 
-	return &Metadata{Kind: KindTorrentFile}
+	return &Metadata{Kind: KindTorrent}
 }
 
 func DetectXMLSubtypes(b Buffer) *Metadata {

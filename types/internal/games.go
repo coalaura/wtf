@@ -3,11 +3,11 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
-	types.RegisterSignature(types.KindAmigaDiskFile, types.TypeNone, 0, []byte("DOS\x00"))
-	types.RegisterSignature(types.KindAmigaDiskFile, types.TypeNone, 0, []byte("DOS\x01"))
-	types.RegisterSignature(types.KindAmigaDiskFile, types.TypeNone, 0, []byte("DOS\x02"))
-	types.RegisterSignature(types.KindAmigaDiskFile, types.TypeNone, 0, []byte("DOS\x03"))
-	types.RegisterSignature(types.KindAmigaHardDiskFile, types.TypeNone, 0, []byte("RDSK"))
+	types.RegisterSignature(types.KindAmigaDisk, types.TypeNone, 0, []byte("DOS\x00"))
+	types.RegisterSignature(types.KindAmigaDisk, types.TypeNone, 0, []byte("DOS\x01"))
+	types.RegisterSignature(types.KindAmigaDisk, types.TypeNone, 0, []byte("DOS\x02"))
+	types.RegisterSignature(types.KindAmigaDisk, types.TypeNone, 0, []byte("DOS\x03"))
+	types.RegisterSignature(types.KindAmigaHardDisk, types.TypeNone, 0, []byte("RDSK"))
 	types.RegisterSignature(types.KindAtari7800ROM, types.TypeNone, 1, []byte("ATARI7800"))
 	types.RegisterSignature(types.KindAtariLynxROM, types.TypeNone, 0, []byte("LYNX"))
 	types.RegisterSignature(types.KindCloneCDControl, types.TypeNone, 0, []byte("[CloneCD]"))
