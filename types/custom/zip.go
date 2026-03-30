@@ -331,7 +331,7 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 	}
 
 	if hasComicInfo {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeComicBookArchive}
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeComicBook}
 	}
 
 	return &types.Metadata{Kind: types.KindZIPArchive}

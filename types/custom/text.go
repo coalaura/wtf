@@ -82,65 +82,65 @@ func detectTextSubtype(data []byte) types.TypeID {
 		}
 
 		if bytes.Contains(shebang, []byte("python")) {
-			return types.TypePython
+			return types.TypePythonScript
 		}
 
 		if bytes.Contains(shebang, []byte("node")) {
-			return types.TypeJavaScript
+			return types.TypeJavaScriptSource
 		}
 
 		if bytes.Contains(shebang, []byte("perl")) {
-			return types.TypePerl
+			return types.TypePerlScript
 		}
 
 		if bytes.Contains(shebang, []byte("ruby")) {
-			return types.TypeRuby
+			return types.TypeRubyScript
 		}
 
 		if bytes.Contains(shebang, []byte("php")) {
-			return types.TypePHP
+			return types.TypePHPScript
 		}
 
 		if bytes.Contains(shebang, []byte("lua")) {
-			return types.TypeLua
+			return types.TypeLuaScript
 		}
 
 		if bytes.Contains(shebang, []byte("Rscript")) {
-			return types.TypeR
+			return types.TypeRScript
 		}
 	}
 
 	// 2. Clear Prefixes
 	if bytes.HasPrefix(trimmed, []byte("<?php")) {
-		return types.TypePHP
+		return types.TypePHPScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("FROM ")) || bytes.HasPrefix(trimmed, []byte("# syntax=")) {
-		return types.TypeDocker
+		return types.TypeDockerfile
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("# ")) || bytes.HasPrefix(trimmed, []byte("## ")) {
-		return types.TypeMarkdown
+		return types.TypeMarkdownDocument
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("---\n")) || bytes.HasPrefix(trimmed, []byte("---\r\n")) {
 		if bytes.Contains(trimmed, []byte("title:")) || bytes.Contains(trimmed, []byte("layout:")) {
-			return types.TypeMarkdown
+			return types.TypeMarkdownDocument
 		}
 
-		return types.TypeYAML
+		return types.TypeYAMLConfiguration
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("CREATE TABLE")) || bytes.HasPrefix(trimmed, []byte("SELECT ")) || bytes.HasPrefix(trimmed, []byte("INSERT INTO")) || bytes.HasPrefix(trimmed, []byte("-- SQL")) {
-		return types.TypeSQL
+		return types.TypeSQLScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("@echo off")) || bytes.HasPrefix(trimmed, []byte("@ECHO OFF")) || bytes.HasPrefix(trimmed, []byte("REM ")) || bytes.HasPrefix(trimmed, []byte("rem ")) {
-		return types.TypeBatch
+		return types.TypeBatchScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("cmake_minimum_required")) || bytes.HasPrefix(trimmed, []byte("project(")) {
-		return types.TypeCMake
+		return types.TypeCMakeScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("body {")) || bytes.HasPrefix(trimmed, []byte("@import url(")) || bytes.HasPrefix(trimmed, []byte("@media ")) || bytes.HasPrefix(trimmed, []byte(":root {")) {
@@ -148,7 +148,7 @@ func detectTextSubtype(data []byte) types.TypeID {
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("resource \"")) || bytes.HasPrefix(trimmed, []byte("variable \"")) || bytes.HasPrefix(trimmed, []byte("provider \"")) || bytes.HasPrefix(trimmed, []byte("terraform {")) {
-		return types.TypeTerraform
+		return types.TypeTerraformConfiguration
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("query {")) || bytes.HasPrefix(trimmed, []byte("mutation {")) || bytes.HasPrefix(trimmed, []byte("fragment ")) {
@@ -163,85 +163,85 @@ func detectTextSubtype(data []byte) types.TypeID {
 
 	if bytes.HasPrefix(code, []byte("package ")) {
 		if bytes.Contains(code, []byte("import (")) || bytes.Contains(code, []byte("import \"")) || bytes.Contains(code, []byte("func ")) {
-			return types.TypeGo
+			return types.TypeGoSource
 		}
 
 		if bytes.Contains(code, []byte("import java")) || bytes.Contains(code, []byte("public class ")) {
-			return types.TypeJava
+			return types.TypeJavaSource
 		}
 
 		if bytes.Contains(code, []byte("import ")) || bytes.Contains(code, []byte("fun ")) || bytes.Contains(code, []byte("val ")) {
-			return types.TypeKotlin
+			return types.TypeKotlinSource
 		}
 
 		if bytes.Contains(code, []byte("import scala.")) || bytes.Contains(code, []byte("object ")) || bytes.Contains(code, []byte("trait ")) {
-			return types.TypeScala
+			return types.TypeScalaSource
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("#include <")) || bytes.HasPrefix(code, []byte("#include \"")) {
 		if bytes.Contains(code, []byte("std::")) || bytes.Contains(code, []byte("class ")) || bytes.Contains(code, []byte("template <")) {
-			return types.TypeCPP
+			return types.TypeCPPSource
 		}
 
-		return types.TypeC
+		return types.TypeCSource
 	}
 
 	if bytes.HasPrefix(code, []byte("#import <")) || bytes.HasPrefix(code, []byte("#import \"")) {
-		return types.TypeObjectiveC
+		return types.TypeObjectiveCSource
 	}
 
 	if bytes.HasPrefix(code, []byte("using System;")) || bytes.HasPrefix(code, []byte("namespace ")) {
 		if bytes.Contains(code, []byte("public class ")) || bytes.Contains(code, []byte("public interface ")) {
-			return types.TypeCSharp
+			return types.TypeCSharpSource
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("import Foundation")) || bytes.HasPrefix(code, []byte("import UIKit")) || bytes.HasPrefix(code, []byte("import SwiftUI")) {
-		return types.TypeSwift
+		return types.TypeSwiftSource
 	}
 
 	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) || bytes.HasPrefix(code, []byte("#[derive(")) || bytes.HasPrefix(code, []byte("#[allow(")) {
-		return types.TypeRust
+		return types.TypeRustSource
 	}
 
 	if bytes.HasPrefix(code, []byte("import ")) || bytes.HasPrefix(code, []byte("def ")) || bytes.HasPrefix(code, []byte("class ")) {
 		if bytes.Contains(code, []byte("def ")) && bytes.Contains(code, []byte(":")) {
-			return types.TypePython
+			return types.TypePythonScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("require '")) || bytes.HasPrefix(code, []byte("require \"")) || bytes.HasPrefix(code, []byte("require_relative ")) {
 		if bytes.Contains(code, []byte("def ")) || bytes.Contains(code, []byte("class ")) || bytes.Contains(code, []byte("module ")) {
-			return types.TypeRuby
+			return types.TypeRubyScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("local ")) || bytes.HasPrefix(code, []byte("function ")) || bytes.HasPrefix(code, []byte("require ")) || bytes.HasPrefix(code, []byte("require(\"")) {
 		if bytes.Contains(code, []byte("end")) || bytes.Contains(code, []byte(" then")) || bytes.Contains(code, []byte(" do")) || bytes.Contains(code, []byte(".lua")) {
-			return types.TypeLua
+			return types.TypeLuaScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("import 'package:")) || bytes.HasPrefix(code, []byte("import 'dart:")) {
-		return types.TypeDart
+		return types.TypeDartSource
 	}
 
 	if bytes.HasPrefix(code, []byte("library(")) || bytes.HasPrefix(code, []byte("require(")) {
 		if bytes.Contains(code, []byte("<-")) || bytes.Contains(code, []byte("%>%")) {
-			return types.TypeR
+			return types.TypeRScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("const ")) || bytes.HasPrefix(code, []byte("let ")) || bytes.HasPrefix(code, []byte("var ")) || bytes.HasPrefix(code, []byte("import ")) {
 		if bytes.Contains(code, []byte("interface ")) || bytes.Contains(code, []byte("type ")) || bytes.Contains(code, []byte(" as ")) || bytes.Contains(code, []byte(": string")) || bytes.Contains(code, []byte(": number")) || bytes.Contains(code, []byte(": boolean")) {
 			if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) || bytes.Contains(code, []byte("from '")) || bytes.Contains(code, []byte("from \"")) {
-				return types.TypeTypeScript
+				return types.TypeTypeScriptSource
 			}
 		}
 
 		if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) || bytes.Contains(code, []byte("function(")) || bytes.Contains(code, []byte("function ")) {
-			return types.TypeJavaScript
+			return types.TypeJavaScriptSource
 		}
 	}
 
@@ -249,10 +249,10 @@ func detectTextSubtype(data []byte) types.TypeID {
 		lineEnd := bytes.IndexByte(code, '\n')
 		if lineEnd != -1 && bytes.Contains(code[:lineEnd], []byte("]")) {
 			if bytes.Contains(code, []byte("=\"")) || bytes.Contains(code, []byte("= \"")) || bytes.Contains(code, []byte("['")) {
-				return types.TypeTOML
+				return types.TypeTOMLConfiguration
 			}
 
-			return types.TypeINI
+			return types.TypeINIConfiguration
 		}
 	}
 
@@ -262,7 +262,7 @@ func detectTextSubtype(data []byte) types.TypeID {
 
 	if bytes.Contains(code, []byte("Write-Host ")) || bytes.Contains(code, []byte("Get-")) || bytes.Contains(code, []byte("Set-")) || bytes.Contains(code, []byte("Out-Null")) {
 		if bytes.Contains(code, []byte("$")) && (bytes.Contains(code, []byte("-eq")) || bytes.Contains(code, []byte("-ne")) || bytes.Contains(code, []byte("param("))) {
-			return types.TypePowerShell
+			return types.TypePowerShellScript
 		}
 	}
 

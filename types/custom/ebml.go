@@ -17,14 +17,14 @@ func DetectEBML(b types.Buffer) *types.Metadata {
 	if bytes.Contains(data, []byte("webm")) {
 		return &types.Metadata{
 			Kind: types.KindEBMLContainer,
-			Type: types.TypeWebM,
+			Type: types.TypeWebMVideo,
 		}
 	}
 
 	if bytes.Contains(data, []byte("matroska")) {
 		return &types.Metadata{
 			Kind: types.KindEBMLContainer,
-			Type: types.TypeMatroska,
+			Type: types.TypeMatroskaVideo,
 		}
 	}
 

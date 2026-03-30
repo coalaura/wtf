@@ -21,9 +21,9 @@ func DetectTar(b types.Buffer) *types.Metadata {
 			if nameEnd > 0 {
 				switch string(b[offset : offset+nameEnd]) {
 				case "package/package.json", "package.json":
-					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeNpmPackageTarball}
+					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeNpmPackage}
 				case "oci-layout", "index.json", "manifest.json":
-					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeOCIImageLayoutTar}
+					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeOCIImageLayout}
 				case "PKG-INFO", "setup.py", "pyproject.toml":
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypePythonSourceDistribution}
 				case "info/index.json":
@@ -35,7 +35,7 @@ func DetectTar(b types.Buffer) *types.Metadata {
 				case "install/doinst.sh":
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeSlackwarePackage}
 				case "ComicInfo.xml", "comicinfo.xml":
-					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeComicBookArchive}
+					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeComicBook}
 				}
 			}
 		}

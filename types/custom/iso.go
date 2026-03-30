@@ -72,19 +72,19 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 	case "heic", "heix", "hevc", "hevx", "mif1", "msf1":
 		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeHEIFImage}
 	case "mjp2":
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMotionJPEG2000}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMotionJPEG2000Video}
 	case "crx ":
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeCanonRAW3}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeCanonRAW3Image}
 	case "braw":
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeBlackmagicRAW}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeBlackmagicRAWVideo}
 	case "3g2a", "3g2b":
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3G2Media}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3G2Video}
 	}
 
 	// Check for 3GPP prefix in major brand (3gp1-3gp6, 3gs7, 3ge6, 3gg6)
 	if len(majorBrand) == 4 && (majorBrand[:3] == "3gp" || majorBrand[:3] == "3g2") {
 		if majorBrand[3] >= '1' && majorBrand[3] <= '9' {
-			return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3GPPMedia}
+			return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3GPPVideo}
 		}
 	}
 
@@ -110,11 +110,11 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "3g2a", "3g2b") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3G2Media}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3G2Video}
 	}
 
 	if hasISOBrandPrefix(b, brandOffset, compatibleOffset, boxEnd, "3gp", "3g2") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3GPPMedia}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.Type3GPPVideo}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "M4A ", "M4B ", "M4P ") {
@@ -126,15 +126,15 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "mjp2") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMotionJPEG2000}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMotionJPEG2000Video}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "crx ") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeCanonRAW3}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeCanonRAW3Image}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "braw") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeBlackmagicRAW}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeBlackmagicRAWVideo}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {

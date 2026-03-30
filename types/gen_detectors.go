@@ -46,14 +46,14 @@ func DetectEBML(b Buffer) *Metadata {
 	if bytes.Contains(data, []byte("webm")) {
 		return &Metadata{
 			Kind: KindEBMLContainer,
-			Type: TypeWebM,
+			Type: TypeWebMVideo,
 		}
 	}
 
 	if bytes.Contains(data, []byte("matroska")) {
 		return &Metadata{
 			Kind: KindEBMLContainer,
-			Type: TypeMatroska,
+			Type: TypeMatroskaVideo,
 		}
 	}
 
@@ -267,18 +267,18 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	case "heic", "heix", "hevc", "hevx", "mif1", "msf1":
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeHEIFImage}
 	case "mjp2":
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000Video}
 	case "crx ":
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3Image}
 	case "braw":
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeBlackmagicRAW}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeBlackmagicRAWVideo}
 	case "3g2a", "3g2b":
-		return &Metadata{Kind: KindISOBaseMedia, Type: Type3G2Media}
+		return &Metadata{Kind: KindISOBaseMedia, Type: Type3G2Video}
 	}
 
 	if len(majorBrand) == 4 && (majorBrand[:3] == "3gp" || majorBrand[:3] == "3g2") {
 		if majorBrand[3] >= '1' && majorBrand[3] <= '9' {
-			return &Metadata{Kind: KindISOBaseMedia, Type: Type3GPPMedia}
+			return &Metadata{Kind: KindISOBaseMedia, Type: Type3GPPVideo}
 		}
 	}
 
@@ -303,11 +303,11 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "3g2a", "3g2b") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: Type3G2Media}
+		return &Metadata{Kind: KindISOBaseMedia, Type: Type3G2Video}
 	}
 
 	if hasISOBrandPrefix(b, brandOffset, compatibleOffset, boxEnd, "3gp", "3g2") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: Type3GPPMedia}
+		return &Metadata{Kind: KindISOBaseMedia, Type: Type3GPPVideo}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "M4A ", "M4B ", "M4P ") {
@@ -319,15 +319,15 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "mjp2") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMotionJPEG2000Video}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "crx ") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeCanonRAW3Image}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "braw") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeBlackmagicRAW}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeBlackmagicRAWVideo}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
@@ -478,7 +478,7 @@ func DetectMachO(b Buffer) *Metadata {
 		if b.Len() >= 8 {
 			majorVersion, ok := b.U16BE(6)
 			if ok && majorVersion >= 45 && majorVersion <= 75 {
-				return &Metadata{Kind: KindJavaClass}
+				return &Metadata{Kind: KindJavaClassBytecode}
 			}
 		}
 
@@ -1007,9 +1007,9 @@ func DetectTar(b Buffer) *Metadata {
 			if nameEnd > 0 {
 				switch string(b[offset : offset+nameEnd]) {
 				case "package/package.json", "package.json":
-					return &Metadata{Kind: KindTARArchive, Type: TypeNpmPackageTarball}
+					return &Metadata{Kind: KindTARArchive, Type: TypeNpmPackage}
 				case "oci-layout", "index.json", "manifest.json":
-					return &Metadata{Kind: KindTARArchive, Type: TypeOCIImageLayoutTar}
+					return &Metadata{Kind: KindTARArchive, Type: TypeOCIImageLayout}
 				case "PKG-INFO", "setup.py", "pyproject.toml":
 					return &Metadata{Kind: KindTARArchive, Type: TypePythonSourceDistribution}
 				case "info/index.json":
@@ -1021,7 +1021,7 @@ func DetectTar(b Buffer) *Metadata {
 				case "install/doinst.sh":
 					return &Metadata{Kind: KindTARArchive, Type: TypeSlackwarePackage}
 				case "ComicInfo.xml", "comicinfo.xml":
-					return &Metadata{Kind: KindTARArchive, Type: TypeComicBookArchive}
+					return &Metadata{Kind: KindTARArchive, Type: TypeComicBook}
 				}
 			}
 		}
@@ -1108,64 +1108,64 @@ func detectTextSubtype(data []byte) TypeID {
 		}
 
 		if bytes.Contains(shebang, []byte("python")) {
-			return TypePython
+			return TypePythonScript
 		}
 
 		if bytes.Contains(shebang, []byte("node")) {
-			return TypeJavaScript
+			return TypeJavaScriptSource
 		}
 
 		if bytes.Contains(shebang, []byte("perl")) {
-			return TypePerl
+			return TypePerlScript
 		}
 
 		if bytes.Contains(shebang, []byte("ruby")) {
-			return TypeRuby
+			return TypeRubyScript
 		}
 
 		if bytes.Contains(shebang, []byte("php")) {
-			return TypePHP
+			return TypePHPScript
 		}
 
 		if bytes.Contains(shebang, []byte("lua")) {
-			return TypeLua
+			return TypeLuaScript
 		}
 
 		if bytes.Contains(shebang, []byte("Rscript")) {
-			return TypeR
+			return TypeRScript
 		}
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("<?php")) {
-		return TypePHP
+		return TypePHPScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("FROM ")) || bytes.HasPrefix(trimmed, []byte("# syntax=")) {
-		return TypeDocker
+		return TypeDockerfile
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("# ")) || bytes.HasPrefix(trimmed, []byte("## ")) {
-		return TypeMarkdown
+		return TypeMarkdownDocument
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("---\n")) || bytes.HasPrefix(trimmed, []byte("---\r\n")) {
 		if bytes.Contains(trimmed, []byte("title:")) || bytes.Contains(trimmed, []byte("layout:")) {
-			return TypeMarkdown
+			return TypeMarkdownDocument
 		}
 
-		return TypeYAML
+		return TypeYAMLConfiguration
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("CREATE TABLE")) || bytes.HasPrefix(trimmed, []byte("SELECT ")) || bytes.HasPrefix(trimmed, []byte("INSERT INTO")) || bytes.HasPrefix(trimmed, []byte("-- SQL")) {
-		return TypeSQL
+		return TypeSQLScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("@echo off")) || bytes.HasPrefix(trimmed, []byte("@ECHO OFF")) || bytes.HasPrefix(trimmed, []byte("REM ")) || bytes.HasPrefix(trimmed, []byte("rem ")) {
-		return TypeBatch
+		return TypeBatchScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("cmake_minimum_required")) || bytes.HasPrefix(trimmed, []byte("project(")) {
-		return TypeCMake
+		return TypeCMakeScript
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("body {")) || bytes.HasPrefix(trimmed, []byte("@import url(")) || bytes.HasPrefix(trimmed, []byte("@media ")) || bytes.HasPrefix(trimmed, []byte(":root {")) {
@@ -1173,7 +1173,7 @@ func detectTextSubtype(data []byte) TypeID {
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("resource \"")) || bytes.HasPrefix(trimmed, []byte("variable \"")) || bytes.HasPrefix(trimmed, []byte("provider \"")) || bytes.HasPrefix(trimmed, []byte("terraform {")) {
-		return TypeTerraform
+		return TypeTerraformConfiguration
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("query {")) || bytes.HasPrefix(trimmed, []byte("mutation {")) || bytes.HasPrefix(trimmed, []byte("fragment ")) {
@@ -1187,85 +1187,85 @@ func detectTextSubtype(data []byte) TypeID {
 
 	if bytes.HasPrefix(code, []byte("package ")) {
 		if bytes.Contains(code, []byte("import (")) || bytes.Contains(code, []byte("import \"")) || bytes.Contains(code, []byte("func ")) {
-			return TypeGo
+			return TypeGoSource
 		}
 
 		if bytes.Contains(code, []byte("import java")) || bytes.Contains(code, []byte("public class ")) {
-			return TypeJava
+			return TypeJavaSource
 		}
 
 		if bytes.Contains(code, []byte("import ")) || bytes.Contains(code, []byte("fun ")) || bytes.Contains(code, []byte("val ")) {
-			return TypeKotlin
+			return TypeKotlinSource
 		}
 
 		if bytes.Contains(code, []byte("import scala.")) || bytes.Contains(code, []byte("object ")) || bytes.Contains(code, []byte("trait ")) {
-			return TypeScala
+			return TypeScalaSource
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("#include <")) || bytes.HasPrefix(code, []byte("#include \"")) {
 		if bytes.Contains(code, []byte("std::")) || bytes.Contains(code, []byte("class ")) || bytes.Contains(code, []byte("template <")) {
-			return TypeCPP
+			return TypeCPPSource
 		}
 
-		return TypeC
+		return TypeCSource
 	}
 
 	if bytes.HasPrefix(code, []byte("#import <")) || bytes.HasPrefix(code, []byte("#import \"")) {
-		return TypeObjectiveC
+		return TypeObjectiveCSource
 	}
 
 	if bytes.HasPrefix(code, []byte("using System;")) || bytes.HasPrefix(code, []byte("namespace ")) {
 		if bytes.Contains(code, []byte("public class ")) || bytes.Contains(code, []byte("public interface ")) {
-			return TypeCSharp
+			return TypeCSharpSource
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("import Foundation")) || bytes.HasPrefix(code, []byte("import UIKit")) || bytes.HasPrefix(code, []byte("import SwiftUI")) {
-		return TypeSwift
+		return TypeSwiftSource
 	}
 
 	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) || bytes.HasPrefix(code, []byte("#[derive(")) || bytes.HasPrefix(code, []byte("#[allow(")) {
-		return TypeRust
+		return TypeRustSource
 	}
 
 	if bytes.HasPrefix(code, []byte("import ")) || bytes.HasPrefix(code, []byte("def ")) || bytes.HasPrefix(code, []byte("class ")) {
 		if bytes.Contains(code, []byte("def ")) && bytes.Contains(code, []byte(":")) {
-			return TypePython
+			return TypePythonScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("require '")) || bytes.HasPrefix(code, []byte("require \"")) || bytes.HasPrefix(code, []byte("require_relative ")) {
 		if bytes.Contains(code, []byte("def ")) || bytes.Contains(code, []byte("class ")) || bytes.Contains(code, []byte("module ")) {
-			return TypeRuby
+			return TypeRubyScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("local ")) || bytes.HasPrefix(code, []byte("function ")) || bytes.HasPrefix(code, []byte("require ")) || bytes.HasPrefix(code, []byte("require(\"")) {
 		if bytes.Contains(code, []byte("end")) || bytes.Contains(code, []byte(" then")) || bytes.Contains(code, []byte(" do")) || bytes.Contains(code, []byte(".lua")) {
-			return TypeLua
+			return TypeLuaScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("import 'package:")) || bytes.HasPrefix(code, []byte("import 'dart:")) {
-		return TypeDart
+		return TypeDartSource
 	}
 
 	if bytes.HasPrefix(code, []byte("library(")) || bytes.HasPrefix(code, []byte("require(")) {
 		if bytes.Contains(code, []byte("<-")) || bytes.Contains(code, []byte("%>%")) {
-			return TypeR
+			return TypeRScript
 		}
 	}
 
 	if bytes.HasPrefix(code, []byte("const ")) || bytes.HasPrefix(code, []byte("let ")) || bytes.HasPrefix(code, []byte("var ")) || bytes.HasPrefix(code, []byte("import ")) {
 		if bytes.Contains(code, []byte("interface ")) || bytes.Contains(code, []byte("type ")) || bytes.Contains(code, []byte(" as ")) || bytes.Contains(code, []byte(": string")) || bytes.Contains(code, []byte(": number")) || bytes.Contains(code, []byte(": boolean")) {
 			if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) || bytes.Contains(code, []byte("from '")) || bytes.Contains(code, []byte("from \"")) {
-				return TypeTypeScript
+				return TypeTypeScriptSource
 			}
 		}
 
 		if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) || bytes.Contains(code, []byte("function(")) || bytes.Contains(code, []byte("function ")) {
-			return TypeJavaScript
+			return TypeJavaScriptSource
 		}
 	}
 
@@ -1273,10 +1273,10 @@ func detectTextSubtype(data []byte) TypeID {
 		lineEnd := bytes.IndexByte(code, '\n')
 		if lineEnd != -1 && bytes.Contains(code[:lineEnd], []byte("]")) {
 			if bytes.Contains(code, []byte("=\"")) || bytes.Contains(code, []byte("= \"")) || bytes.Contains(code, []byte("['")) {
-				return TypeTOML
+				return TypeTOMLConfiguration
 			}
 
-			return TypeINI
+			return TypeINIConfiguration
 		}
 	}
 
@@ -1286,7 +1286,7 @@ func detectTextSubtype(data []byte) TypeID {
 
 	if bytes.Contains(code, []byte("Write-Host ")) || bytes.Contains(code, []byte("Get-")) || bytes.Contains(code, []byte("Set-")) || bytes.Contains(code, []byte("Out-Null")) {
 		if bytes.Contains(code, []byte("$")) && (bytes.Contains(code, []byte("-eq")) || bytes.Contains(code, []byte("-ne")) || bytes.Contains(code, []byte("param("))) {
-			return TypePowerShell
+			return TypePowerShellScript
 		}
 	}
 
@@ -1385,7 +1385,7 @@ const (
 func DetectTIFFSubtypes(b Buffer) *Metadata {
 	if !isTIFFHeader(b) {
 		if b.Has(0, []byte{'I', 'I', 'R', 'O', 0x08, 0x00}) || b.Has(0, []byte{'M', 'M', 'O', 'R', 0x00, 0x00}) {
-			return &Metadata{Kind: KindOlympusRAWImage}
+			return &Metadata{Kind: KindTIFFImage, Type: TypeOlympusRAW}
 		}
 
 		return nil
@@ -1419,7 +1419,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("OLYMPUS")) || bytes.HasPrefix(makeValue, []byte("Olympus")) {
-			return &Metadata{Kind: KindOlympusRAWImage}
+			return &Metadata{Kind: KindTIFFImage, Type: TypeOlympusRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
@@ -1443,7 +1443,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
-		return &Metadata{Kind: KindOlympusRAWImage}
+		return &Metadata{Kind: KindTIFFImage, Type: TypeOlympusRAW}
 	}
 
 	if bytes.Contains(data, []byte("PENTAX")) {
@@ -1984,7 +1984,7 @@ func DetectZIPContainer(b Buffer) *Metadata {
 	}
 
 	if hasComicInfo {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeComicBookArchive}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeComicBook}
 	}
 
 	return &Metadata{Kind: KindZIPArchive}

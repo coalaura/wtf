@@ -16,7 +16,7 @@ const (
 func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 	if !isTIFFHeader(b) {
 		if b.Has(0, []byte{'I', 'I', 'R', 'O', 0x08, 0x00}) || b.Has(0, []byte{'M', 'M', 'O', 'R', 0x00, 0x00}) {
-			return &types.Metadata{Kind: types.KindOlympusRAWImage}
+			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeOlympusRAW}
 		}
 
 		return nil
@@ -50,7 +50,7 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("OLYMPUS")) || bytes.HasPrefix(makeValue, []byte("Olympus")) {
-			return &types.Metadata{Kind: types.KindOlympusRAWImage}
+			return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeOlympusRAW}
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("PENTAX")) {
@@ -74,7 +74,7 @@ func DetectTIFFSubtypes(b types.Buffer) *types.Metadata {
 	}
 
 	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
-		return &types.Metadata{Kind: types.KindOlympusRAWImage}
+		return &types.Metadata{Kind: types.KindTIFFImage, Type: types.TypeOlympusRAW}
 	}
 
 	if bytes.Contains(data, []byte("PENTAX")) {

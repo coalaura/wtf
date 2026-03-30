@@ -53,7 +53,7 @@ func DetectMachO(b types.Buffer) *types.Metadata {
 		if b.Len() >= 8 {
 			majorVersion, ok := b.U16BE(6)
 			if ok && majorVersion >= 45 && majorVersion <= 75 {
-				return &types.Metadata{Kind: types.KindJavaClass}
+				return &types.Metadata{Kind: types.KindJavaClassBytecode}
 			}
 		}
 

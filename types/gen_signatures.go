@@ -98,7 +98,7 @@ func detectOptimized(b Buffer) *Metadata {
 										switch b[4] {
 										case 0x14:
 											if len(b) >= 8 && string(b[:8]) == "\x00\x00\x00\x00\x14\x00\x00\x00" {
-												return &Metadata{Kind: KindTeraByteImage}
+												return &Metadata{Kind: KindTeraByteDiskImage}
 											}
 										case 0x20:
 											if len(b) >= 16 && string(b[:16]) == "\x00\x00\x00\x00 \x00\x00\x00\xff\xff\x00\x00\xff\xff\x00\x00" {
@@ -144,7 +144,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x02:
 							if len(b) >= 8 && string(b[:8]) == "\x00\x00\x02\x00\x06\x04\x06\x00" {
-								return &Metadata{Kind: KindLotus123}
+								return &Metadata{Kind: KindLotus123Spreadsheet}
 							}
 							if len(b) >= 4 && string(b[:4]) == "\x00\x00\x02\x00" {
 								return &Metadata{Kind: KindICOCURImage, Type: TypeWindowsCursor}
@@ -158,15 +158,15 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[4] {
 								case 0x00:
 									if len(b) >= 8 && string(b[:8]) == "\x00\x00\x1a\x00\x00\x10\x04\x00" {
-										return &Metadata{Kind: KindLotus123}
+										return &Metadata{Kind: KindLotus123Spreadsheet}
 									}
 								case 0x02:
 									if len(b) >= 8 && string(b[:8]) == "\x00\x00\x1a\x00\x02\x10\x04\x00" {
-										return &Metadata{Kind: KindLotus123}
+										return &Metadata{Kind: KindLotus123Spreadsheet}
 									}
 								case 0x05:
 									if len(b) >= 7 && string(b[:7]) == "\x00\x00\x1a\x00\x05\x10\x04" {
-										return &Metadata{Kind: KindLotus123}
+										return &Metadata{Kind: KindLotus123Spreadsheet}
 									}
 								}
 							}
@@ -176,11 +176,11 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x49:
 							if len(b) >= 7 && string(b[:7]) == "\x00\x00IIXPR" {
-								return &Metadata{Kind: KindQuarkExpress}
+								return &Metadata{Kind: KindQuarkExpressDocument}
 							}
 						case 0x4d:
 							if len(b) >= 7 && string(b[:7]) == "\x00\x00MMXPR" {
-								return &Metadata{Kind: KindQuarkExpress}
+								return &Metadata{Kind: KindQuarkExpressDocument}
 							}
 						}
 					}
@@ -223,11 +223,11 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x09:
 							if len(b) >= 4 && string(b[:4]) == "\x00\x04\t\x88" {
-								return &Metadata{Kind: KindBerkeleyDB}
+								return &Metadata{Kind: KindBerkeleyDatabase}
 							}
 						case 0x22:
 							if len(b) >= 4 && string(b[:4]) == "\x00\x04\"S" {
-								return &Metadata{Kind: KindBerkeleyDB}
+								return &Metadata{Kind: KindBerkeleyDatabase}
 							}
 						}
 					}
@@ -239,23 +239,23 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[3] {
 								case 0x00:
 									if len(b) >= 4 && string(b[:4]) == "\x00\x05\x16\x00" {
-										return &Metadata{Kind: KindAppleSingle}
+										return &Metadata{Kind: KindAppleSingleArchive}
 									}
 								case 0x07:
 									if len(b) >= 4 && string(b[:4]) == "\x00\x05\x16\a" {
-										return &Metadata{Kind: KindAppleDouble}
+										return &Metadata{Kind: KindAppleDoubleArchive}
 									}
 								}
 							}
 						case 0x31:
 							if len(b) >= 4 && string(b[:4]) == "\x00\x051b" {
-								return &Metadata{Kind: KindBerkeleyDB}
+								return &Metadata{Kind: KindBerkeleyDatabase}
 							}
 						}
 					}
 				case 0x06:
 					if len(b) >= 4 && string(b[:4]) == "\x00\x06\x15a" {
-						return &Metadata{Kind: KindBerkeleyDB}
+						return &Metadata{Kind: KindBerkeleyDatabase}
 					}
 				case 0x09:
 					if len(b) >= 14 && string(b[:14]) == "\x00\t\x0f\xf0\x0f\xf0\x0f\xf0\x0f\xf0\x00\x00\x01a" {
@@ -287,7 +287,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x5a:
 					if len(b) >= 5 && string(b[:5]) == "\x00ZCK1" {
-						return &Metadata{Kind: KindZchunk}
+						return &Metadata{Kind: KindZchunkArchive}
 					}
 				case 0x61:
 					if len(b) >= 4 && string(b[:4]) == "\x00asm" {
@@ -311,7 +311,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x02:
 							if len(b) >= 4 && string(b[:4]) == "\x01\x00\x02\x00" {
-								return &Metadata{Kind: KindWebexARF}
+								return &Metadata{Kind: KindWebexARFVideo}
 							}
 						case 0x39:
 							if len(b) >= 4 && string(b[:4]) == "\x01\x0090" {
@@ -417,7 +417,7 @@ func detectOptimized(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x08:
 					if len(b) >= 2 && string(b[:2]) == "\x04\b" {
-						return &Metadata{Kind: KindRubyMarshal}
+						return &Metadata{Kind: KindRubyMarshalData}
 					}
 				case 0x22:
 					if len(b) >= 4 && string(b[:4]) == "\x04\"M\x18" {
@@ -455,7 +455,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x64:
 					if len(b) >= 8 && string(b[:8]) == "\adt2ddtd" {
-						return &Metadata{Kind: KindDesignTools2D}
+						return &Metadata{Kind: KindDesignTools2DDrawing}
 					}
 				}
 			}
@@ -539,7 +539,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0xab:
 					if len(b) >= 4 && string(b[:4]) == "\x13\xab\xa1\\" {
-						return &Metadata{Kind: KindASTCTexture}
+						return &Metadata{Kind: KindASTCTextureImage}
 					}
 				}
 			}
@@ -775,7 +775,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x64:
 					if len(b) >= 8 && string(b[:8]) == "#define " {
-						return &Metadata{Kind: KindXBMImage}
+						return &Metadata{Kind: KindXBitMapImage}
 					}
 				}
 			}
@@ -800,7 +800,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x62:
 					if len(b) >= 7 && string(b[:7]) == "%bitmap" {
-						return &Metadata{Kind: KindFuzzyBitmap}
+						return &Metadata{Kind: KindFuzzyBitmapImage}
 					}
 				}
 			}
@@ -877,7 +877,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x72:
 					if len(b) >= 8 && string(b[:8]) == "-rom1fs-" {
-						return &Metadata{Kind: KindROMFS}
+						return &Metadata{Kind: KindROMFSFilesystem}
 					}
 				}
 			}
@@ -923,7 +923,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x4d:
 							if len(b) >= 6 && string(b[:6]) == "//Maya" {
-								return &Metadata{Kind: KindMayaASCII}
+								return &Metadata{Kind: KindMayaASCIIModel}
 							}
 						}
 					}
@@ -976,7 +976,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0xbe:
 					if len(b) >= 2 && string(b[:2]) == "1\xbe" {
-						return &Metadata{Kind: KindMicrosoftWrite}
+						return &Metadata{Kind: KindMicrosoftWriteDocument}
 					}
 				}
 			}
@@ -989,7 +989,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0xbe:
 					if len(b) >= 2 && string(b[:2]) == "2\xbe" {
-						return &Metadata{Kind: KindMicrosoftWrite}
+						return &Metadata{Kind: KindMicrosoftWriteDocument}
 					}
 				}
 			}
@@ -1268,7 +1268,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x58:
 							if len(b) >= 4 && string(b[:4]) == "ATX " {
-								return &Metadata{Kind: KindAppleTexture}
+								return &Metadata{Kind: KindAppleTextureImage}
 							}
 						}
 					}
@@ -1282,7 +1282,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x75:
 					if len(b) >= 22 && string(b[:22]) == "AutoCAD Binary DXF\r\n\x1a\x00" {
-						return &Metadata{Kind: KindAutoCADDXF}
+						return &Metadata{Kind: KindAutoCADDXFDrawing}
 					}
 				}
 			}
@@ -1366,7 +1366,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x45:
 							if len(b) >= 7 && string(b[:7]) == "BLENDER" {
-								return &Metadata{Kind: KindBlender}
+								return &Metadata{Kind: KindBlenderProject}
 							}
 						case 0x49:
 							if len(b) >= 6 && string(b[:6]) == "BLI223" {
@@ -1377,11 +1377,11 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[3] {
 								case 0x31:
 									if len(b) >= 4 && string(b[:4]) == "BLP1" {
-										return &Metadata{Kind: KindBlizzardTexture}
+										return &Metadata{Kind: KindBlizzardTextureImage}
 									}
 								case 0x32:
 									if len(b) >= 4 && string(b[:4]) == "BLP2" {
-										return &Metadata{Kind: KindBlizzardTexture}
+										return &Metadata{Kind: KindBlizzardTextureImage}
 									}
 								}
 							}
@@ -1446,11 +1446,11 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[3] {
 						case 0x20:
 							if len(b) >= 19 && string(b[:19]) == "C64 tape image file" {
-								return &Metadata{Kind: KindCommodore64Tape}
+								return &Metadata{Kind: KindCommodore64TapeImage}
 							}
 						case 0x2d:
 							if len(b) >= 12 && string(b[:12]) == "C64-TAPE-RAW" {
-								return &Metadata{Kind: KindCommodore64TapeRAW}
+								return &Metadata{Kind: KindCommodore64TapeRAWImage}
 							}
 						}
 					}
@@ -1715,7 +1715,7 @@ func detectOptimized(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x3d:
 					if len(b) >= 4 && string(b[:4]) == "E=\xcd(" {
-						return &Metadata{Kind: KindCramFS}
+						return &Metadata{Kind: KindCramFSFilesystem}
 					}
 				case 0x41:
 					if len(b) >= 3 && string(b[:3]) == "EA\x01" {
@@ -1731,11 +1731,11 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x4e:
 					if len(b) >= 8 && string(b[:8]) == "ENTRYVCD" {
-						return &Metadata{Kind: KindVideoVCD}
+						return &Metadata{Kind: KindVideoCD}
 					}
 				case 0x52:
 					if len(b) >= 5 && string(b[:5]) == "ER\x02\x00\x00" {
-						return &Metadata{Kind: KindAppleISOHybridCDImage}
+						return &Metadata{Kind: KindAppleISOHybridDiskImage}
 					}
 				case 0x56:
 					if len(b) > 3 {
@@ -1767,7 +1767,7 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[9] {
 								case 0x6e:
 									if len(b) >= 12 && string(b[:12]) == "ElecbyteSnd\x00" {
-										return &Metadata{Kind: KindMUGENSound}
+										return &Metadata{Kind: KindMUGENAudio}
 									}
 								case 0x70:
 									if len(b) >= 12 && string(b[:12]) == "ElecbyteSpr\x00" {
@@ -1849,11 +1849,11 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[3] {
 								case 0x31:
 									if b.HasMask(0, "FOR1\x00\x00\x00\x00BEAM", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
-										return &Metadata{Kind: KindErlangBEAM}
+										return &Metadata{Kind: KindErlangBEAMBytecode}
 									}
 								case 0x34:
 									if len(b) >= 4 && string(b[:4]) == "FOR4" {
-										return &Metadata{Kind: KindMayaBinary}
+										return &Metadata{Kind: KindMayaBinaryModel}
 									}
 								case 0x4d:
 									if b.HasMask(0, "FORM\x00\x00\x00\x00FRM8", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
@@ -1906,7 +1906,7 @@ func detectOptimized(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x42:
 					if len(b) >= 4 && string(b[:4]) == "GBS " {
-						return &Metadata{Kind: KindGameBoySound}
+						return &Metadata{Kind: KindGameBoyAudio}
 					}
 				case 0x44:
 					if len(b) >= 4 && string(b[:4]) == "GDPC" {
@@ -2027,7 +2027,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x63:
 							if len(b) >= 4 && string(b[:4]) == "ISc(" {
-								return &Metadata{Kind: KindInstallShieldCAB}
+								return &Metadata{Kind: KindInstallShieldCabinet}
 							}
 						}
 					}
@@ -2036,7 +2036,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x4f:
 							if len(b) >= 8 && string(b[:8]) == "ITOLITLS" {
-								return &Metadata{Kind: KindMicrosoftReader}
+								return &Metadata{Kind: KindMicrosoftReaderDocument}
 							}
 						case 0x53:
 							if len(b) >= 4 && string(b[:4]) == "ITSF" {
@@ -2156,7 +2156,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x52:
 							if len(b) >= 8 && string(b[:8]) == "L\x00R\x00F\x00\x00\x00" {
-								return &Metadata{Kind: KindBroadbandEBook}
+								return &Metadata{Kind: KindBroadbandEBookDocument}
 							}
 						}
 					}
@@ -2261,7 +2261,7 @@ func detectOptimized(b Buffer) *Metadata {
 									}
 								case 0x52:
 									if len(b) >= 10 && string(b[:10]) == "MACROSOFT\x00" {
-										return &Metadata{Kind: KindMicrosoftNetworkMonitor}
+										return &Metadata{Kind: KindMicrosoftNetworkMonitorCapture}
 									}
 								}
 							}
@@ -2301,7 +2301,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x6f:
 							if len(b) >= 8 && string(b[:8]) == "MComprHD" {
-								return &Metadata{Kind: KindMAMECHD}
+								return &Metadata{Kind: KindMAMECHDDiskImage}
 							}
 						}
 					}
@@ -2469,13 +2469,13 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x56:
 							if len(b) >= 8 && string(b[:8]) == "NAVTRAFF" {
-								return &Metadata{Kind: KindTomTomTraffic}
+								return &Metadata{Kind: KindTomTomTrafficData}
 							}
 						}
 					}
 				case 0x42:
 					if len(b) >= 4 && string(b[:4]) == "NB*\x00" {
-						return &Metadata{Kind: KindMicrosoftJournal}
+						return &Metadata{Kind: KindMicrosoftJournalDocument}
 					}
 				case 0x45:
 					if len(b) > 3 {
@@ -2486,7 +2486,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x4d:
 							if len(b) >= 5 && string(b[:5]) == "NESM\x1a" {
-								return &Metadata{Kind: KindNESSoundFormat}
+								return &Metadata{Kind: KindNESAudio}
 							}
 						}
 					}
@@ -2508,7 +2508,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x4f:
 							if len(b) >= 4 && string(b[:4]) == "NSO0" {
-								return &Metadata{Kind: KindNintendoSwitchNSO}
+								return &Metadata{Kind: KindNintendoSwitchNSOExecutable}
 							}
 						case 0x56:
 							if len(b) >= 4 && string(b[:4]) == "NSVf" {
@@ -2518,7 +2518,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x65:
 					if len(b) >= 8 && string(b[:8]) == "NetMon\x00\x00" {
-						return &Metadata{Kind: KindMicrosoftNetworkMonitor}
+						return &Metadata{Kind: KindMicrosoftNetworkMonitorCapture}
 					}
 				}
 			}
@@ -2591,7 +2591,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x58:
 							if len(b) >= 3 && string(b[:3]) == "PAX" {
-								return &Metadata{Kind: KindPAXBitmap}
+								return &Metadata{Kind: KindPAXImage}
 							}
 						}
 					}
@@ -2625,7 +2625,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x43:
 							if len(b) >= 6 && string(b[:6]) == "PICT\x00\b" {
-								return &Metadata{Kind: KindChromaGraphBitmap}
+								return &Metadata{Kind: KindChromaGraphImage}
 							}
 						case 0x4d:
 							if len(b) >= 4 && string(b[:4]) == "PIM\x00" {
@@ -2675,35 +2675,35 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[3] {
 								case 0x01:
 									if len(b) >= 4 && string(b[:4]) == "PSF\x01" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								case 0x02:
 									if len(b) >= 4 && string(b[:4]) == "PSF\x02" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								case 0x11:
 									if len(b) >= 4 && string(b[:4]) == "PSF\x11" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								case 0x12:
 									if len(b) >= 4 && string(b[:4]) == "PSF\x12" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								case 0x21:
 									if len(b) >= 4 && string(b[:4]) == "PSF!" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								case 0x22:
 									if len(b) >= 4 && string(b[:4]) == "PSF\"" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								case 0x24:
 									if len(b) >= 4 && string(b[:4]) == "PSF$" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								case 0x41:
 									if len(b) >= 4 && string(b[:4]) == "PSFA" {
-										return &Metadata{Kind: KindPlayStationSoundFormat}
+										return &Metadata{Kind: KindPlayStationAudio}
 									}
 								}
 							}
@@ -2719,7 +2719,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x56:
 					if len(b) >= 4 && string(b[:4]) == "PVR\x03" {
-						return &Metadata{Kind: KindPVRTexture}
+						return &Metadata{Kind: KindPVRTextureImage}
 					}
 				case 0x57:
 					if len(b) >= 4 && string(b[:4]) == "PWAD" {
@@ -2795,11 +2795,11 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x52:
 							if len(b) >= 4 && string(b[:4]) == "RARC" {
-								return &Metadata{Kind: KindNintendoRARC}
+								return &Metadata{Kind: KindNintendoRARCArchive}
 							}
 						case 0x5a:
 							if len(b) >= 8 && string(b[:8]) == "RAZATDB1" {
-								return &Metadata{Kind: KindShareazaThumbnail}
+								return &Metadata{Kind: KindShareazaThumbnailImage}
 							}
 						}
 					}
@@ -2838,7 +2838,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x46:
 							if len(b) >= 8 && string(b[:8]) == "REFLECT " {
-								return &Metadata{Kind: KindMacriumReflectImage}
+								return &Metadata{Kind: KindMacriumReflectDiskImage}
 							}
 						case 0x47:
 							if len(b) >= 7 && string(b[:7]) == "REGEDIT" {
@@ -2883,11 +2883,11 @@ func detectOptimized(b Buffer) *Metadata {
 							if b.HasMask(0, "RIFF\x00\x00\x00\x00HDP ", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
 								return &Metadata{Kind: KindRIFFContainer, Type: TypeHDPhoto}
 							}
+							if b.HasMask(0, "RIFF\x00\x00\x00\x00RMID", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
+								return &Metadata{Kind: KindRIFFContainer, Type: TypeMIDIAudio}
+							}
 							if b.HasMask(0, "RIFF\x00\x00\x00\x00QLCM", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
 								return &Metadata{Kind: KindRIFFContainer, Type: TypeQCPAudio}
-							}
-							if b.HasMask(0, "RIFF\x00\x00\x00\x00RMID", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
-								return &Metadata{Kind: KindRIFFContainer, Type: TypeRIFFMIDI}
 							}
 							if b.HasMask(0, "RIFF\x00\x00\x00\x00PAL ", "\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff") {
 								return &Metadata{Kind: KindRIFFContainer, Type: TypeRIFFPalette}
@@ -2995,7 +2995,7 @@ func detectOptimized(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x22:
 					if len(b) >= 4 && string(b[:4]) == "S\"\x04\x00" {
-						return &Metadata{Kind: KindBerkeleyDB, Type: TypeLittleEndian}
+						return &Metadata{Kind: KindBerkeleyDatabase, Type: TypeLittleEndian}
 					}
 				case 0x43:
 					if len(b) > 2 {
@@ -3010,7 +3010,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x4d:
 							if len(b) >= 4 && string(b[:4]) == "SCMI" {
-								return &Metadata{Kind: KindImgSoftwareBitmap}
+								return &Metadata{Kind: KindImgSoftwareImage}
 							}
 						}
 					}
@@ -3094,7 +3094,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x4e:
 					if len(b) >= 27 && string(b[:27]) == "SNES-SPC700 Sound File Data" {
-						return &Metadata{Kind: KindSNESSPC}
+						return &Metadata{Kind: KindSNESSPCAudio}
 					}
 				case 0x50:
 					if len(b) > 2 {
@@ -3170,7 +3170,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x75:
 					if len(b) >= 8 && string(b[:8]) == "SuperCal" {
-						return &Metadata{Kind: KindSuperCalcWorksheet}
+						return &Metadata{Kind: KindSuperCalcSpreadsheet}
 					}
 				}
 			}
@@ -3271,7 +3271,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x53:
 							if len(b) >= 4 && string(b[:4]) == "VBSP" {
-								return &Metadata{Kind: KindSourceEngineBSP}
+								return &Metadata{Kind: KindSourceEngineBSPMap}
 							}
 						}
 					}
@@ -3307,7 +3307,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x4f:
 					if len(b) >= 4 && string(b[:4]) == "VOX " {
-						return &Metadata{Kind: KindMagicaVoxel}
+						return &Metadata{Kind: KindMagicaVoxelModel}
 					}
 				case 0x50:
 					if len(b) >= 4 && string(b[:4]) == "VPR\x00" {
@@ -3328,11 +3328,11 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x54:
 					if len(b) >= 4 && string(b[:4]) == "VTF\x00" {
-						return &Metadata{Kind: KindValveTextureFormat}
+						return &Metadata{Kind: KindValveTextureFormatImage}
 					}
 				case 0x67:
 					if len(b) >= 4 && string(b[:4]) == "Vgm " {
-						return &Metadata{Kind: KindVideoGameMusic}
+						return &Metadata{Kind: KindVideoGameAudio}
 					}
 				}
 			}
@@ -3390,7 +3390,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x6f:
 					if len(b) >= 7 && string(b[:7]) == "WordPro" {
-						return &Metadata{Kind: KindLotusWordPro}
+						return &Metadata{Kind: KindLotusWordProDocument}
 					}
 				}
 			}
@@ -3457,11 +3457,11 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x79:
 							if len(b) >= 4 && string(b[:4]) == "Yay0" {
-								return &Metadata{Kind: KindNintendoYay0}
+								return &Metadata{Kind: KindNintendoYay0Archive}
 							}
 						case 0x7a:
 							if len(b) >= 4 && string(b[:4]) == "Yaz0" {
-								return &Metadata{Kind: KindNintendoYaz0}
+								return &Metadata{Kind: KindNintendoYaz0Archive}
 							}
 						}
 					}
@@ -3585,7 +3585,7 @@ func detectOptimized(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x15:
 					if len(b) >= 4 && string(b[:4]) == "a\x15\x06\x00" {
-						return &Metadata{Kind: KindBerkeleyDB, Type: TypeLittleEndian}
+						return &Metadata{Kind: KindBerkeleyDatabase, Type: TypeLittleEndian}
 					}
 				case 0x6a:
 					if len(b) >= 4 && string(b[:4]) == "ajkg" {
@@ -3602,7 +3602,7 @@ func detectOptimized(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x31:
 					if len(b) >= 4 && string(b[:4]) == "b1\x05\x00" {
-						return &Metadata{Kind: KindBerkeleyDB, Type: TypeLittleEndian}
+						return &Metadata{Kind: KindBerkeleyDatabase, Type: TypeLittleEndian}
 					}
 				case 0x65:
 					if len(b) >= 12 && string(b[:12]) == "begin-base64" {
@@ -3628,7 +3628,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x74:
 					if len(b) >= 8 && string(b[:8]) == "btsnoop\x00" {
-						return &Metadata{Kind: KindBluetoothSnoop}
+						return &Metadata{Kind: KindBluetoothSnoopCapture}
 					}
 				case 0x76:
 					if len(b) >= 4 && string(b[:4]) == "bvx2" {
@@ -3726,7 +3726,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x74:
 					if len(b) >= 7 && string(b[:7]) == "dt2ddtd" {
-						return &Metadata{Kind: KindDesignTools2D}
+						return &Metadata{Kind: KindDesignTools2DDrawing}
 					}
 				}
 			}
@@ -3777,7 +3777,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x6c:
 					if len(b) >= 4 && string(b[:4]) == "glTF" {
-						return &Metadata{Kind: KindGLTFBinary}
+						return &Metadata{Kind: KindGLTFBinaryModel}
 					}
 				}
 			}
@@ -3790,7 +3790,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x69:
 					if len(b) >= 4 && string(b[:4]) == "hibr" {
-						return &Metadata{Kind: KindWindowsHibernation}
+						return &Metadata{Kind: KindWindowsHibernationData}
 					}
 				case 0x73:
 					if len(b) >= 4 && string(b[:4]) == "hsqs" {
@@ -4032,7 +4032,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x70:
 							if len(b) >= 5 && string(b[:5]) == "{\\pwi" {
-								return &Metadata{Kind: KindMicrosoftWinMobileNote}
+								return &Metadata{Kind: KindMicrosoftWinMobileNoteDocument}
 							}
 						case 0x72:
 							if len(b) >= 5 && string(b[:5]) == "{\\rtf" {
@@ -4055,7 +4055,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x45:
 					if len(b) >= 28 && string(b[:28]) == "~ESDw\xf6\x85>\xbfj\xd2\x11Easy Street Draw" {
-						return &Metadata{Kind: KindEasyStreetDraw}
+						return &Metadata{Kind: KindEasyStreetDrawDrawing}
 					}
 				case 0x74:
 					if len(b) >= 9 && string(b[:9]) == "~t,\x01Pp\x02MR" {
@@ -4085,15 +4085,15 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x03:
 					if len(b) >= 2 && string(b[:2]) == "\x80\x03" {
-						return &Metadata{Kind: KindPythonPickle}
+						return &Metadata{Kind: KindPythonPickleData}
 					}
 				case 0x04:
 					if len(b) >= 2 && string(b[:2]) == "\x80\x04" {
-						return &Metadata{Kind: KindPythonPickle}
+						return &Metadata{Kind: KindPythonPickleData}
 					}
 				case 0x05:
 					if len(b) >= 2 && string(b[:2]) == "\x80\x05" {
-						return &Metadata{Kind: KindPythonPickle}
+						return &Metadata{Kind: KindPythonPickleData}
 					}
 				case 0x2a:
 					if len(b) >= 4 && string(b[:4]) == "\x80*_\xd7" {
@@ -4114,7 +4114,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0xcd:
 					if len(b) >= 3 && string(b[:3]) == "\x81ͫ" {
-						return &Metadata{Kind: KindWordPerfectText}
+						return &Metadata{Kind: KindWordPerfectTextDocument}
 					}
 				}
 			}
@@ -4132,7 +4132,7 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0x88:
 			if len(b) >= 4 && string(b[:4]) == "\x88\t\x04\x00" {
-				return &Metadata{Kind: KindBerkeleyDB, Type: TypeLittleEndian}
+				return &Metadata{Kind: KindBerkeleyDatabase, Type: TypeLittleEndian}
 			}
 		case 0x89:
 			if len(b) > 1 {
@@ -4146,7 +4146,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x46:
 							if len(b) >= 8 && string(b[:8]) == "\x89LFP\r\n\x1a\n" {
-								return &Metadata{Kind: KindLytroLightField}
+								return &Metadata{Kind: KindLytroLightFieldImage}
 							}
 						case 0x5a:
 							if len(b) >= 9 && string(b[:9]) == "\x89LZO\x00\r\n\x1a\n" {
@@ -4241,18 +4241,18 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0xa9:
 			if len(b) >= 8 && string(b[:8]) == "\xa9\r\x00\x00\x00\x00\x00\x00" {
-				return &Metadata{Kind: KindAccessDataFTK}
+				return &Metadata{Kind: KindAccessDataFTKEvidence}
 			}
 		case 0xab:
 			if len(b) > 5 {
 				switch b[5] {
 				case 0x31:
 					if len(b) >= 12 && string(b[:12]) == "\xabKTX 11\xbb\r\n\x1a\n" {
-						return &Metadata{Kind: KindKTXTexture, Type: TypeVersion1}
+						return &Metadata{Kind: KindKTXTextureImage, Type: TypeVersion1}
 					}
 				case 0x32:
 					if len(b) >= 12 && string(b[:12]) == "\xabKTX 20\xbb\r\n\x1a\n" {
-						return &Metadata{Kind: KindKTXTexture, Type: TypeVersion2}
+						return &Metadata{Kind: KindKTXTextureImage, Type: TypeVersion2}
 					}
 				}
 			}
@@ -4278,7 +4278,7 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0xb1:
 			if len(b) >= 4 && string(b[:4]) == "\xb1h\xde:" {
-				return &Metadata{Kind: KindPCXDCXBitmap}
+				return &Metadata{Kind: KindPCXDCXImage}
 			}
 		case 0xb4:
 			if len(b) >= 4 && string(b[:4]) == "\xb4nhD" {
@@ -4301,7 +4301,7 @@ func detectOptimized(b Buffer) *Metadata {
 				switch b[1] {
 				case 0x00:
 					if len(b) >= 5 && string(b[:5]) == "\xbe\x00\x00\x00\xab" {
-						return &Metadata{Kind: KindMicrosoftWrite}
+						return &Metadata{Kind: KindMicrosoftWriteDocument}
 					}
 				case 0xba:
 					if len(b) >= 16 && string(b[:16]) == "\xbe\xba\xfe\xca\x0fPalmSG Data" {
@@ -4327,7 +4327,7 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0xca:
 			if len(b) >= 4 && string(b[:4]) == "\xca\xfe\xd0\r" {
-				return &Metadata{Kind: KindJavaPack200}
+				return &Metadata{Kind: KindJavaPack200Archive}
 			}
 		case 0xcc:
 			if len(b) >= 16 && string(b[:16]) == "\xccR3\xfc\xe9,\x18H\xaf\xe360\x1a9@\x06" {
@@ -4519,17 +4519,17 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x01:
 							if len(b) >= 4 && string(b[:4]) == "\xfe\xef\x01\x01" {
-								return &Metadata{Kind: KindSymantecGhostImage}
+								return &Metadata{Kind: KindSymantecGhostDiskImage}
 							}
 						case 0x02:
 							if len(b) >= 4 && string(b[:4]) == "\xfe\xef\x02\x01" {
-								return &Metadata{Kind: KindSymantecGhostImage}
+								return &Metadata{Kind: KindSymantecGhostDiskImage}
 							}
 						}
 					}
 				case 0xfe:
 					if len(b) >= 3 && string(b[:3]) == "\xfe\xfe\a" {
-						return &Metadata{Kind: KindMySQLMyISAM}
+						return &Metadata{Kind: KindMySQLMyISAMDatabase}
 					}
 				}
 			}
@@ -4569,7 +4569,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x57:
 					if len(b) >= 4 && string(b[:4]) == "\xffWPC" {
-						return &Metadata{Kind: KindWordPerfectGraphics}
+						return &Metadata{Kind: KindWordPerfectGraphicsImage}
 					}
 				case 0x74:
 					if len(b) >= 4 && string(b[:4]) == "\xfftOc" {
@@ -4745,7 +4745,7 @@ func detectOptimized(b Buffer) *Metadata {
 	}
 
 	if len(b) >= 44 && string(b[11:44]) == "must be converted with BinHex 4.0" {
-		return &Metadata{Kind: KindBinHex}
+		return &Metadata{Kind: KindBinHexArchive}
 	}
 
 	if len(b) >= 32 && string(b[12:32]) == "\xc2\xea\x81`\xb3\x14\x11Ͻ\x92\b\x00\t\xc71\x8c\x18\x1f\x10\x11" {
@@ -4760,7 +4760,7 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0x4e:
 			if len(b) >= 20 && string(b[16:20]) == "NRO0" {
-				return &Metadata{Kind: KindNintendoSwitchNRO}
+				return &Metadata{Kind: KindNintendoSwitchNROExecutable}
 			}
 		case 0x53:
 			if len(b) > 20 {
@@ -4786,7 +4786,7 @@ func detectOptimized(b Buffer) *Metadata {
 		switch b[24] {
 		case 0x3e:
 			if len(b) >= 33 && string(b[24:33]) == ">\x00\x03\x00\xfe\xff\t\x00\x06" {
-				return &Metadata{Kind: KindQuattroPro}
+				return &Metadata{Kind: KindQuattroProSpreadsheet}
 			}
 		case 0x47:
 			if len(b) >= 37 && string(b[24:37]) == "GIMP Pattern\n" {
@@ -4857,7 +4857,7 @@ func detectOptimized(b Buffer) *Metadata {
 	}
 
 	if len(b) >= 106 && string(b[102:106]) == "mBIN" {
-		return &Metadata{Kind: KindMacBinary}
+		return &Metadata{Kind: KindMacBinaryArchive}
 	}
 
 	if len(b) >= 132 && string(b[128:132]) == "DICM" {
@@ -5038,7 +5038,7 @@ func detectOptimized(b Buffer) *Metadata {
 		switch b[32769] {
 		case 0x43:
 			if len(b) >= 32774 && string(b[32769:32774]) == "CD001" {
-				return &Metadata{Kind: KindISO9660Image}
+				return &Metadata{Kind: KindISO9660DiskImage}
 			}
 		case 0x4e:
 			if len(b) > 32773 {
