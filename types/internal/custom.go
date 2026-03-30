@@ -26,6 +26,8 @@ func init() {
 	types.Register(types.DetectFunc(custom.DetectTorrent))
 	types.Register(types.DetectFunc(custom.DetectZIPContainer))
 
+	types.RegisterWeak(types.DetectFunc(custom.DetectAV1))
+	types.RegisterWeak(types.DetectFunc(custom.DetectH26x))
 	types.RegisterWeak(types.DetectFunc(custom.DetectJSON))
 	types.RegisterWeak(types.DetectFunc(custom.DetectLZMA))
 	types.RegisterWeak(types.DetectFunc(custom.DetectMP3))

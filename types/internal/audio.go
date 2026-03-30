@@ -13,6 +13,7 @@ func init() {
 	types.RegisterSignature(types.KindAmigaOctaMED, types.TypeNone, 0, []byte("MMD3"))
 	types.RegisterSignature(types.KindAMRAudio, types.TypeNone, 0, []byte("#!AMR\n"))
 	types.RegisterSignature(types.KindAMRWBAudio, types.TypeNone, 0, []byte("#!AMR-WB\n"))
+	types.RegisterSignature(types.KindAMRWBPlus, types.TypeNone, 0, []byte("#!AMR-WB+\n"))
 	types.RegisterSignature(types.KindAnalogBoxCircuit, types.TypeNone, 0, []byte("ABox"))
 	types.RegisterSignature(types.KindAUAudio, types.TypeNone, 0, []byte(".snd"))
 	types.RegisterSignature(types.KindAudacityBlock, types.TypeNone, 0, []byte("dns."))

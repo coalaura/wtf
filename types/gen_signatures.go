@@ -309,6 +309,9 @@ func detectOptimized(b Buffer) *Metadata {
 							if b.HasMask(0, "\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 EMF", "\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff") {
 								return &Metadata{Kind: KindMetafileImage, Type: TypeEnhancedMetafile}
 							}
+							if len(b) >= 4 && string(b[:4]) == "\x01\x00\x00\x00" {
+								return &Metadata{Kind: KindDialogicADPCM}
+							}
 						case 0x02:
 							if len(b) >= 4 && string(b[:4]) == "\x01\x00\x02\x00" {
 								return &Metadata{Kind: KindWebexARFVideo}
@@ -713,8 +716,17 @@ func detectOptimized(b Buffer) *Metadata {
 										return &Metadata{Kind: KindAMRAudio}
 									}
 								case 0x2d:
-									if len(b) >= 9 && string(b[:9]) == "#!AMR-WB\n" {
-										return &Metadata{Kind: KindAMRWBAudio}
+									if len(b) > 8 {
+										switch b[8] {
+										case 0x0a:
+											if len(b) >= 9 && string(b[:9]) == "#!AMR-WB\n" {
+												return &Metadata{Kind: KindAMRWBAudio}
+											}
+										case 0x2b:
+											if len(b) >= 10 && string(b[:10]) == "#!AMR-WB+\n" {
+												return &Metadata{Kind: KindAMRWBPlus}
+											}
+										}
 									}
 								}
 							}
@@ -3093,8 +3105,17 @@ func detectOptimized(b Buffer) *Metadata {
 						}
 					}
 				case 0x4e:
-					if len(b) >= 27 && string(b[:27]) == "SNES-SPC700 Sound File Data" {
-						return &Metadata{Kind: KindSNESSPCAudio}
+					if len(b) > 2 {
+						switch b[2] {
+						case 0x44:
+							if len(b) >= 4 && string(b[:4]) == "SND " {
+								return &Metadata{Kind: KindSoundDesignerII}
+							}
+						case 0x45:
+							if len(b) >= 27 && string(b[:27]) == "SNES-SPC700 Sound File Data" {
+								return &Metadata{Kind: KindSNESSPCAudio}
+							}
+						}
 					}
 				case 0x50:
 					if len(b) > 2 {
@@ -5081,6 +5102,14 @@ func detectOptimized(b Buffer) *Metadata {
 
 	if len(b) >= 65608 && string(b[65600:65608]) == "_BHRfS_M" {
 		return &Metadata{Kind: KindBtrfsFilesystem}
+	}
+
+	if meta := DetectAV1(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectH26x(b); meta != nil {
+		return meta
 	}
 
 	if meta := DetectJSON(b); meta != nil {

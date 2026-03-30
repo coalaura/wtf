@@ -21,6 +21,40 @@ func DetectAC3(b Buffer) *Metadata {
 	return nil
 }
 
+func DetectAV1(b Buffer) *Metadata {
+	if b.Len() < 4 {
+		return nil
+	}
+
+	if b[0] != 0x12 || b[1] != 0x00 {
+		return nil
+	}
+
+	if !isValidAV1OBUHeader(b[2], 1) {
+		return nil
+	}
+
+	return &Metadata{Kind: KindAV1Video, Confidence: ConfidenceMedium}
+}
+
+func isValidAV1OBUHeader(header, expectedType byte) bool {
+	if header&0x80 != 0 {
+		return false
+	}
+
+	if header&0x01 != 0 {
+		return false
+	}
+
+	if header&0x02 == 0 {
+		return false
+	}
+
+	obuType := (header >> 3) & 0x0F
+
+	return obuType == expectedType
+}
+
 func DetectAppleDiskImage(b Buffer) *Metadata {
 	if b.Len() < 512 {
 		return nil
@@ -201,6 +235,71 @@ func DetectFAT(b Buffer) *Metadata {
 	}
 
 	return nil
+}
+
+func DetectH26x(b Buffer) *Metadata {
+	startCodeOffset := findAnnexBStartCode(b)
+	if startCodeOffset == -1 {
+		return nil
+	}
+
+	nalOffset := startCodeOffset
+	if nalOffset >= b.Len() {
+		return nil
+	}
+
+	nalHeader := b[nalOffset]
+
+	if nalHeader&0x80 != 0 {
+		return nil
+	}
+
+	h264Type := nalHeader & 0x1F
+
+	if nalOffset+1 < b.Len() {
+		h265Type := (nalHeader >> 1) & 0x3F
+		temporalIdPlus1 := (b[nalOffset+1] >> 3) & 0x07
+
+		if temporalIdPlus1 >= 1 {
+			switch h265Type {
+			case 32, 33, 34:
+				return &Metadata{Kind: KindH265Video}
+			case 19, 20:
+				return &Metadata{Kind: KindH265Video, Confidence: ConfidenceMedium}
+			}
+		}
+	}
+
+	switch h264Type {
+	case 7:
+		return &Metadata{Kind: KindH264Video}
+	case 8:
+		return &Metadata{Kind: KindH264Video, Confidence: ConfidenceMedium}
+	case 5:
+		return &Metadata{Kind: KindH264Video, Confidence: ConfidenceMedium}
+	}
+
+	return nil
+}
+
+func findAnnexBStartCode(b Buffer) int {
+	if b.Len() < 4 {
+		return -1
+	}
+
+	var zeroCount int
+
+	for i := 0; i < b.Len() && i < 8; i++ {
+		if b[i] == 0x00 {
+			zeroCount++
+		} else if b[i] == 0x01 && zeroCount >= 2 {
+			return i + 1
+		} else {
+			break
+		}
+	}
+
+	return -1
 }
 
 func DetectISOBaseMedia(b Buffer) *Metadata {

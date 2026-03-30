@@ -27,6 +27,7 @@ const (
 	KindAmigaOctaMED
 	KindAMRAudio
 	KindAMRWBAudio
+	KindAMRWBPlus
 	KindAnalogBoxCircuit
 	KindAndroidART
 	KindAndroidBackup
@@ -74,6 +75,7 @@ const (
 	KindAudacityBlock
 	KindAutoCADDrawing
 	KindAutoCADDXFDrawing
+	KindAV1Video
 	KindAVG6IntegrityDatabase
 	KindAvroObjectContainer
 	KindBAMData
@@ -139,6 +141,7 @@ const (
 	KindDesignTools2DDrawing
 	KindDeskMateDocument
 	KindDeskMateWorksheet
+	KindDialogicADPCM
 	KindDialUpNetworking
 	KindDICOMMedicalImage
 	KindDigitalSpeechStandard
@@ -229,6 +232,8 @@ const (
 	KindGUIDPartitionTable
 	KindGzipArchive
 	KindGzipData
+	KindH264Video
+	KindH265Video
 	KindHadoopRC
 	KindHadoopSequence
 	KindHamarsoftArchive
@@ -546,6 +551,7 @@ const (
 	KindSonyCompressedVoice
 	KindSonyOpenMG
 	KindSonyWave64Audio
+	KindSoundDesignerII
 	KindSourceEngineBSPMap
 	KindSpeedtouchFirmware
 	KindSPSSData
@@ -997,6 +1003,7 @@ var kindNames = [...]string{
 	KindAmigaOctaMED:                        "Amiga OctaMED Audio",
 	KindAMRAudio:                            "AMR Audio",
 	KindAMRWBAudio:                          "AMR-WB Audio",
+	KindAMRWBPlus:                           "AMR-WB+ Audio",
 	KindAnalogBoxCircuit:                    "Analog Box Circuit",
 	KindAndroidART:                          "Android ART",
 	KindAndroidBackup:                       "Android Backup",
@@ -1044,6 +1051,7 @@ var kindNames = [...]string{
 	KindAudacityBlock:                       "Audacity Block",
 	KindAutoCADDrawing:                      "AutoCAD Drawing",
 	KindAutoCADDXFDrawing:                   "AutoCAD DXF Drawing",
+	KindAV1Video:                            "AV1 Video",
 	KindAVG6IntegrityDatabase:               "AVG6 Integrity Database",
 	KindAvroObjectContainer:                 "Avro Object Container",
 	KindBAMData:                             "BAM Data",
@@ -1109,6 +1117,7 @@ var kindNames = [...]string{
 	KindDesignTools2DDrawing:                "DesignTools 2D Drawing",
 	KindDeskMateDocument:                    "DeskMate Document",
 	KindDeskMateWorksheet:                   "DeskMate Worksheet",
+	KindDialogicADPCM:                       "Dialogic ADPCM Audio",
 	KindDialUpNetworking:                    "Dial-up Networking",
 	KindDICOMMedicalImage:                   "DICOM Medical Image",
 	KindDigitalSpeechStandard:               "Digital Speech Standard",
@@ -1199,6 +1208,8 @@ var kindNames = [...]string{
 	KindGUIDPartitionTable:                  "GUID Partition Table",
 	KindGzipArchive:                         "Gzip Archive",
 	KindGzipData:                            "Gzip Data",
+	KindH264Video:                           "H.264 Video",
+	KindH265Video:                           "H.265 Video",
 	KindHadoopRC:                            "Hadoop RC",
 	KindHadoopSequence:                      "Hadoop Sequence",
 	KindHamarsoftArchive:                    "Hamarsoft Archive",
@@ -1516,6 +1527,7 @@ var kindNames = [...]string{
 	KindSonyCompressedVoice:                 "Sony Compressed Voice",
 	KindSonyOpenMG:                          "Sony OpenMG Audio",
 	KindSonyWave64Audio:                     "Sony Wave64 Audio",
+	KindSoundDesignerII:                     "Sound Designer II Audio",
 	KindSourceEngineBSPMap:                  "Source Engine BSP Map",
 	KindSpeedtouchFirmware:                  "Speedtouch Firmware",
 	KindSPSSData:                            "SPSS Data",
