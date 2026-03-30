@@ -13,21 +13,21 @@ const (
 	KindACEArchive
 	KindAcrobatFormsDataFormat
 	KindAcronisTrueImage
-	KindAdobeFrameMaker
+	KindAdobeFrameMakerDocument
 	KindAdobeInDesignDocument
 	KindAdvancedForensicFormat
 	KindAINArchive
 	KindAllegroPackfile
 	KindALZArchive
-	KindAmigaDisk
-	KindAmigaDiskMasher
-	KindAmigaHardDisk
+	KindAmigaDiskImage
+	KindAmigaDiskMasherArchive
+	KindAmigaHardDiskImage
 	KindAmigaHunkExecutable
 	KindAmigaIcon
 	KindAmigaOctaMED
 	KindAMRAudio
 	KindAMRWBAudio
-	KindAnalogBox
+	KindAnalogBoxCircuit
 	KindAndroidART
 	KindAndroidBackup
 	KindAndroidBinaryXML
@@ -116,7 +116,7 @@ const (
 	KindCloneCDControl
 	KindCommodore64TapeImage
 	KindCommodore64TapeRAWImage
-	KindCommodoreSID
+	KindCommodoreSIDAudio
 	KindCompiledTerminfo
 	KindCOMPlusCatalog
 	KindCompressedSquareWave
@@ -129,7 +129,7 @@ const (
 	KindCrushArchive
 	KindCRXBrowserExtension
 	KindCSOArchive
-	KindCsoundMusic
+	KindCsoundAudio
 	KindDalvikExecutable
 	KindDAXArchive
 	KindDB2Conversion
@@ -199,7 +199,7 @@ const (
 	KindGameBoyROM
 	KindGameCubeROM
 	KindGDBMDatabase
-	KindGEMRaster
+	KindGEMRasterImage
 	KindGenealogicalData
 	KindGenetecVideo
 	KindGHCiInterface
@@ -232,7 +232,7 @@ const (
 	KindHadoopRC
 	KindHadoopSequence
 	KindHamarsoftArchive
-	KindHarvardGraphics
+	KindHarvardGraphicsImage
 	KindHDF4Data
 	KindHDF5Data
 	KindHealthLevel7
@@ -624,7 +624,7 @@ const (
 	KindVMwareSnapshot
 	KindVMwareSuspend
 	KindVocaloidProject
-	KindVocalTecMedia
+	KindVocalTecAudio
 	KindVOCAudio
 	KindVRML3DModel
 	KindVulkanSPIRV
@@ -983,21 +983,21 @@ var kindNames = [...]string{
 	KindACEArchive:                          "ACE Archive",
 	KindAcrobatFormsDataFormat:              "Acrobat Forms Data Format",
 	KindAcronisTrueImage:                    "Acronis True Image",
-	KindAdobeFrameMaker:                     "Adobe FrameMaker",
+	KindAdobeFrameMakerDocument:             "Adobe FrameMaker Document",
 	KindAdobeInDesignDocument:               "Adobe InDesign Document",
 	KindAdvancedForensicFormat:              "Advanced Forensic Format",
 	KindAINArchive:                          "AIN Archive",
 	KindAllegroPackfile:                     "Allegro Packfile",
 	KindALZArchive:                          "ALZ Archive",
-	KindAmigaDisk:                           "Amiga Disk",
-	KindAmigaDiskMasher:                     "Amiga DiskMasher",
-	KindAmigaHardDisk:                       "Amiga Hard Disk",
+	KindAmigaDiskImage:                      "Amiga Disk Image",
+	KindAmigaDiskMasherArchive:              "Amiga DiskMasher Archive",
+	KindAmigaHardDiskImage:                  "Amiga Hard Disk Image",
 	KindAmigaHunkExecutable:                 "Amiga Hunk Executable",
 	KindAmigaIcon:                           "Amiga Icon",
 	KindAmigaOctaMED:                        "Amiga OctaMED Audio",
 	KindAMRAudio:                            "AMR Audio",
 	KindAMRWBAudio:                          "AMR-WB Audio",
-	KindAnalogBox:                           "Analog Box Circuit",
+	KindAnalogBoxCircuit:                    "Analog Box Circuit",
 	KindAndroidART:                          "Android ART",
 	KindAndroidBackup:                       "Android Backup",
 	KindAndroidBinaryXML:                    "Android Binary XML",
@@ -1086,7 +1086,7 @@ var kindNames = [...]string{
 	KindCloneCDControl:                      "CloneCD Control",
 	KindCommodore64TapeImage:                "Commodore 64 Tape Image",
 	KindCommodore64TapeRAWImage:             "Commodore 64 Tape RAW Image",
-	KindCommodoreSID:                        "Commodore SID Audio",
+	KindCommodoreSIDAudio:                   "Commodore SID Audio",
 	KindCompiledTerminfo:                    "Compiled Terminfo",
 	KindCOMPlusCatalog:                      "COM+ Catalog",
 	KindCompressedSquareWave:                "Compressed Square Wave",
@@ -1099,7 +1099,7 @@ var kindNames = [...]string{
 	KindCrushArchive:                        "Crush Archive",
 	KindCRXBrowserExtension:                 "CRX Browser Extension",
 	KindCSOArchive:                          "CSO Compressed ISO",
-	KindCsoundMusic:                         "Csound Music",
+	KindCsoundAudio:                         "Csound Audio",
 	KindDalvikExecutable:                    "Dalvik Executable",
 	KindDAXArchive:                          "DAX Archive",
 	KindDB2Conversion:                       "DB2 Conversion",
@@ -1169,7 +1169,7 @@ var kindNames = [...]string{
 	KindGameBoyROM:                          "Game Boy ROM",
 	KindGameCubeROM:                         "GameCube ROM",
 	KindGDBMDatabase:                        "GDBM Database",
-	KindGEMRaster:                           "GEM Raster",
+	KindGEMRasterImage:                      "GEM Raster Image",
 	KindGenealogicalData:                    "Genealogical Data",
 	KindGenetecVideo:                        "Genetec Video",
 	KindGHCiInterface:                       "GHCi Interface",
@@ -1202,7 +1202,7 @@ var kindNames = [...]string{
 	KindHadoopRC:                            "Hadoop RC",
 	KindHadoopSequence:                      "Hadoop Sequence",
 	KindHamarsoftArchive:                    "Hamarsoft Archive",
-	KindHarvardGraphics:                     "Harvard Graphics",
+	KindHarvardGraphicsImage:                "Harvard Graphics Image",
 	KindHDF4Data:                            "HDF4 Data",
 	KindHDF5Data:                            "HDF5 Data",
 	KindHealthLevel7:                        "Health Level-7 Data",
@@ -1594,7 +1594,7 @@ var kindNames = [...]string{
 	KindVMwareSnapshot:                      "VMware Snapshot",
 	KindVMwareSuspend:                       "VMware Suspend",
 	KindVocaloidProject:                     "Vocaloid Project",
-	KindVocalTecMedia:                       "VocalTec Media",
+	KindVocalTecAudio:                       "VocalTec Audio",
 	KindVOCAudio:                            "VOC Audio",
 	KindVRML3DModel:                         "VRML 3D Model",
 	KindVulkanSPIRV:                         "Vulkan SPIR-V",

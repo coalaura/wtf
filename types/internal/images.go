@@ -32,7 +32,7 @@ func init() {
 	types.RegisterSignature(types.KindFLIFImage, types.TypeNone, 0, []byte("FLIF"))
 	types.RegisterSignature(types.KindFujifilmRAWImage, types.TypeNone, 0, []byte("FUJIFILMCCD-RAW "))
 	types.RegisterSignature(types.KindFuzzyBitmapImage, types.TypeNone, 0, []byte("%bitmap"))
-	types.RegisterSignature(types.KindGEMRaster, types.TypeNone, 0, []byte{0xeb, 0x3c, 0x90, 0x2a})
+	types.RegisterSignature(types.KindGEMRasterImage, types.TypeNone, 0, []byte{0xeb, 0x3c, 0x90, 0x2a})
 	types.RegisterSignature(types.KindGIFImage, types.TypeGIF87a, 0, []byte("GIF87a"))
 	types.RegisterSignature(types.KindGIFImage, types.TypeGIF89a, 0, []byte("GIF89a"))
 	types.RegisterSignature(types.KindGIMPBrush, types.TypeNone, 20, []byte("GIMP Brush\n"))

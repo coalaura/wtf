@@ -9,7 +9,7 @@ func init() {
 	types.RegisterSignature(types.KindAllegroPackfile, types.TypeNone, 0, []byte("slh!"))
 	types.RegisterSignature(types.KindAllegroPackfile, types.TypeNone, 0, []byte("slh."))
 	types.RegisterSignature(types.KindALZArchive, types.TypeNone, 0, []byte("ALZ\x01"))
-	types.RegisterSignature(types.KindAmigaDiskMasher, types.TypeNone, 0, []byte("DMS!"))
+	types.RegisterSignature(types.KindAmigaDiskMasherArchive, types.TypeNone, 0, []byte("DMS!"))
 	types.RegisterSignature(types.KindAppleArchive, types.TypeNone, 0, []byte("AA01"))
 	types.RegisterSignature(types.KindARArchive, types.TypeNone, 0, []byte("!<arch>\n"))
 	types.RegisterSignature(types.KindARCArchive, types.TypeNone, 0, []byte{0x1a, 0x02})

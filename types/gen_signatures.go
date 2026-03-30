@@ -1104,7 +1104,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x73:
 							if len(b) >= 16 && string(b[:16]) == "<CsoundSynthesiz" {
-								return &Metadata{Kind: KindCsoundMusic}
+								return &Metadata{Kind: KindCsoundAudio}
 							}
 						}
 					}
@@ -1114,7 +1114,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x4d:
 					if len(b) >= 8 && string(b[:8]) == "<MakerFi" {
-						return &Metadata{Kind: KindAdobeFrameMaker}
+						return &Metadata{Kind: KindAdobeFrameMakerDocument}
 					}
 				case 0x67:
 					if len(b) >= 16 && string(b[:16]) == "<gpx version=\"1." {
@@ -1156,7 +1156,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x42:
 					if len(b) >= 4 && string(b[:4]) == "ABox" {
-						return &Metadata{Kind: KindAnalogBox}
+						return &Metadata{Kind: KindAnalogBoxCircuit}
 					}
 				case 0x43:
 					if len(b) > 2 {
@@ -1185,7 +1185,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x4d:
 					if len(b) >= 4 && string(b[:4]) == "AMYO" {
-						return &Metadata{Kind: KindHarvardGraphics}
+						return &Metadata{Kind: KindHarvardGraphicsImage}
 					}
 				case 0x4e:
 					if len(b) > 7 {
@@ -1663,7 +1663,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x4d:
 					if len(b) >= 4 && string(b[:4]) == "DMS!" {
-						return &Metadata{Kind: KindAmigaDiskMasher}
+						return &Metadata{Kind: KindAmigaDiskMasherArchive}
 					}
 				case 0x4f:
 					if len(b) > 2 {
@@ -1677,19 +1677,19 @@ func detectOptimized(b Buffer) *Metadata {
 								switch b[3] {
 								case 0x00:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x00" {
-										return &Metadata{Kind: KindAmigaDisk}
+										return &Metadata{Kind: KindAmigaDiskImage}
 									}
 								case 0x01:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x01" {
-										return &Metadata{Kind: KindAmigaDisk}
+										return &Metadata{Kind: KindAmigaDiskImage}
 									}
 								case 0x02:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x02" {
-										return &Metadata{Kind: KindAmigaDisk}
+										return &Metadata{Kind: KindAmigaDiskImage}
 									}
 								case 0x03:
 									if len(b) >= 4 && string(b[:4]) == "DOS\x03" {
-										return &Metadata{Kind: KindAmigaDisk}
+										return &Metadata{Kind: KindAmigaDiskImage}
 									}
 								}
 							}
@@ -1960,7 +1960,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x48:
 					if len(b) >= 5 && string(b[:5]) == "HHGB1" {
-						return &Metadata{Kind: KindHarvardGraphics}
+						return &Metadata{Kind: KindHarvardGraphicsImage}
 					}
 				}
 			}
@@ -2709,7 +2709,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x49:
 							if len(b) >= 4 && string(b[:4]) == "PSID" {
-								return &Metadata{Kind: KindCommodoreSID}
+								return &Metadata{Kind: KindCommodoreSIDAudio}
 							}
 						}
 					}
@@ -2812,7 +2812,7 @@ func detectOptimized(b Buffer) *Metadata {
 						switch b[2] {
 						case 0x53:
 							if len(b) >= 4 && string(b[:4]) == "RDSK" {
-								return &Metadata{Kind: KindAmigaHardDisk}
+								return &Metadata{Kind: KindAmigaHardDiskImage}
 							}
 						case 0x58:
 							if len(b) > 3 {
@@ -2944,7 +2944,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x53:
 					if len(b) >= 4 && string(b[:4]) == "RSID" {
-						return &Metadata{Kind: KindCommodoreSID}
+						return &Metadata{Kind: KindCommodoreSIDAudio}
 					}
 				case 0x54:
 					if len(b) > 3 {
@@ -3042,7 +3042,7 @@ func detectOptimized(b Buffer) *Metadata {
 					}
 				case 0x48:
 					if len(b) >= 4 && string(b[:4]) == "SHOW" {
-						return &Metadata{Kind: KindHarvardGraphics}
+						return &Metadata{Kind: KindHarvardGraphicsImage}
 					}
 				case 0x49:
 					if len(b) > 2 {
@@ -3537,7 +3537,7 @@ func detectOptimized(b Buffer) *Metadata {
 							}
 						case 0x4d:
 							if len(b) >= 5 && string(b[:5]) == "[VMD]" {
-								return &Metadata{Kind: KindVocalTecMedia}
+								return &Metadata{Kind: KindVocalTecAudio}
 							}
 						}
 					}
@@ -4472,7 +4472,7 @@ func detectOptimized(b Buffer) *Metadata {
 			}
 		case 0xeb:
 			if len(b) >= 4 && string(b[:4]) == "\xeb<\x90*" {
-				return &Metadata{Kind: KindGEMRaster}
+				return &Metadata{Kind: KindGEMRasterImage}
 			}
 		case 0xed:
 			if len(b) >= 4 && string(b[:4]) == "\xed\xab\xee\xdb" {
