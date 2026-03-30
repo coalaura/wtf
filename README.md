@@ -9,16 +9,19 @@ wtf achieves sub-millisecond detection times through extreme mechanical sympathy
 The Go compiler flattens this tree into a highly optimized jump table in assembly. The CPU branch predictor routes file signatures in nanoseconds-resulting in **zero-allocation startup**, **zero runtime locks** and $O(1)$ time complexity for 95% of files.
 
 ```bash
-$ time wtf wtf
+$ time wtf wtf -t
 wtf
   └─ Executable and Linkable Format
      Type: ELF64 Little-Endian
+	 Time: 15µs / 6µs
 
 real	0m0.002s
 user	0m0.000s
 sys 	0m0.002s
 ```
-*(Benchmark ran on an AMD Ryzen 7 7840U / CachyOS Linux)*
+*(Benchmark ran on an AMD Ryzen 7 7840U / NVMe SSD / CachyOS Linux)*
+
+Total execution time (including process creation and Go runtime overhead) is typically **<2ms on Linux** and **<8ms on Windows**. The actual file read and signature detection take mere microseconds.
 
 ## Features
 
