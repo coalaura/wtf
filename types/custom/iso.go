@@ -64,7 +64,7 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 	case "f4v ":
 		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeF4VVideo}
 	case "M4A ", "M4B ", "M4P ":
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMPEG4AudioM4AFamily}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMPEG4Audio}
 	case "avif":
 		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeAVIFImage}
 	case "avis":
@@ -118,7 +118,7 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "M4A ", "M4B ", "M4P ") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMPEG4AudioM4AFamily}
+		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMPEG4Audio}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "qt  ") {

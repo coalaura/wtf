@@ -3675,23 +3675,23 @@ func detectOptimized(b Buffer) *Metadata {
 										switch b[6] {
 										case 0x35:
 											if len(b) >= 8 && string(b[:8]) == "dex\n035\x00" {
-												return &Metadata{Kind: KindDalvikExecutable, Type: TypeDEX035}
+												return &Metadata{Kind: KindDalvikExecutable, Type: TypeVersion035}
 											}
 										case 0x36:
 											if len(b) >= 8 && string(b[:8]) == "dex\n036\x00" {
-												return &Metadata{Kind: KindDalvikExecutable, Type: TypeDEX036}
+												return &Metadata{Kind: KindDalvikExecutable, Type: TypeVersion036}
 											}
 										case 0x37:
 											if len(b) >= 8 && string(b[:8]) == "dex\n037\x00" {
-												return &Metadata{Kind: KindDalvikExecutable, Type: TypeDEX037}
+												return &Metadata{Kind: KindDalvikExecutable, Type: TypeVersion037}
 											}
 										case 0x38:
 											if len(b) >= 8 && string(b[:8]) == "dex\n038\x00" {
-												return &Metadata{Kind: KindDalvikExecutable, Type: TypeDEX038}
+												return &Metadata{Kind: KindDalvikExecutable, Type: TypeVersion038}
 											}
 										case 0x39:
 											if len(b) >= 8 && string(b[:8]) == "dex\n039\x00" {
-												return &Metadata{Kind: KindDalvikExecutable, Type: TypeDEX039}
+												return &Metadata{Kind: KindDalvikExecutable, Type: TypeVersion039}
 											}
 										}
 									}
@@ -3700,11 +3700,11 @@ func detectOptimized(b Buffer) *Metadata {
 										switch b[6] {
 										case 0x30:
 											if len(b) >= 8 && string(b[:8]) == "dex\n040\x00" {
-												return &Metadata{Kind: KindDalvikExecutable, Type: TypeDEX040}
+												return &Metadata{Kind: KindDalvikExecutable, Type: TypeVersion040}
 											}
 										case 0x31:
 											if len(b) >= 8 && string(b[:8]) == "dex\n041\x00" {
-												return &Metadata{Kind: KindDalvikExecutable, Type: TypeDEX041}
+												return &Metadata{Kind: KindDalvikExecutable, Type: TypeVersion041}
 											}
 										}
 									}

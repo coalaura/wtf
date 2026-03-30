@@ -259,7 +259,7 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	case "f4v ":
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeF4VVideo}
 	case "M4A ", "M4B ", "M4P ":
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMPEG4AudioM4AFamily}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMPEG4Audio}
 	case "avif":
 		return &Metadata{Kind: KindISOBaseMedia, Type: TypeAVIFImage}
 	case "avis":
@@ -311,7 +311,7 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "M4A ", "M4B ", "M4P ") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMPEG4AudioM4AFamily}
+		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMPEG4Audio}
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxEnd, "qt  ") {
@@ -1021,7 +1021,7 @@ func DetectTar(b Buffer) *Metadata {
 				case "install/doinst.sh":
 					return &Metadata{Kind: KindTARArchive, Type: TypeSlackwarePackage}
 				case "ComicInfo.xml", "comicinfo.xml":
-					return &Metadata{Kind: KindComicBookArchive, Type: TypeCBT}
+					return &Metadata{Kind: KindTARArchive, Type: TypeComicBookArchive}
 				}
 			}
 		}
@@ -1396,7 +1396,7 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	if b.Has(0, []byte{'I', 'I', 0x2a, 0x00, 0x10, 0x00, 0x00, 0x00, 'C', 'R'}) {
-		return &Metadata{Kind: KindCanonRAWImage, Type: TypeCanonRAWHE}
+		return &Metadata{Kind: KindCanonRAWImage, Type: TypeHE}
 	}
 
 	order, ifd0, ok := tiffHeaderInfo(b)
@@ -1984,7 +1984,7 @@ func DetectZIPContainer(b Buffer) *Metadata {
 	}
 
 	if hasComicInfo {
-		return &Metadata{Kind: KindComicBookArchive, Type: TypeCBZ}
+		return &Metadata{Kind: KindZIPArchive, Type: TypeComicBookArchive}
 	}
 
 	return &Metadata{Kind: KindZIPArchive}

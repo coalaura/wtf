@@ -114,7 +114,6 @@ const (
 	KindCinema4DModel
 	KindCineonImage
 	KindCloneCDControl
-	KindComicBookArchive
 	KindCommodore64Tape
 	KindCommodore64TapeRAW
 	KindCommodoreSID
@@ -753,15 +752,13 @@ const (
 	TypeByteSwapped
 	TypeC
 	TypeCanonRAW3
-	TypeCanonRAWHE
 	TypeCAT
-	TypeCBT
-	TypeCBZ
 	TypeCDAAudio
 	TypeCE
 	TypeCharacterDevice
 	TypeCMake
 	TypeCodestream
+	TypeComicBookArchive
 	TypeCondaPackage
 	TypeContainer
 	TypeCorelDRAWDocument
@@ -771,13 +768,6 @@ const (
 	TypeCSS
 	TypeCubaseProject
 	TypeDart
-	TypeDEX035
-	TypeDEX036
-	TypeDEX037
-	TypeDEX038
-	TypeDEX039
-	TypeDEX040
-	TypeDEX041
 	TypeDirectory
 	TypeDocker
 	TypeDownloadableSounds
@@ -861,7 +851,7 @@ const (
 	TypeMP3ID3Tagged
 	TypeMP4Video
 	TypeMPEG12Video
-	TypeMPEG4AudioM4AFamily
+	TypeMPEG4Audio
 	TypeMPEGLayer1
 	TypeMPEGLayer2
 	TypeMPEGLayer3
@@ -948,6 +938,13 @@ const (
 	TypeUncompressed
 	TypeUTF8
 	TypeVagrantBox
+	TypeVersion035
+	TypeVersion036
+	TypeVersion037
+	TypeVersion038
+	TypeVersion039
+	TypeVersion040
+	TypeVersion041
 	TypeVersion1
 	TypeVersion2
 	TypeVersion3
@@ -1087,7 +1084,6 @@ var kindNames = [...]string{
 	KindCinema4DModel:                       "Cinema 4D Model",
 	KindCineonImage:                         "Cineon Image",
 	KindCloneCDControl:                      "CloneCD Control",
-	KindComicBookArchive:                    "Comic Book Archive",
 	KindCommodore64Tape:                     "Commodore 64 Tape",
 	KindCommodore64TapeRAW:                  "Commodore 64 Tape RAW",
 	KindCommodoreSID:                        "Commodore SID Audio",
@@ -1701,11 +1697,11 @@ var typeNames = [...]string{
 	TypeAfterEffectsProject:                "After Effects Project",
 	TypeAIFCAudio:                          "AIFC Audio",
 	TypeAIFFAudio:                          "AIFF Audio",
-	TypeAndroidAppBundle:                   "Android App Bundle",
-	TypeAndroidArchive:                     "Android Archive",
-	TypeAndroidPackage:                     "Android Package",
-	TypeAndroidPackageX:                    "Android XAPK Package",
-	TypeAndroidSplitAPKSet:                 "Android Split APK Set",
+	TypeAndroidAppBundle:                   "AAB Package",
+	TypeAndroidArchive:                     "AAR Package",
+	TypeAndroidPackage:                     "APK Package",
+	TypeAndroidPackageX:                    "XAPK Package",
+	TypeAndroidSplitAPKSet:                 "APKS Package",
 	TypeAndroidSystemPackage:               "Android System Package",
 	TypeAPPXPackage:                        "APPX Package",
 	TypeArchLinuxPackage:                   "Arch Linux Package",
@@ -1726,15 +1722,13 @@ var typeNames = [...]string{
 	TypeByteSwapped:                        "Byte-Swapped",
 	TypeC:                                  "C Source",
 	TypeCanonRAW3:                          "Canon RAW 3",
-	TypeCanonRAWHE:                         "Canon RAW HE",
 	TypeCAT:                                "CAT",
-	TypeCBT:                                "CBT",
-	TypeCBZ:                                "CBZ",
 	TypeCDAAudio:                           "CD Audio",
 	TypeCE:                                 "CE",
 	TypeCharacterDevice:                    "Character Device",
 	TypeCMake:                              "CMake Script",
 	TypeCodestream:                         "Codestream",
+	TypeComicBookArchive:                   "",
 	TypeCondaPackage:                       "Conda Package",
 	TypeContainer:                          "Container",
 	TypeCorelDRAWDocument:                  "CorelDRAW Document",
@@ -1744,13 +1738,6 @@ var typeNames = [...]string{
 	TypeCSS:                                "Cascading Style Sheets",
 	TypeCubaseProject:                      "Cubase Project",
 	TypeDart:                               "Dart Source",
-	TypeDEX035:                             "DEX 035",
-	TypeDEX036:                             "DEX 036",
-	TypeDEX037:                             "DEX 037",
-	TypeDEX038:                             "DEX 038",
-	TypeDEX039:                             "DEX 039",
-	TypeDEX040:                             "DEX 040",
-	TypeDEX041:                             "DEX 041",
 	TypeDirectory:                          "Directory",
 	TypeDocker:                             "Dockerfile",
 	TypeDownloadableSounds:                 "Downloadable Sounds",
@@ -1834,7 +1821,7 @@ var typeNames = [...]string{
 	TypeMP3ID3Tagged:                                "MP3 (ID3 Tagged)",
 	TypeMP4Video:                                    "MP4 Video",
 	TypeMPEG12Video:                                 "MPEG-1/2 Video",
-	TypeMPEG4AudioM4AFamily:                         "MPEG-4 Audio (M4A Family)",
+	TypeMPEG4Audio:                                  "MPEG-4 Audio",
 	TypeMPEGLayer1:                                  "MPEG Layer I",
 	TypeMPEGLayer2:                                  "MPEG Layer II",
 	TypeMPEGLayer3:                                  "MPEG Layer III",
@@ -1921,6 +1908,13 @@ var typeNames = [...]string{
 	TypeUncompressed:                                "Uncompressed",
 	TypeUTF8:                                        "UTF-8",
 	TypeVagrantBox:                                  "Vagrant Box",
+	TypeVersion035:                                  "Version 035",
+	TypeVersion036:                                  "Version 036",
+	TypeVersion037:                                  "Version 037",
+	TypeVersion038:                                  "Version 038",
+	TypeVersion039:                                  "Version 039",
+	TypeVersion040:                                  "Version 040",
+	TypeVersion041:                                  "Version 041",
 	TypeVersion1:                                    "Version 1",
 	TypeVersion2:                                    "Version 2",
 	TypeVersion3:                                    "Version 3",
@@ -1932,7 +1926,7 @@ var typeNames = [...]string{
 	TypeVMDKDescription:                             "VMDK Description",
 	TypeVorbisAudio:                                 "Vorbis Audio",
 	TypeWAVAudio:                                    "WAV Audio",
-	TypeWebM:                                        "WebM",
+	TypeWebM:                                        "WebM Video",
 	TypeWebPImage:                                   "WebP Image",
 	TypeWindowsAnimatedCursor:                       "Windows Animated Cursor",
 	TypeWindowsCursor:                               "Windows Cursor",
