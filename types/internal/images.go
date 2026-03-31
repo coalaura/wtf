@@ -3,6 +3,8 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
+	types.RegisterSignature(types.KindAdobeColorBook, types.TypeNone, 0, []byte("8BCB"))
+	types.RegisterSignature(types.KindAdobeSwatchExchange, types.TypeNone, 0, []byte("ASEF"))
 	types.RegisterSignature(types.KindAOLARTImage, types.TypeNone, 0, []byte("JG\x03\x0e"))
 	types.RegisterSignature(types.KindAOLARTImage, types.TypeNone, 0, []byte("JG\x04\x0e"))
 	types.RegisterSignature(types.KindAppleTextureImage, types.TypeNone, 0, []byte("ATX "))
@@ -36,6 +38,7 @@ func init() {
 	types.RegisterSignature(types.KindGIFImage, types.TypeGIF87a, 0, []byte("GIF87a"))
 	types.RegisterSignature(types.KindGIFImage, types.TypeGIF89a, 0, []byte("GIF89a"))
 	types.RegisterSignature(types.KindGIMPBrush, types.TypeNone, 20, []byte("GIMP Brush\n"))
+	types.RegisterSignature(types.KindGIMPPalette, types.TypeNone, 0, []byte("GIMP Palette\n"))
 	types.RegisterSignature(types.KindGIMPPattern, types.TypeNone, 0, []byte("GPAT"))
 	types.RegisterSignature(types.KindGIMPPattern, types.TypeNone, 24, []byte("GIMP Pattern\n"))
 	types.RegisterSignature(types.KindGIMPXCFImage, types.TypeNone, 0, []byte("gimp xcf "))
@@ -71,6 +74,7 @@ func init() {
 	types.RegisterSignature(types.KindNIfTIMedicalImage, types.TypeNone, 344, []byte("ni1\x00"))
 	types.RegisterSignature(types.KindNintendoTPL, types.TypeNone, 0, []byte{0x00, 0x20, 0xaf, 0x30})
 	types.RegisterSignature(types.KindNOAARasterChart, types.TypeNone, 0, []byte("!\r\nCRR/This elec"))
+	types.RegisterSignature(types.KindNRRDMedicalImage, types.TypeNone, 0, []byte("NRRD"))
 	types.RegisterSignature(types.KindOpenEXRImage, types.TypeNone, 0, []byte{0x76, 0x2f, 0x31, 0x01})
 	types.RegisterSignature(types.KindPaintShopProImage, types.TypeNone, 0, []byte("Paint Shop Pro Image File\n\x1a\x00"))
 	types.RegisterSignature(types.KindPaintShopProImage, types.TypeNone, 0, []byte("~BK\x00"))

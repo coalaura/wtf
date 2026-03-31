@@ -7,7 +7,6 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -215,13 +214,13 @@ var ignoredTypes = map[string]bool{
 }
 
 func main() {
-	log.Println("Sorting ids.go...")
-	count := sortIDs("./ids.go")
+	fmt.Println("Sorting ids_kind.go and ids_type.go...")
+	count := sortIDs("./ids_kind.go", "./ids_type.go")
 
-	log.Println("Sorting format registrations...")
+	fmt.Println("Sorting format registrations...")
 	sortRegistrations("./internal")
 
-	log.Println("Updating README.md...")
+	fmt.Println("Updating README.md...")
 	updateReadme(count)
 }
 
@@ -230,8 +229,9 @@ func updateReadme(count int) {
 
 	content, err := os.ReadFile(path)
 	if err != nil {
-		log.Printf("failed to read README.md: %v", err)
-		return
+		fmt.Printf("failed to read README.md: %v\n", err)
+
+		os.Exit(1)
 	}
 
 	rounded := (count / 10) * 10
@@ -243,83 +243,89 @@ func updateReadme(count int) {
 
 	if !bytes.Equal(content, updated) {
 		if err := os.WriteFile(path, updated, 0644); err != nil {
-			log.Printf("failed to write README.md: %v", err)
+			fmt.Printf("failed to write README.md: %v\n", err)
+
+			os.Exit(1)
 		} else {
-			log.Printf("Updated README.md format count to %d+", rounded)
+			fmt.Printf("Updated README.md format count to %d+", rounded)
 		}
 	}
 }
 
-func sortIDs(path string) int {
-	fset := token.NewFileSet()
-
-	node, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
-	if err != nil {
-		log.Fatalf("failed to parse %s: %v", path, err)
-	}
-
+func sortIDs(kindPath, typePath string) int {
 	kindsMap := make(map[string]string)
 	typesMap := make(map[string]string)
 
-	for _, decl := range node.Decls {
-		genDecl, ok := decl.(*ast.GenDecl)
-		if !ok {
-			continue
+	parseFile := func(path string) {
+		fset := token.NewFileSet()
+
+		node, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
+		if err != nil {
+			fmt.Printf("failed to parse %s: %v\n", path, err)
+
+			os.Exit(1)
 		}
 
-		if genDecl.Tok == token.CONST {
-			for _, spec := range genDecl.Specs {
-				vs, ok := spec.(*ast.ValueSpec)
-				if !ok {
-					continue
-				}
+		for _, decl := range node.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if !ok {
+				continue
+			}
 
-				for _, name := range vs.Names {
-					if strings.HasPrefix(name.Name, "Kind") {
-						if _, exists := kindsMap[name.Name]; !exists {
-							kindsMap[name.Name] = `""`
-						}
-					} else if strings.HasPrefix(name.Name, "Type") {
-						if _, exists := typesMap[name.Name]; !exists {
-							typesMap[name.Name] = `""`
+			if genDecl.Tok == token.CONST {
+				for _, spec := range genDecl.Specs {
+					vs, ok := spec.(*ast.ValueSpec)
+					if !ok {
+						continue
+					}
+
+					for _, name := range vs.Names {
+						if strings.HasPrefix(name.Name, "Kind") {
+							if _, exists := kindsMap[name.Name]; !exists {
+								kindsMap[name.Name] = `""`
+							}
+						} else if strings.HasPrefix(name.Name, "Type") {
+							if _, exists := typesMap[name.Name]; !exists {
+								typesMap[name.Name] = `""`
+							}
 						}
 					}
 				}
-			}
-		} else if genDecl.Tok == token.VAR {
-			for _, spec := range genDecl.Specs {
-				vs, ok := spec.(*ast.ValueSpec)
-				if !ok {
-					continue
-				}
+			} else if genDecl.Tok == token.VAR {
+				for _, spec := range genDecl.Specs {
+					vs, ok := spec.(*ast.ValueSpec)
+					if !ok {
+						continue
+					}
 
-				for _, name := range vs.Names {
-					if name.Name == "kindNames" || name.Name == "typeNames" {
-						compLit, ok := vs.Values[0].(*ast.CompositeLit)
-						if !ok {
-							continue
-						}
-
-						for _, elt := range compLit.Elts {
-							kv, ok := elt.(*ast.KeyValueExpr)
+					for _, name := range vs.Names {
+						if name.Name == "kindNames" || name.Name == "typeNames" {
+							compLit, ok := vs.Values[0].(*ast.CompositeLit)
 							if !ok {
 								continue
 							}
 
-							keyIdent, ok := kv.Key.(*ast.Ident)
-							if !ok {
-								continue
-							}
+							for _, elt := range compLit.Elts {
+								kv, ok := elt.(*ast.KeyValueExpr)
+								if !ok {
+									continue
+								}
 
-							valLit, ok := kv.Value.(*ast.BasicLit)
-							if !ok {
-								continue
-							}
+								keyIdent, ok := kv.Key.(*ast.Ident)
+								if !ok {
+									continue
+								}
 
-							if name.Name == "kindNames" {
-								kindsMap[keyIdent.Name] = valLit.Value
-							} else {
-								typesMap[keyIdent.Name] = valLit.Value
+								valLit, ok := kv.Value.(*ast.BasicLit)
+								if !ok {
+									continue
+								}
+
+								if name.Name == "kindNames" {
+									kindsMap[keyIdent.Name] = valLit.Value
+								} else {
+									typesMap[keyIdent.Name] = valLit.Value
+								}
 							}
 						}
 					}
@@ -327,6 +333,9 @@ func sortIDs(path string) int {
 			}
 		}
 	}
+
+	parseFile(kindPath)
+	parseFile(typePath)
 
 	var kinds []string
 
@@ -356,47 +365,28 @@ func sortIDs(path string) int {
 
 	typesList = append([]string{"TypeNone"}, typesList...)
 
-	var buf bytes.Buffer
+	var kindBuf bytes.Buffer
 
-	buf.WriteString("package types\n\n")
-	buf.WriteString("type KindID uint16\n")
-	buf.WriteString("type TypeID uint16\n\n")
-
-	buf.WriteString("const (\n")
+	kindBuf.WriteString("package types\n\n")
+	kindBuf.WriteString("type KindID uint16\n\n")
+	kindBuf.WriteString("const (\n")
 
 	for i, k := range kinds {
 		if i == 0 {
-			fmt.Fprintf(&buf, "\t%s KindID = iota\n", k)
+			fmt.Fprintf(&kindBuf, "\t%s KindID = iota\n", k)
 		} else {
-			fmt.Fprintf(&buf, "\t%s\n", k)
+			fmt.Fprintf(&kindBuf, "\t%s\n", k)
 		}
 	}
 
-	buf.WriteString(")\n\nconst (\n")
-
-	for i, t := range typesList {
-		if i == 0 {
-			fmt.Fprintf(&buf, "\t%s TypeID = iota\n", t)
-		} else {
-			fmt.Fprintf(&buf, "\t%s\n", t)
-		}
-	}
-
-	buf.WriteString(")\n\nvar kindNames = [...]string{\n")
+	kindBuf.WriteString(")\n\nvar kindNames = [...]string{\n")
 
 	for _, k := range kinds {
-		fmt.Fprintf(&buf, "\t%s: %s,\n", k, kindsMap[k])
+		fmt.Fprintf(&kindBuf, "\t%s: %s,\n", k, kindsMap[k])
 	}
 
-	buf.WriteString("}\n\nvar typeNames = [...]string{\n")
-
-	for _, t := range typesList {
-		fmt.Fprintf(&buf, "\t%s: %s,\n", t, typesMap[t])
-	}
-
-	buf.WriteString("}\n\n")
-
-	buf.WriteString(`func (k KindID) String() string {
+	kindBuf.WriteString("}\n\n")
+	kindBuf.WriteString(`func (k KindID) String() string {
 	if int(k) >= 0 && int(k) < len(kindNames) {
 		name := kindNames[k]
 		if name != "" {
@@ -406,8 +396,43 @@ func sortIDs(path string) int {
 
 	return "Unknown"
 }
+`)
 
-func (t TypeID) String() string {
+	formattedKind, err := format.Source(kindBuf.Bytes())
+	if err != nil {
+		fmt.Printf("format error in %s: %v\n", kindPath, err)
+
+		os.Exit(1)
+	}
+
+	if err := os.WriteFile(kindPath, formattedKind, 0644); err != nil {
+		fmt.Printf("write error for %s: %v\n", kindPath, err)
+
+		os.Exit(1)
+	}
+
+	var typeBuf bytes.Buffer
+
+	typeBuf.WriteString("package types\n\n")
+	typeBuf.WriteString("type TypeID uint16\n\n")
+	typeBuf.WriteString("const (\n")
+
+	for i, t := range typesList {
+		if i == 0 {
+			fmt.Fprintf(&typeBuf, "\t%s TypeID = iota\n", t)
+		} else {
+			fmt.Fprintf(&typeBuf, "\t%s\n", t)
+		}
+	}
+
+	typeBuf.WriteString(")\n\nvar typeNames = [...]string{\n")
+
+	for _, t := range typesList {
+		fmt.Fprintf(&typeBuf, "\t%s: %s,\n", t, typesMap[t])
+	}
+
+	typeBuf.WriteString("}\n\n")
+	typeBuf.WriteString(`func (t TypeID) String() string {
 	if int(t) >= 0 && int(t) < len(typeNames) {
 		return typeNames[t]
 	}
@@ -416,13 +441,17 @@ func (t TypeID) String() string {
 }
 `)
 
-	formatted, err := format.Source(buf.Bytes())
+	formattedType, err := format.Source(typeBuf.Bytes())
 	if err != nil {
-		log.Fatalf("format error in ids.go: %v", err)
+		fmt.Printf("format error in %s: %v\n", typePath, err)
+
+		os.Exit(1)
 	}
 
-	if err := os.WriteFile(path, formatted, 0644); err != nil {
-		log.Fatalf("write error for ids.go: %v", err)
+	if err := os.WriteFile(typePath, formattedType, 0644); err != nil {
+		fmt.Printf("write error for %s: %v\n", typePath, err)
+
+		os.Exit(1)
 	}
 
 	var validTypes int
@@ -440,7 +469,9 @@ func (t TypeID) String() string {
 func sortRegistrations(dir string) {
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		log.Fatalf("failed to read dir %s: %v", dir, err)
+		fmt.Printf("failed to read dir %s: %v\n", dir, err)
+
+		os.Exit(1)
 	}
 
 	for _, entry := range files {
@@ -459,7 +490,9 @@ func processFormatFile(path string) {
 
 	node, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
-		log.Fatalf("failed to parse %s: %v", path, err)
+		fmt.Printf("failed to parse %s: %v\n", path, err)
+
+		os.Exit(1)
 	}
 
 	var initFunc *ast.FuncDecl
@@ -544,7 +577,9 @@ func processFormatFile(path string) {
 
 	originalSrc, err := os.ReadFile(path)
 	if err != nil {
-		log.Fatalf("failed to read %s: %v", path, err)
+		fmt.Printf("failed to read %s: %v\n", path, err)
+
+		os.Exit(1)
 	}
 
 	start := fset.Position(initFunc.Body.Pos()).Offset
@@ -580,12 +615,15 @@ func processFormatFile(path string) {
 
 	finalSrc, err := format.Source(newSrc)
 	if err != nil {
-		fmt.Println(string(newSrc))
-		log.Fatalf("failed final format for %s: %v", path, err)
+		fmt.Printf("failed final format for %s: %v\n", path, err)
+
+		os.Exit(1)
 	}
 
 	if err := os.WriteFile(path, finalSrc, 0644); err != nil {
-		log.Fatalf("failed to write %s: %v", path, err)
+		fmt.Printf("failed to write %s: %v\n", path, err)
+
+		os.Exit(1)
 	}
 }
 

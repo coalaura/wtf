@@ -34,6 +34,8 @@ func init() {
 	types.RegisterSignature(types.KindQCOWDiskImage, types.TypeQCOW2, 0, []byte{'Q', 'F', 'I', 0xfb, 0x00, 0x00, 0x00, 0x02})
 	types.RegisterSignature(types.KindQCOWDiskImage, types.TypeQCOW2, 0, []byte{'Q', 'F', 'I', 0xfb, 0x00, 0x00, 0x00, 0x03})
 	types.RegisterSignature(types.KindQEMUQEDDiskImage, types.TypeNone, 0, []byte("QED\x00"))
+	types.RegisterSignature(types.KindQNX4Filesystem, types.TypeNone, 512, []byte("QNX4FS"))
+	types.RegisterSignature(types.KindQNX6Filesystem, types.TypeNone, 8192, []byte("QNX6FS"))
 	types.RegisterSignature(types.KindReiserFSFilesystem, types.TypeNone, 65588, []byte("ReIsEr2Fs"))
 	types.RegisterSignature(types.KindReiserFSFilesystem, types.TypeNone, 65588, []byte("ReIsEr3Fs"))
 	types.RegisterSignature(types.KindReiserFSFilesystem, types.TypeNone, 65588, []byte("ReIsEr4"))
@@ -62,6 +64,13 @@ func init() {
 	types.RegisterSignature(types.KindVMwareNVRAM, types.TypeNone, 0, []byte("VMWARE NVRAM"))
 	types.RegisterSignature(types.KindVMwareSnapshot, types.TypeNone, 0, []byte("VMSN"))
 	types.RegisterSignature(types.KindVMwareSuspend, types.TypeNone, 0, []byte("VMSS"))
+	types.RegisterSignature(types.KindWiiUCompressedDiskImage, types.TypeNone, 0, []byte("WUX\x00"))
+	types.RegisterSignature(types.KindWiiUDiskImage, types.TypeNone, 0, []byte("WUD\x00"))
 	types.RegisterSignature(types.KindZFSFilesystem, types.TypeNone, 0, []byte{0x00, 0xba, 0xb1, 0x0c})
 	types.RegisterSignature(types.KindZFSFilesystem, types.TypeNone, 0, []byte{0x0c, 0xb1, 0xba, 0x00})
+
+	types.RegisterWeakSignature(types.KindApplePartitionMap, types.TypeNone, 512, []byte("ER"))
+	types.RegisterWeakSignature(types.KindMinixFilesystem, types.TypeNone, 1040, []byte{0x13, 0x7f})
+	types.RegisterWeakSignature(types.KindMinixFilesystem, types.TypeNone, 1040, []byte{0x14, 0x7f})
+	types.RegisterWeakSignature(types.KindMinixFilesystem, types.TypeNone, 1040, []byte{0x24, 0x78})
 }

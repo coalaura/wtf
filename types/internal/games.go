@@ -53,6 +53,7 @@ func init() {
 	types.RegisterSignature(types.KindSegaNaomiROM, types.TypeNone, 0, []byte("NAOMI"))
 	types.RegisterSignature(types.KindSegaSaturnROM, types.TypeNone, 0, []byte("SEGA SEGA"))
 	types.RegisterSignature(types.KindSourceEngineBSPMap, types.TypeNone, 0, []byte("VBSP"))
+	types.RegisterSignature(types.KindSourceEngineDemo, types.TypeNone, 0, []byte("HL2DEMO\x00"))
 	types.RegisterSignature(types.KindUnityWebData, types.TypeNone, 0, []byte("UnityFS"))
 	types.RegisterSignature(types.KindUnityWebData, types.TypeNone, 0, []byte("UnityRaw"))
 	types.RegisterSignature(types.KindUnityWebData, types.TypeNone, 0, []byte("UnityWeb"))
@@ -62,4 +63,6 @@ func init() {
 	types.RegisterSignature(types.KindWiiUArchive, types.TypeNone, 0, []byte("WUA\x01"))
 	types.RegisterSignature(types.KindXbox360Executable, types.TypeNone, 0, []byte("XEX2"))
 	types.RegisterSignature(types.KindXboxExecutable, types.TypeNone, 0, []byte("XBEH"))
+
+	types.RegisterMaskedSignature(types.KindGameMakerData, types.TypeNone, 0, []byte("FORM\x00\x00\x00\x00GEN8"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 }

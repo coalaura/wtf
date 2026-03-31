@@ -21,6 +21,7 @@ func init() {
 	types.RegisterSignature(types.KindAppleKeychain, types.TypeNone, 0, []byte("kych"))
 	types.RegisterSignature(types.KindAppleSingleArchive, types.TypeNone, 0, []byte{0x00, 0x05, 0x16, 0x00})
 	types.RegisterSignature(types.KindAppleSystemLog, types.TypeNone, 0, []byte("ASL "))
+	types.RegisterSignature(types.KindAppleSystemProfiler, types.TypeNone, 0, []byte("SPX\x00"))
 	types.RegisterSignature(types.KindBinHexArchive, types.TypeNone, 11, []byte("must be converted with BinHex 4.0"))
 	types.RegisterSignature(types.KindBitcoinBlock, types.TypeNone, 0, []byte{0xf9, 0xbe, 0xb4, 0xd9})
 	types.RegisterSignature(types.KindBlackBerryBackup, types.TypeNone, 0, []byte("Inter@ctive Page"))
@@ -45,7 +46,8 @@ func init() {
 	types.RegisterSignature(types.KindGameBoyROM, types.TypeNone, 0x104, []byte{0xce, 0xed, 0x66, 0x66, 0xcc, 0x0d, 0x00, 0x0b})
 	types.RegisterSignature(types.KindGameCubeROM, types.TypeNone, 0x1c, []byte{0xc2, 0x33, 0x9f, 0x3d})
 	types.RegisterSignature(types.KindGitIndex, types.TypeNone, 0, []byte("DIRC"))
-	types.RegisterSignature(types.KindGitPack, types.TypeNone, 0, []byte("PACK"))
+	types.RegisterSignature(types.KindGitPack, types.TypeNone, 0, []byte("PACK\x00\x00\x00\x02"))
+	types.RegisterSignature(types.KindGitPack, types.TypeNone, 0, []byte("PACK\x00\x00\x00\x03"))
 	types.RegisterSignature(types.KindGlibcLocale, types.TypeNone, 0, []byte{0xde, 0xc0, 0x26, 0xe8})
 	types.RegisterSignature(types.KindGNOMEKeyring, types.TypeNone, 0, []byte("GnomeKeyring\n\r\x00\n"))
 	types.RegisterSignature(types.KindGnuPGKeybox, types.TypeNone, 0, []byte("KBXf"))
@@ -170,5 +172,8 @@ func init() {
 
 	types.RegisterMaskedSignature(types.KindErlangBEAMBytecode, types.TypeNone, 0, []byte("FOR1\x00\x00\x00\x00BEAM"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 
+	types.RegisterWeakSignature(types.KindAtariTOSExecutable, types.TypeNone, 0, []byte{0x60, 0x1a})
 	types.RegisterWeakSignature(types.KindMSDOSCOFFObject, types.TypeOBJ, 0, []byte{0x4c, 0x01})
+	types.RegisterWeakSignature(types.KindPalmOSApplication, types.TypeNone, 60, []byte("appl"))
+	types.RegisterWeakSignature(types.KindPalmOSApplication, types.TypeNone, 60, []byte("libr"))
 }

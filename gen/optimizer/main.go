@@ -7,7 +7,6 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -46,22 +45,22 @@ type Generator struct {
 }
 
 func main() {
-	log.Println("Parsing signatures and detectors for Radix Trie optimization...")
+	fmt.Println("Parsing signatures and detectors for Radix Trie optimization...")
 	gen := parseSignatures("./internal")
 
-	log.Println("Checking for duplicate signatures...")
+	fmt.Println("Checking for duplicate signatures...")
 	checkDuplicateSignatures(gen.StrongSigs, gen.WeakSigs)
 
-	log.Println("Checking for unused Kind/Type IDs...")
-	checkUnusedIDs("./ids.go", "./internal", "./custom")
+	fmt.Println("Checking for unused Kind/Type IDs...")
+	checkUnusedIDs("./ids_kind.go", "./ids_type.go", "./internal", "./custom")
 
-	log.Println("Generating optimized jump table (gen_signatures.go)...")
+	fmt.Println("Generating optimized jump table (gen_signatures.go)...")
 	generateOptimizedCode(gen, "./gen_signatures.go")
 
-	log.Println("Merging custom detectors (gen_detectors.go)...")
+	fmt.Println("Merging custom detectors (gen_detectors.go)...")
 	mergeCustomDetectors("./custom", "./gen_detectors.go")
 
-	log.Println("Generating format list (gen_formats.go)...")
+	fmt.Println("Generating format list (gen_formats.go)...")
 	generateFormatList(gen, "./gen_formats.go")
 }
 
@@ -72,7 +71,9 @@ func parseSignatures(dir string) *Generator {
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		log.Fatalf("failed to read dir: %v", err)
+		fmt.Printf("failed to read dir: %v\n", err)
+
+		os.Exit(1)
 	}
 
 	for _, entry := range files {
@@ -84,7 +85,9 @@ func parseSignatures(dir string) *Generator {
 
 		node, err := parser.ParseFile(fset, path, nil, 0)
 		if err != nil {
-			log.Fatalf("failed to parse %s: %v", path, err)
+			fmt.Printf("failed to parse %s: %v\n", path, err)
+
+			os.Exit(1)
 		}
 
 		for _, decl := range node.Decls {
@@ -175,6 +178,7 @@ func parseSignatures(dir string) *Generator {
 
 func checkDuplicateSignatures(strongSigs, weakSigs []Sig) {
 	seen := make(map[SignatureKey]Sig)
+	hasDuplicates := false
 
 	check := func(sigs []Sig, category string) {
 		for _, sig := range sigs {
@@ -185,27 +189,34 @@ func checkDuplicateSignatures(strongSigs, weakSigs []Sig) {
 			}
 
 			if prev, exists := seen[key]; exists {
-				log.Fatalf("DUPLICATE SIGNATURE in %s:\n"+
-					"  Existing: %s.%s at offset %d, magic=%q, mask=%q\n"+
-					"  Duplicate: %s.%s at offset %d, magic=%q, mask=%q\n"+
-					"  (Signatures evaluate to the exact same bytes and will fight each other)",
-					category,
-					prev.Kind, prev.Type, prev.Offset, string(prev.Magic), string(prev.Mask),
-					sig.Kind, sig.Type, sig.Offset, string(sig.Magic), string(sig.Mask),
+				fmt.Printf("[%s] Conflict at Offset: %d | Magic: %q | Mask: %q\n"+
+					"  -> Existing:  %s.%s\n"+
+					"  -> Duplicate: %s.%s\n",
+					category, sig.Offset, string(sig.Magic), string(sig.Mask),
+					prev.Kind, prev.Type,
+					sig.Kind, sig.Type,
 				)
-			}
 
-			seen[key] = sig
+				hasDuplicates = true
+			} else {
+				seen[key] = sig
+			}
 		}
 	}
 
 	check(strongSigs, "strong signatures")
 	check(weakSigs, "weak signatures")
+
+	if hasDuplicates {
+		fmt.Println("Found duplicate signatures (they evaluate to the exact same bytes and will fight each other). Please fix them.")
+
+		os.Exit(1)
+	}
 }
 
-func checkUnusedIDs(idsPath string, internalDir string, customDir string) {
-	definedKinds := parseDefinedIDs(idsPath, "Kind")
-	definedTypes := parseDefinedIDs(idsPath, "Type")
+func checkUnusedIDs(idsKindPath string, idsTypePath string, internalDir string, customDir string) {
+	definedKinds := parseDefinedIDs(idsKindPath, "Kind")
+	definedTypes := parseDefinedIDs(idsTypePath, "Type")
 
 	usedKinds := make(map[string]bool)
 	usedTypes := make(map[string]bool)
@@ -282,23 +293,25 @@ func checkUnusedIDs(idsPath string, internalDir string, customDir string) {
 	sort.Strings(unusedTypes)
 
 	if len(unusedKinds) > 0 {
-		log.Println("UNUSED KIND IDs:")
+		fmt.Println("UNUSED KIND IDs:")
 
 		for _, k := range unusedKinds {
-			log.Printf("  %s", k)
+			fmt.Printf("  %s\n", k)
 		}
 	}
 
 	if len(unusedTypes) > 0 {
-		log.Println("UNUSED TYPE IDs:")
+		fmt.Println("UNUSED TYPE IDs:")
 
 		for _, t := range unusedTypes {
-			log.Printf("  %s", t)
+			fmt.Printf("  %s\n", t)
 		}
 	}
 
 	if len(unusedKinds) > 0 || len(unusedTypes) > 0 {
-		log.Fatalf("Found %d unused Kind IDs and %d unused Type IDs", len(unusedKinds), len(unusedTypes))
+		fmt.Printf("Found %d unused Kind IDs and %d unused Type IDs\n", len(unusedKinds), len(unusedTypes))
+
+		os.Exit(1)
 	}
 }
 
@@ -307,7 +320,7 @@ func parseDefinedIDs(path string, prefix string) map[string]bool {
 
 	node, err := parser.ParseFile(fset, path, nil, 0)
 	if err != nil {
-		log.Fatalf("failed to parse %s: %v", path, err)
+		fmt.Printf("failed to parse %s: %v", path, err)
 	}
 
 	result := make(map[string]bool)
@@ -375,11 +388,11 @@ func generateOptimizedCode(gen *Generator, outPath string) {
 
 	formatted, err := format.Source([]byte(buf.String()))
 	if err != nil {
-		log.Fatalf("format error: %v\n", err)
+		fmt.Printf("format error: %v\n", err)
 	}
 
 	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
-		log.Fatalf("write error: %v", err)
+		fmt.Printf("write error: %v\n", err)
 	}
 }
 
@@ -388,7 +401,9 @@ func mergeCustomDetectors(dir string, outPath string) {
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
-		log.Fatalf("failed to read custom dir: %v", err)
+		fmt.Printf("failed to read custom dir: %v\n", err)
+
+		os.Exit(1)
 	}
 
 	importSet := make(map[string]bool)
@@ -404,7 +419,9 @@ func mergeCustomDetectors(dir string, outPath string) {
 
 		node, err := parser.ParseFile(fset, path, nil, 0)
 		if err != nil {
-			log.Fatalf("failed to parse %s: %v", path, err)
+			fmt.Printf("failed to parse %s: %v\n", path, err)
+
+			os.Exit(1)
 		}
 
 		for _, imp := range node.Imports {
@@ -474,11 +491,15 @@ func mergeCustomDetectors(dir string, outPath string) {
 
 	formatted, err := format.Source([]byte(out.String()))
 	if err != nil {
-		log.Fatalf("format error in detectors: %v\n%s", err, out.String())
+		fmt.Printf("format error in detectors: %v\n%s\n", err, out.String())
+
+		os.Exit(1)
 	}
 
 	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
-		log.Fatalf("write error: %v", err)
+		fmt.Printf("write error: %v\n", err)
+
+		os.Exit(1)
 	}
 }
 
@@ -586,11 +607,15 @@ func generateFormatList(gen *Generator, outPath string) {
 
 	formatted, err := format.Source([]byte(buf.String()))
 	if err != nil {
-		log.Fatalf("format error: %v\n%s", err, buf.String())
+		fmt.Printf("format error: %v\n%s\n", err, buf.String())
+
+		os.Exit(1)
 	}
 
 	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
-		log.Fatalf("write error: %v", err)
+		fmt.Printf("write error: %v\n", err)
+
+		os.Exit(1)
 	}
 }
 

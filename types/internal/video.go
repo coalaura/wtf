@@ -14,6 +14,7 @@ func init() {
 	types.RegisterSignature(types.KindElitePlusCommander, types.TypeNone, 0, []byte("ELITE Co"))
 	types.RegisterSignature(types.KindFLVVideo, types.TypeNone, 0, []byte("FLV"))
 	types.RegisterSignature(types.KindGenetecVideo, types.TypeNone, 0, []byte("Genetec Omnicast"))
+	types.RegisterSignature(types.KindIdRoQVideo, types.TypeNone, 0, []byte{0x84, 0x10, 0xff, 0xff})
 	types.RegisterSignature(types.KindIVFVideo, types.TypeNone, 0, []byte("DKIF"))
 	types.RegisterSignature(types.KindM3U8Playlist, types.TypeNone, 0, []byte("#EXTM3U"))
 	types.RegisterSignature(types.KindMaterialExchangeFormat, types.TypeNone, 0, []byte{0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01, 0x0d, 0x01, 0x02, 0x01, 0x01, 0x02})
