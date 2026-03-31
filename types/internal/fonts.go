@@ -3,6 +3,8 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
+	types.RegisterSignature(types.KindAdobeFontMetrics, types.TypeNone, 0, []byte("StartFontMetrics"))
+	types.RegisterSignature(types.KindBMFont, types.TypeNone, 0, []byte("BMF\x03"))
 	types.RegisterSignature(types.KindEOTFont, types.TypeNone, 34, []byte("LP"))
 	types.RegisterSignature(types.KindGlyphBitmapDistributionFormat, types.TypeNone, 0, []byte("STARTFONT "))
 	types.RegisterSignature(types.KindOpenTypeFont, types.TypeNone, 0, []byte("OTTO"))

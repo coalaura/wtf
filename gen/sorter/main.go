@@ -247,7 +247,7 @@ func updateReadme(count int) {
 
 			os.Exit(1)
 		} else {
-			fmt.Printf("Updated README.md format count to %d+", rounded)
+			fmt.Printf("Updated README.md format count to %d+\n", rounded)
 		}
 	}
 }

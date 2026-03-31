@@ -1581,6 +1581,8 @@ func DetectTar(b Buffer) *Metadata {
 					return &Metadata{Kind: KindTARArchive, Type: TypeSlackwarePackage}
 				case "ComicInfo.xml", "comicinfo.xml":
 					return &Metadata{Kind: KindTARArchive, Type: TypeComicBook}
+				case "metadata", "deploy":
+					return &Metadata{Kind: KindTARArchive, Type: TypeFlatpak}
 				}
 			}
 		}
@@ -1757,6 +1759,15 @@ func detectTextSubtype(data []byte) TypeID {
 
 		if bytes.Contains(shebang, []byte("fsharpi")) || bytes.Contains(shebang, []byte("fsharp")) {
 			return TypeFSharpSource
+		}
+	}
+
+	if bytes.HasPrefix(trimmed, []byte(`{"type":`)) || bytes.HasPrefix(trimmed, []byte(`{"type": `)) {
+		if bytes.Contains(trimmed, []byte(`"Topology"`)) || bytes.Contains(trimmed, []byte(`"transform"`)) {
+			return TypeTopoJSON
+		}
+		if bytes.Contains(trimmed, []byte(`"FeatureCollection"`)) || bytes.Contains(trimmed, []byte(`"Feature"`)) {
+			return TypeGeoJSON
 		}
 	}
 
@@ -2562,6 +2573,11 @@ func DetectZIPContainer(b Buffer) *Metadata {
 		hasPyTorchData      bool
 		hasPyTorchVersion   bool
 		hasComicInfo        bool
+		hasProcreateDoc     bool
+		hasCeltxScript      bool
+		hasStudioOneSong    bool
+		hasBitwigProject    bool
+		hasPSVitaEboot      bool
 		firstFile           = true
 	)
 
@@ -2691,6 +2707,16 @@ func DetectZIPContainer(b Buffer) *Metadata {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeNuGetPackage}
 		} else if matchASCII(name, "comicinfo.xml") {
 			hasComicInfo = true
+		} else if matchASCII(name, "document.archive") {
+			hasProcreateDoc = true
+		} else if matchASCII(name, "script.html") || matchASCII(name, "project.rdf") {
+			hasCeltxScript = true
+		} else if matchASCII(name, "song.xml") || matchASCII(name, "project.xml") {
+			hasStudioOneSong = true
+		} else if matchASCII(name, "project.json") {
+			hasBitwigProject = true
+		} else if matchASCII(name, "eboot.bin") || matchASCII(name, "sce_sys/param.sfo") {
+			hasPSVitaEboot = true
 		} else if matchASCII(name, "metadata/buildversionhistory.plist") || hasPrefixASCII(name, "index/document.iwa") {
 			return &Metadata{Kind: KindAppleiWorkDocument}
 		}
@@ -2853,6 +2879,26 @@ func DetectZIPContainer(b Buffer) *Metadata {
 
 	if hasComicInfo {
 		return &Metadata{Kind: KindZIPArchive, Type: TypeComicBook}
+	}
+
+	if hasProcreateDoc {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeProcreate}
+	}
+
+	if hasCeltxScript {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeCeltx}
+	}
+
+	if hasStudioOneSong {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeStudioOne}
+	}
+
+	if hasBitwigProject {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeBitwig}
+	}
+
+	if hasPSVitaEboot {
+		return &Metadata{Kind: KindZIPArchive, Type: TypePSVita}
 	}
 
 	return &Metadata{Kind: KindZIPArchive}

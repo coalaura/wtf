@@ -35,6 +35,7 @@ const (
 	TypeAVIFImageSequence
 	TypeAVIVideo
 	TypeB4
+	TypeBA2
 	TypeBashScript
 	TypeBatchScript
 	TypeBGZF
@@ -43,6 +44,7 @@ const (
 	TypeBinary
 	TypeBinaryBigEndian
 	TypeBinaryLittleEndian
+	TypeBitwig
 	TypeBlackmagicRAWVideo
 	TypeBlockDevice
 	TypeByteSwapped
@@ -50,6 +52,7 @@ const (
 	TypeCAT
 	TypeCDAAudio
 	TypeCE
+	TypeCeltx
 	TypeCharacterDevice
 	TypeClojureScript
 	TypeCMakeScript
@@ -94,8 +97,11 @@ const (
 	TypeFirefoxExtension
 	TypeFishScript
 	TypeFLACAudio
+	TypeFlatpak
 	TypeForgeMod
 	TypeFSharpSource
+	TypeGeoJSON
+	TypeGeoPackage
 	TypeGIF87a
 	TypeGIF89a
 	TypeGitConfig
@@ -149,6 +155,7 @@ const (
 	TypeMakefile
 	TypeMarkdownDocument
 	TypeMatroskaVideo
+	TypeMBTiles
 	TypeMicrosoftExcelAddIn
 	TypeMicrosoftExcelMacroEnabledTemplate
 	TypeMicrosoftExcelMacroEnabledWorkbook
@@ -233,10 +240,12 @@ const (
 	TypePowerShellScript
 	TypePPMASCII
 	TypePPMBinary
+	TypeProcreate
 	TypePropertiesFile
 	TypeProtocolBuffer
 	TypePSB
 	TypePSD
+	TypePSVita
 	TypePWAD
 	TypePythonScript
 	TypePythonSourceDistribution
@@ -272,6 +281,7 @@ const (
 	TypeSpeexAudio
 	TypeSQLScript
 	TypeSSHConfig
+	TypeStudioOne
 	TypeSvelteComponent
 	TypeSwiftSource
 	TypeSymbolicLink
@@ -282,6 +292,7 @@ const (
 	TypeTheoraVideo
 	TypeThriftInterface
 	TypeTOMLConfiguration
+	TypeTopoJSON
 	TypeTSVData
 	TypeTypeScriptSource
 	TypeUncompressed
@@ -315,6 +326,7 @@ const (
 	TypeWAVAudio
 	TypeWebMVideo
 	TypeWebPImage
+	TypeWestwoodVQA
 	TypeWindowsAnimatedCursor
 	TypeWindowsCursor
 	TypeWindowsIcon
@@ -365,6 +377,7 @@ var typeNames = [...]string{
 	TypeAVIFImageSequence:                  "AVIF Image Sequence",
 	TypeAVIVideo:                           "AVI Video",
 	TypeB4:                                 "B4",
+	TypeBA2:                                "Bethesda Archive 2",
 	TypeBashScript:                         "Bash Script",
 	TypeBatchScript:                        "Batch Script",
 	TypeBGZF:                               "BGZF",
@@ -373,6 +386,7 @@ var typeNames = [...]string{
 	TypeBinary:                             "Binary",
 	TypeBinaryBigEndian:                    "Binary Big-Endian",
 	TypeBinaryLittleEndian:                 "Binary Little-Endian",
+	TypeBitwig:                             "Bitwig Studio Project",
 	TypeBlackmagicRAWVideo:                 "Blackmagic RAW Video",
 	TypeBlockDevice:                        "Block Device",
 	TypeByteSwapped:                        "Byte-Swapped",
@@ -380,6 +394,7 @@ var typeNames = [...]string{
 	TypeCAT:                                "CAT",
 	TypeCDAAudio:                           "CD Audio",
 	TypeCE:                                 "CE",
+	TypeCeltx:                              "Celtx Project",
 	TypeCharacterDevice:                    "Character Device",
 	TypeClojureScript:                      "Clojure Script",
 	TypeCMakeScript:                        "CMake Script",
@@ -424,8 +439,11 @@ var typeNames = [...]string{
 	TypeFirefoxExtension:                   "Firefox Extension",
 	TypeFishScript:                         "Fish Script",
 	TypeFLACAudio:                          "FLAC Audio",
+	TypeFlatpak:                            "Flatpak Bundle",
 	TypeForgeMod:                           "Forge Mod",
 	TypeFSharpSource:                       "F# Source",
+	TypeGeoJSON:                            "GeoJSON",
+	TypeGeoPackage:                         "GeoPackage",
 	TypeGIF87a:                             "GIF87a",
 	TypeGIF89a:                             "GIF89a",
 	TypeGitConfig:                          "Git Configuration",
@@ -479,6 +497,7 @@ var typeNames = [...]string{
 	TypeMakefile:                           "Makefile",
 	TypeMarkdownDocument:                   "Markdown Document",
 	TypeMatroskaVideo:                      "Matroska Video",
+	TypeMBTiles:                            "MBTiles",
 	TypeMicrosoftExcelAddIn:                "Microsoft Excel Add-In",
 	TypeMicrosoftExcelMacroEnabledTemplate: "Microsoft Excel Macro-Enabled Template",
 	TypeMicrosoftExcelMacroEnabledWorkbook: "Microsoft Excel Macro-Enabled Workbook",
@@ -563,10 +582,12 @@ var typeNames = [...]string{
 	TypePowerShellScript:                            "PowerShell Script",
 	TypePPMASCII:                                    "PPM ASCII",
 	TypePPMBinary:                                   "PPM binary",
+	TypeProcreate:                                   "Procreate Artwork",
 	TypePropertiesFile:                              "Properties File",
 	TypeProtocolBuffer:                              "Protocol Buffer",
 	TypePSB:                                         "PSB",
 	TypePSD:                                         "PSD",
+	TypePSVita:                                      "PS Vita Package",
 	TypePWAD:                                        "PWAD",
 	TypePythonScript:                                "Python Script",
 	TypePythonSourceDistribution:                    "Python Source Distribution",
@@ -602,6 +623,7 @@ var typeNames = [...]string{
 	TypeSpeexAudio:                                  "Speex Audio",
 	TypeSQLScript:                                   "SQL Script",
 	TypeSSHConfig:                                   "SSH Configuration",
+	TypeStudioOne:                                   "Studio One Song",
 	TypeSvelteComponent:                             "Svelte Component",
 	TypeSwiftSource:                                 "Swift Source",
 	TypeSymbolicLink:                                "Symbolic Link",
@@ -612,6 +634,7 @@ var typeNames = [...]string{
 	TypeTheoraVideo:                                 "Theora Video",
 	TypeThriftInterface:                             "Thrift Interface",
 	TypeTOMLConfiguration:                           "TOML Configuration",
+	TypeTopoJSON:                                    "TopoJSON",
 	TypeTSVData:                                     "TSV Data",
 	TypeTypeScriptSource:                            "TypeScript Source",
 	TypeUncompressed:                                "Uncompressed",
@@ -645,6 +668,7 @@ var typeNames = [...]string{
 	TypeWAVAudio:                                    "WAV Audio",
 	TypeWebMVideo:                                   "WebM Video",
 	TypeWebPImage:                                   "WebP Image",
+	TypeWestwoodVQA:                                 "Westwood VQA Video",
 	TypeWindowsAnimatedCursor:                       "Windows Animated Cursor",
 	TypeWindowsCursor:                               "Windows Cursor",
 	TypeWindowsIcon:                                 "Windows Icon",

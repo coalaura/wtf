@@ -36,6 +36,11 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 		hasPyTorchData      bool
 		hasPyTorchVersion   bool
 		hasComicInfo        bool
+		hasProcreateDoc     bool
+		hasCeltxScript      bool
+		hasStudioOneSong    bool
+		hasBitwigProject    bool
+		hasPSVitaEboot      bool
 		firstFile           = true
 	)
 
@@ -165,6 +170,16 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeNuGetPackage}
 		} else if matchASCII(name, "comicinfo.xml") {
 			hasComicInfo = true
+		} else if matchASCII(name, "document.archive") {
+			hasProcreateDoc = true
+		} else if matchASCII(name, "script.html") || matchASCII(name, "project.rdf") {
+			hasCeltxScript = true
+		} else if matchASCII(name, "song.xml") || matchASCII(name, "project.xml") {
+			hasStudioOneSong = true
+		} else if matchASCII(name, "project.json") {
+			hasBitwigProject = true
+		} else if matchASCII(name, "eboot.bin") || matchASCII(name, "sce_sys/param.sfo") {
+			hasPSVitaEboot = true
 		} else if matchASCII(name, "metadata/buildversionhistory.plist") || hasPrefixASCII(name, "index/document.iwa") {
 			return &types.Metadata{Kind: types.KindAppleiWorkDocument}
 		}
@@ -332,6 +347,26 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 
 	if hasComicInfo {
 		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeComicBook}
+	}
+
+	if hasProcreateDoc {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeProcreate}
+	}
+
+	if hasCeltxScript {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeCeltx}
+	}
+
+	if hasStudioOneSong {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeStudioOne}
+	}
+
+	if hasBitwigProject {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeBitwig}
+	}
+
+	if hasPSVitaEboot {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypePSVita}
 	}
 
 	return &types.Metadata{Kind: types.KindZIPArchive}

@@ -11,6 +11,8 @@ func init() {
 	types.RegisterSignature(types.KindEnCaseImage, types.TypeNone, 0, []byte("EVF\x09\x0d\x0a\xff\x00"))
 	types.RegisterSignature(types.KindExpertWitnessFormat, types.TypeNone, 0, []byte("EVF\x09\x0d\x0a\x81"))
 	types.RegisterSignature(types.KindLogicalFileEvidence, types.TypeNone, 0, []byte("LVF\x09\x0d\x0a\xff\x00"))
+	types.RegisterSignature(types.KindMacOSEventsLog, types.TypeNone, 0, []byte("1SLD"))
+	types.RegisterSignature(types.KindMacOSEventsLog, types.TypeNone, 0, []byte("2SLD"))
 	types.RegisterSignature(types.KindMCAPCapture, types.TypeNone, 0, []byte{0x89, 'M', 'C', 'A', 'P', '0', '\r', '\n'})
 	types.RegisterSignature(types.KindMediaDescriptor, types.TypeNone, 0, []byte("MEDIA DESCRIPTOR"))
 	types.RegisterSignature(types.KindMicrosoftNetworkMonitorCapture, types.TypeNone, 0, []byte("MACROSOFT\x00"))
@@ -24,4 +26,7 @@ func init() {
 
 	types.RegisterMaskedSignature(types.KindPCAPNGCapture, types.TypeNone, 0, []byte{0x0a, 0x0d, 0x0d, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x1a, 0x2b, 0x3c, 0x4d}, []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindPCAPNGCapture, types.TypeNone, 0, []byte{0x0a, 0x0d, 0x0d, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x4d, 0x3c, 0x2b, 0x1a}, []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
+
+	types.RegisterWeakSignature(types.KindCellebriteUFED, types.TypeNone, 0, []byte("[Cellebrite]"))
+	types.RegisterWeakSignature(types.KindCellebriteUFED, types.TypeNone, 0, []byte("[Dump]"))
 }

@@ -175,6 +175,16 @@ func detectTextSubtype(data []byte) types.TypeID {
 		}
 	}
 
+	// TopoJSON / GeoJSON
+	if bytes.HasPrefix(trimmed, []byte(`{"type":`)) || bytes.HasPrefix(trimmed, []byte(`{"type": `)) {
+		if bytes.Contains(trimmed, []byte(`"Topology"`)) || bytes.Contains(trimmed, []byte(`"transform"`)) {
+			return types.TypeTopoJSON
+		}
+		if bytes.Contains(trimmed, []byte(`"FeatureCollection"`)) || bytes.Contains(trimmed, []byte(`"Feature"`)) {
+			return types.TypeGeoJSON
+		}
+	}
+
 	// 2. Clear Prefixes
 	if bytes.HasPrefix(trimmed, []byte("<?php")) {
 		return types.TypePHPScript

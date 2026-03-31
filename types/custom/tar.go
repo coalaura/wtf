@@ -36,6 +36,8 @@ func DetectTar(b types.Buffer) *types.Metadata {
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeSlackwarePackage}
 				case "ComicInfo.xml", "comicinfo.xml":
 					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeComicBook}
+				case "metadata", "deploy":
+					return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeFlatpak}
 				}
 			}
 		}
