@@ -52,6 +52,18 @@ func DetectXMLSubtypes(b types.Buffer) *types.Metadata {
 			return &types.Metadata{Kind: types.KindSOAPMessage, Confidence: types.ConfidenceMedium}
 		}
 
+		if bytes.Contains(data, []byte("<COLLADA")) {
+			return &types.Metadata{Kind: types.KindColladaModel, Confidence: types.ConfidenceMedium}
+		}
+
+		if bytes.Contains(data, []byte("<X3D")) {
+			return &types.Metadata{Kind: types.KindX3DModel, Confidence: types.ConfidenceMedium}
+		}
+
+		if bytes.Contains(data, []byte("<gml:")) {
+			return &types.Metadata{Kind: types.KindGeographyMarkupLanguage, Confidence: types.ConfidenceMedium}
+		}
+
 		return &types.Metadata{Kind: types.KindXMLDocument, Confidence: types.ConfidenceMedium}
 	}
 

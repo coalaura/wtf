@@ -368,6 +368,21 @@ func detectTextSubtype(data []byte) types.TypeID {
 		return types.TypeRustSource
 	}
 
+	// Zig
+	if bytes.HasPrefix(code, []byte("const std = @import(")) || bytes.Contains(code, []byte("pub fn ")) {
+		return types.TypeZigSource
+	}
+
+	// Nim
+	if bytes.Contains(code, []byte("proc ")) && bytes.Contains(code, []byte("=")) && bytes.Contains(code, []byte("import ")) {
+		return types.TypeNimSource
+	}
+
+	// Solidity
+	if bytes.HasPrefix(code, []byte("pragma solidity")) {
+		return types.TypeSoliditySource
+	}
+
 	// F#
 	if bytes.HasPrefix(code, []byte("open ")) || bytes.HasPrefix(code, []byte("let ")) {
 		if bytes.Contains(code, []byte("type ")) && bytes.Contains(code, []byte("member ")) {

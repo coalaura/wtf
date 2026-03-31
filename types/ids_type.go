@@ -78,6 +78,7 @@ const (
 	TypeDockerfile
 	TypeDownloadableSounds
 	TypeDSA
+	TypeDSIKModule
 	TypeEAC3
 	TypeEC
 	TypeElixirScript
@@ -196,6 +197,7 @@ const (
 	TypeNewASCIIWithCRC
 	TypeNginxLog
 	TypeNikonRAW
+	TypeNimSource
 	TypeNixExpression
 	TypeNpmPackage
 	TypeNuGetPackage
@@ -216,6 +218,8 @@ const (
 	TypeOpenRasterImage
 	TypeOpusAudio
 	TypeOrgMode
+	TypeOsuBeatmap
+	TypeOsuSkin
 	TypePAM
 	TypePanasonicRAW
 	TypePBMASCII
@@ -274,6 +278,7 @@ const (
 	TypeSkinnableFrame
 	TypeSlackwarePackage
 	TypeSocket
+	TypeSoliditySource
 	TypeSonyRAW
 	TypeSonyRAWSR2
 	TypeSoundFont2
@@ -313,6 +318,7 @@ const (
 	TypeVersion1
 	TypeVersion2
 	TypeVersion3
+	TypeVersion4
 	TypeVersion5
 	TypeVersion7
 	TypeVersion8
@@ -339,6 +345,7 @@ const (
 	TypeXMLPaperSpecification
 	TypeXSLTStylesheet
 	TypeYAMLConfiguration
+	TypeZigSource
 	TypeZlibCompressed
 	TypeZshScript
 	MaxTypes
@@ -420,6 +427,7 @@ var typeNames = [...]string{
 	TypeDockerfile:                         "Dockerfile",
 	TypeDownloadableSounds:                 "Downloadable Sounds",
 	TypeDSA:                                "DSA",
+	TypeDSIKModule:                         "DSIK Module",
 	TypeEAC3:                               "E-AC-3",
 	TypeEC:                                 "EC",
 	TypeElixirScript:                       "Elixir Script",
@@ -538,6 +546,7 @@ var typeNames = [...]string{
 	TypeNewASCIIWithCRC:                             "New ASCII with CRC",
 	TypeNginxLog:                                    "Nginx Log",
 	TypeNikonRAW:                                    "Nikon RAW",
+	TypeNimSource:                                   "Nim Source",
 	TypeNixExpression:                               "Nix Expression",
 	TypeNpmPackage:                                  "npm Package",
 	TypeNuGetPackage:                                "NuGet Package",
@@ -558,6 +567,8 @@ var typeNames = [...]string{
 	TypeOpenRasterImage:                             "OpenRaster Image",
 	TypeOpusAudio:                                   "Opus Audio",
 	TypeOrgMode:                                     "Org Mode",
+	TypeOsuBeatmap:                                  "osu! Beatmap",
+	TypeOsuSkin:                                     "osu! Skin",
 	TypePAM:                                         "PAM",
 	TypePanasonicRAW:                                "Panasonic RAW",
 	TypePBMASCII:                                    "PBM ASCII",
@@ -616,6 +627,7 @@ var typeNames = [...]string{
 	TypeSkinnableFrame:                              "Skinnable Frame",
 	TypeSlackwarePackage:                            "Slackware Package",
 	TypeSocket:                                      "Socket",
+	TypeSoliditySource:                              "Solidity Source",
 	TypeSonyRAW:                                     "Sony RAW",
 	TypeSonyRAWSR2:                                  "Sony SR2 RAW",
 	TypeSoundFont2:                                  "SoundFont 2",
@@ -655,6 +667,7 @@ var typeNames = [...]string{
 	TypeVersion1:                                    "Version 1",
 	TypeVersion2:                                    "Version 2",
 	TypeVersion3:                                    "Version 3",
+	TypeVersion4:                                    "Version 4",
 	TypeVersion5:                                    "Version 5",
 	TypeVersion7:                                    "Version 7",
 	TypeVersion8:                                    "Version 8",
@@ -681,6 +694,7 @@ var typeNames = [...]string{
 	TypeXMLPaperSpecification:                       "XML Paper Specification",
 	TypeXSLTStylesheet:                              "XSLT Stylesheet",
 	TypeYAMLConfiguration:                           "YAML Configuration",
+	TypeZigSource:                                   "Zig Source",
 	TypeZlibCompressed:                              "Zlib Compressed",
 	TypeZshScript:                                   "Zsh Script",
 }

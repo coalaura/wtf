@@ -16,6 +16,7 @@ var subtypeMap = map[KindID][]TypeID{
 	KindFATFilesystem:         {TypeFAT12, TypeFAT16, TypeFAT32},
 	KindGHCiInterface:         {Type32Bit, Type64Bit},
 	KindGIFImage:              {TypeGIF87a, TypeGIF89a},
+	KindGuitarProTablature:    {TypeVersion3, TypeVersion4, TypeVersion5},
 	KindGzipData:              {TypeBGZF},
 	KindHighEntropyData:       {TypeBinary, TypeEncrypted, TypeHighEntropy},
 	KindICOCURImage:           {TypeWindowsCursor, TypeWindowsIcon},
@@ -48,7 +49,7 @@ var subtypeMap = map[KindID][]TypeID{
 	KindPortableExecutable:    {TypeWindowsLE, TypeWindowsLX, TypeWindowsNE},
 	KindQCOWDiskImage:         {TypeQCOW1, TypeQCOW2},
 	KindRARArchive:            {TypeLegacy, TypeVersion5},
-	KindRIFFContainer:         {TypeAVIVideo, TypeAfterEffectsProject, TypeCDAAudio, TypeCorelDRAWDocument, TypeCubaseProject, TypeDownloadableSounds, TypeHDPhoto, TypeMIDIAudio, TypeQCPAudio, TypeRF64Audio, TypeRIFFPalette, TypeSoundFont2, TypeWAVAudio, TypeWebPImage, TypeWindowsAnimatedCursor},
+	KindRIFFContainer:         {TypeAVIVideo, TypeAfterEffectsProject, TypeCDAAudio, TypeCorelDRAWDocument, TypeCubaseProject, TypeDSIKModule, TypeDownloadableSounds, TypeHDPhoto, TypeMIDIAudio, TypeQCPAudio, TypeRF64Audio, TypeRIFFPalette, TypeSoundFont2, TypeWAVAudio, TypeWebPImage, TypeWindowsAnimatedCursor},
 	KindRagePackageFormat:     {TypeRPF0, TypeRPF2, TypeRPF3, TypeRPF4, TypeRPF6, TypeRPF7},
 	KindSQLite3WriteAheadLog:  {TypeBigEndian, TypeLittleEndian},
 	KindSQLiteDatabase:        {TypeGeoPackage, TypeMBTiles},
@@ -62,7 +63,7 @@ var subtypeMap = map[KindID][]TypeID{
 	KindWebAssemblyModule:     {TypeASCII},
 	KindWindowsThumbnailCache: {TypeIMMM},
 	KindXMLDocument:           {TypeXSLTStylesheet},
-	KindZIPArchive:            {Type3MFDocument, TypeAPPXPackage, TypeAndroidAppBundle, TypeAndroidArchive, TypeAndroidPackage, TypeAndroidPackageX, TypeAndroidSplitAPKSet, TypeAndroidSystemPackage, TypeBitwig, TypeCeltx, TypeComicBook, TypeEPUBDocument, TypeEmpty, TypeFabricMod, TypeFirefoxExtension, TypeForgeMod, TypeIOSApplicationArchive, TypeJavaArchive, TypeJavaEnterpriseArchive, TypeJavaWebArchive, TypeKMZArchive, TypeKerasModel, TypeKritaDocument, TypeLOVEGame, TypeMSIXPackage, TypeMicrosoftExcelAddIn, TypeMicrosoftExcelMacroEnabledTemplate, TypeMicrosoftExcelMacroEnabledWorkbook, TypeMicrosoftExcelTemplate, TypeMicrosoftExcelWorkbook, TypeMicrosoftPowerPointAddIn, TypeMicrosoftPowerPointMacroEnabledPresentation, TypeMicrosoftPowerPointMacroEnabledSlideshow, TypeMicrosoftPowerPointMacroEnabledTemplate, TypeMicrosoftPowerPointPresentation, TypeMicrosoftPowerPointSlideshow, TypeMicrosoftPowerPointTemplate, TypeMicrosoftWordDocument, TypeMicrosoftWordMacroEnabledDocument, TypeMicrosoftWordMacroEnabledTemplate, TypeMicrosoftWordTemplate, TypeMinecraftResourcePack, TypeNone, TypeNuGetPackage, TypeOpenDocumentChart, TypeOpenDocumentDatabase, TypeOpenDocumentFormula, TypeOpenDocumentGraphics, TypeOpenDocumentImage, TypeOpenDocumentPresentation, TypeOpenDocumentSpreadsheet, TypeOpenDocumentText, TypeOpenRasterImage, TypePSVita, TypeProcreate, TypePyTorchModel, TypePythonWheel, TypeStudioOne, TypeVisualStudioExtension, TypeXMLPaperSpecification},
+	KindZIPArchive:            {Type3MFDocument, TypeAPPXPackage, TypeAndroidAppBundle, TypeAndroidArchive, TypeAndroidPackage, TypeAndroidPackageX, TypeAndroidSplitAPKSet, TypeAndroidSystemPackage, TypeBitwig, TypeCeltx, TypeComicBook, TypeEPUBDocument, TypeEmpty, TypeFabricMod, TypeFirefoxExtension, TypeForgeMod, TypeIOSApplicationArchive, TypeJavaArchive, TypeJavaEnterpriseArchive, TypeJavaWebArchive, TypeKMZArchive, TypeKerasModel, TypeKritaDocument, TypeLOVEGame, TypeMSIXPackage, TypeMicrosoftExcelAddIn, TypeMicrosoftExcelMacroEnabledTemplate, TypeMicrosoftExcelMacroEnabledWorkbook, TypeMicrosoftExcelTemplate, TypeMicrosoftExcelWorkbook, TypeMicrosoftPowerPointAddIn, TypeMicrosoftPowerPointMacroEnabledPresentation, TypeMicrosoftPowerPointMacroEnabledSlideshow, TypeMicrosoftPowerPointMacroEnabledTemplate, TypeMicrosoftPowerPointPresentation, TypeMicrosoftPowerPointSlideshow, TypeMicrosoftPowerPointTemplate, TypeMicrosoftWordDocument, TypeMicrosoftWordMacroEnabledDocument, TypeMicrosoftWordMacroEnabledTemplate, TypeMicrosoftWordTemplate, TypeMinecraftResourcePack, TypeNone, TypeNuGetPackage, TypeOpenDocumentChart, TypeOpenDocumentDatabase, TypeOpenDocumentFormula, TypeOpenDocumentGraphics, TypeOpenDocumentImage, TypeOpenDocumentPresentation, TypeOpenDocumentSpreadsheet, TypeOpenDocumentText, TypeOpenRasterImage, TypeOsuBeatmap, TypeOsuSkin, TypePSVita, TypeProcreate, TypePyTorchModel, TypePythonWheel, TypeStudioOne, TypeVisualStudioExtension, TypeXMLPaperSpecification},
 	KindZstandardArchive:      {TypeSkinnableFrame},
 }
 

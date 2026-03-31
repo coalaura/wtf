@@ -9,6 +9,8 @@ func init() {
 	types.RegisterSignature(types.KindGlyphBitmapDistributionFormat, types.TypeNone, 0, []byte("STARTFONT "))
 	types.RegisterSignature(types.KindOpenTypeFont, types.TypeNone, 0, []byte("OTTO"))
 	types.RegisterSignature(types.KindPCFFont, types.TypeNone, 0, []byte("\x01fcp"))
+	types.RegisterSignature(types.KindPortableFontResource, types.TypeNone, 0, []byte("PFR0"))
+	types.RegisterSignature(types.KindPortableFontResource, types.TypeNone, 0, []byte("PFR1"))
 	types.RegisterSignature(types.KindPSFFont, types.TypeNone, 0, []byte{0x36, 0x04})
 	types.RegisterSignature(types.KindPSFFont, types.TypeNone, 0, []byte{0x72, 0xb5, 0x4a, 0x86})
 	types.RegisterSignature(types.KindTrueTypeCollection, types.TypeNone, 0, []byte("ttcf"))

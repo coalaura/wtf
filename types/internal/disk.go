@@ -81,6 +81,7 @@ func init() {
 	types.RegisterSignature(types.KindZFSFilesystem, types.TypeNone, 0, []byte{0x0c, 0xb1, 0xba, 0x00})
 
 	types.RegisterWeakSignature(types.KindApplePartitionMap, types.TypeNone, 512, []byte("ER"))
+	types.RegisterWeakSignature(types.KindMasterBootRecord, types.TypeNone, 510, []byte{0x55, 0xaa})
 	types.RegisterWeakSignature(types.KindMinixFilesystem, types.TypeNone, 1040, []byte{0x13, 0x7f})
 	types.RegisterWeakSignature(types.KindMinixFilesystem, types.TypeNone, 1040, []byte{0x14, 0x7f})
 	types.RegisterWeakSignature(types.KindMinixFilesystem, types.TypeNone, 1040, []byte{0x24, 0x78})

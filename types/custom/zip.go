@@ -41,6 +41,8 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 		hasStudioOneSong    bool
 		hasBitwigProject    bool
 		hasPSVitaEboot      bool
+		hasOsuBeatmap       bool
+		hasOsuSkin          bool
 		firstFile           = true
 	)
 
@@ -180,6 +182,10 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 			hasBitwigProject = true
 		} else if matchASCII(name, "eboot.bin") || matchASCII(name, "sce_sys/param.sfo") {
 			hasPSVitaEboot = true
+		} else if hasSuffixASCII(name, ".osu") {
+			hasOsuBeatmap = true
+		} else if matchASCII(name, "skin.ini") {
+			hasOsuSkin = true
 		} else if matchASCII(name, "metadata/buildversionhistory.plist") || hasPrefixASCII(name, "index/document.iwa") {
 			return &types.Metadata{Kind: types.KindAppleiWorkDocument}
 		}
@@ -367,6 +373,14 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 
 	if hasPSVitaEboot {
 		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypePSVita}
+	}
+
+	if hasOsuBeatmap {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeOsuBeatmap}
+	}
+
+	if hasOsuSkin {
+		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeOsuSkin}
 	}
 
 	return &types.Metadata{Kind: types.KindZIPArchive}

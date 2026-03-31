@@ -11,6 +11,7 @@ func init() {
 	types.RegisterSignature(types.KindBinkVideo, types.TypeNone, 0, []byte("BIKh"))
 	types.RegisterSignature(types.KindBinkVideo, types.TypeNone, 0, []byte("BIKi"))
 	types.RegisterSignature(types.KindCineFormVideo, types.TypeNone, 0, []byte("CFHD"))
+	types.RegisterSignature(types.KindCRIWAREVideo, types.TypeNone, 0, []byte("CRID"))
 	types.RegisterSignature(types.KindDiracVideo, types.TypeNone, 0, []byte("BBCD"))
 	types.RegisterSignature(types.KindDVRMSVideo, types.TypeNone, 0, []byte{0x05, 0x16, 0x11, 0xc3, 0x53, 0x12, 0x04, 0x11, 0xa3, 0x14, 0x00, 0x90, 0x27, 0x51, 0x46, 0xf3})
 	types.RegisterSignature(types.KindElitePlusCommander, types.TypeNone, 0, []byte("ELITE Co"))

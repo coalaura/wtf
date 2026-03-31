@@ -1943,6 +1943,18 @@ func detectTextSubtype(data []byte) TypeID {
 		return TypeRustSource
 	}
 
+	if bytes.HasPrefix(code, []byte("const std = @import(")) || bytes.Contains(code, []byte("pub fn ")) {
+		return TypeZigSource
+	}
+
+	if bytes.Contains(code, []byte("proc ")) && bytes.Contains(code, []byte("=")) && bytes.Contains(code, []byte("import ")) {
+		return TypeNimSource
+	}
+
+	if bytes.HasPrefix(code, []byte("pragma solidity")) {
+		return TypeSoliditySource
+	}
+
 	if bytes.HasPrefix(code, []byte("open ")) || bytes.HasPrefix(code, []byte("let ")) {
 		if bytes.Contains(code, []byte("type ")) && bytes.Contains(code, []byte("member ")) {
 			return TypeFSharpSource
@@ -2537,6 +2549,18 @@ func DetectXMLSubtypes(b Buffer) *Metadata {
 			return &Metadata{Kind: KindSOAPMessage, Confidence: ConfidenceMedium}
 		}
 
+		if bytes.Contains(data, []byte("<COLLADA")) {
+			return &Metadata{Kind: KindColladaModel, Confidence: ConfidenceMedium}
+		}
+
+		if bytes.Contains(data, []byte("<X3D")) {
+			return &Metadata{Kind: KindX3DModel, Confidence: ConfidenceMedium}
+		}
+
+		if bytes.Contains(data, []byte("<gml:")) {
+			return &Metadata{Kind: KindGeographyMarkupLanguage, Confidence: ConfidenceMedium}
+		}
+
 		return &Metadata{Kind: KindXMLDocument, Confidence: ConfidenceMedium}
 	}
 
@@ -2578,6 +2602,8 @@ func DetectZIPContainer(b Buffer) *Metadata {
 		hasStudioOneSong    bool
 		hasBitwigProject    bool
 		hasPSVitaEboot      bool
+		hasOsuBeatmap       bool
+		hasOsuSkin          bool
 		firstFile           = true
 	)
 
@@ -2717,6 +2743,10 @@ func DetectZIPContainer(b Buffer) *Metadata {
 			hasBitwigProject = true
 		} else if matchASCII(name, "eboot.bin") || matchASCII(name, "sce_sys/param.sfo") {
 			hasPSVitaEboot = true
+		} else if hasSuffixASCII(name, ".osu") {
+			hasOsuBeatmap = true
+		} else if matchASCII(name, "skin.ini") {
+			hasOsuSkin = true
 		} else if matchASCII(name, "metadata/buildversionhistory.plist") || hasPrefixASCII(name, "index/document.iwa") {
 			return &Metadata{Kind: KindAppleiWorkDocument}
 		}
@@ -2899,6 +2929,14 @@ func DetectZIPContainer(b Buffer) *Metadata {
 
 	if hasPSVitaEboot {
 		return &Metadata{Kind: KindZIPArchive, Type: TypePSVita}
+	}
+
+	if hasOsuBeatmap {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeOsuBeatmap}
+	}
+
+	if hasOsuSkin {
+		return &Metadata{Kind: KindZIPArchive, Type: TypeOsuSkin}
 	}
 
 	return &Metadata{Kind: KindZIPArchive}

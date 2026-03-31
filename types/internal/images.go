@@ -11,6 +11,7 @@ func init() {
 	types.RegisterSignature(types.KindAppleTextureImage, types.TypeNone, 0, []byte("ATX "))
 	types.RegisterSignature(types.KindARRIRAWImage, types.TypeNone, 0, []byte("ARRI"))
 	types.RegisterSignature(types.KindASTCTextureImage, types.TypeNone, 0, []byte{0x13, 0xab, 0xa1, 0x5c})
+	types.RegisterSignature(types.KindBasisUniversalImage, types.TypeNone, 0, []byte("sB\x2d\x54"))
 	types.RegisterSignature(types.KindBlizzardTextureImage, types.TypeNone, 0, []byte("BLP1"))
 	types.RegisterSignature(types.KindBlizzardTextureImage, types.TypeNone, 0, []byte("BLP2"))
 	types.RegisterSignature(types.KindBMPImage, types.TypeNone, 0, []byte("BM"))
@@ -101,6 +102,7 @@ func init() {
 	types.RegisterSignature(types.KindRadianceHDRImage, types.TypeNone, 0, []byte("#?RADIANCE"))
 	types.RegisterSignature(types.KindRadianceHDRImage, types.TypeNone, 0, []byte("#?RGBE"))
 	types.RegisterSignature(types.KindREDRAWImage, types.TypeNone, 4, []byte("RED2"))
+	types.RegisterSignature(types.KindSeattleFilmWorksImage, types.TypeNone, 0, []byte("SFW94A"))
 	types.RegisterSignature(types.KindSGIImage, types.TypeNone, 0, []byte{0x01, 0xda, 0x01, 0x01, 0x00, 0x03})
 	types.RegisterSignature(types.KindSGIImage, types.TypeNone, 0, []byte{0x01, 0xda})
 	types.RegisterSignature(types.KindShareazaThumbnailImage, types.TypeNone, 0, []byte("RAZATDB1"))
@@ -121,6 +123,7 @@ func init() {
 	types.RegisterSignature(types.KindWordPerfectGraphicsImage, types.TypeNone, 0, []byte("\xffWPC"))
 	types.RegisterSignature(types.KindXBitMapImage, types.TypeNone, 0, []byte("#define "))
 	types.RegisterSignature(types.KindXPMImage, types.TypeNone, 0, []byte("/* XPM */"))
+	types.RegisterSignature(types.KindXWindowDumpImage, types.TypeNone, 4, []byte{0x00, 0x00, 0x00, 0x07})
 	types.RegisterSignature(types.KindZoomBrowserIndex, types.TypeNone, 0, []byte("zbex"))
 
 	types.RegisterMaskedSignature(types.KindDjVuDocument, types.TypeNone, 0, []byte("AT&TFORM\x00\x00\x00\x00DJVI"), []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
