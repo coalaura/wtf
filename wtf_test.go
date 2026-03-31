@@ -1,8 +1,12 @@
 package main
 
 import (
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/coalaura/wtf/types"
@@ -12,6 +16,33 @@ type testCase struct {
 	file string
 	kind types.KindID
 	typ  types.TypeID
+}
+
+func TestConsistency(t *testing.T) {
+	typeNames := getIdentifiers(t, "types/ids_type.go", "Type")
+	kindNames := getIdentifiers(t, "types/ids_kind.go", "Kind")
+
+	for i := types.TypeID(1); i < types.MaxTypes; i++ {
+		if i.String() == "" {
+			name := "Unknown Identifier"
+			if int(i) < len(typeNames) {
+				name = typeNames[i]
+			}
+
+			t.Errorf("Type %s (%d) is missing a label in typeNames array", name, i)
+		}
+	}
+
+	for i := types.KindID(1); i < types.MaxKinds; i++ {
+		if i.String() == "Unknown" {
+			name := "Unknown Identifier"
+			if int(i) < len(kindNames) {
+				name = kindNames[i]
+			}
+
+			t.Errorf("Kind %s (%d) is missing a label in kindNames array", name, i)
+		}
+	}
 }
 
 func TestDetectFixtures(t *testing.T) {
@@ -110,4 +141,37 @@ func TestDetectFixtures(t *testing.T) {
 			}
 		})
 	}
+}
+
+func getIdentifiers(t *testing.T, filename, prefix string) []string {
+	fset := token.NewFileSet()
+
+	node, err := parser.ParseFile(fset, filename, nil, 0)
+	if err != nil {
+		t.Fatalf("Failed to parse %s: %v", filename, err)
+	}
+
+	var names []string
+
+	for _, decl := range node.Decls {
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok || genDecl.Tok != token.CONST {
+			continue
+		}
+
+		for _, spec := range genDecl.Specs {
+			vs, ok := spec.(*ast.ValueSpec)
+			if !ok {
+				continue
+			}
+
+			for _, name := range vs.Names {
+				if strings.HasPrefix(name.Name, prefix) {
+					names = append(names, name.Name)
+				}
+			}
+		}
+	}
+
+	return names
 }

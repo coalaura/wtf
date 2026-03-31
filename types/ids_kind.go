@@ -741,6 +741,7 @@ const (
 	KindZstandardArchive
 	KindZstandardDictionary
 	KindZXTape
+	MaxKinds
 )
 
 var kindNames = [...]string{

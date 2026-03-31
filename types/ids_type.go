@@ -329,6 +329,7 @@ const (
 	TypeYAMLConfiguration
 	TypeZlibCompressed
 	TypeZshScript
+	MaxTypes
 )
 
 var typeNames = [...]string{

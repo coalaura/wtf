@@ -280,11 +280,11 @@ func sortIDs(kindPath, typePath string) int {
 					}
 
 					for _, name := range vs.Names {
-						if strings.HasPrefix(name.Name, "Kind") {
+						if strings.HasPrefix(name.Name, "Kind") || name.Name == "MaxKinds" {
 							if _, exists := kindsMap[name.Name]; !exists {
 								kindsMap[name.Name] = `""`
 							}
-						} else if strings.HasPrefix(name.Name, "Type") {
+						} else if strings.HasPrefix(name.Name, "Type") || name.Name == "MaxTypes" {
 							if _, exists := typesMap[name.Name]; !exists {
 								typesMap[name.Name] = `""`
 							}
@@ -337,12 +337,23 @@ func sortIDs(kindPath, typePath string) int {
 	parseFile(kindPath)
 	parseFile(typePath)
 
-	var kinds []string
+	var (
+		kinds       []string
+		hasMaxKinds bool
+	)
 
 	for k := range kindsMap {
-		if k != "KindUnknown" {
-			kinds = append(kinds, k)
+		if k == "KindUnknown" {
+			continue
 		}
+
+		if k == "MaxKinds" {
+			hasMaxKinds = true
+
+			continue
+		}
+
+		kinds = append(kinds, k)
 	}
 
 	sort.Slice(kinds, func(i, j int) bool {
@@ -351,12 +362,27 @@ func sortIDs(kindPath, typePath string) int {
 
 	kinds = append([]string{"KindUnknown"}, kinds...)
 
-	var typesList []string
+	if hasMaxKinds {
+		kinds = append(kinds, "MaxKinds")
+	}
+
+	var (
+		typesList   []string
+		hasMaxTypes bool
+	)
 
 	for t := range typesMap {
-		if t != "TypeNone" {
-			typesList = append(typesList, t)
+		if t == "TypeNone" {
+			continue
 		}
+
+		if t == "MaxTypes" {
+			hasMaxTypes = true
+
+			continue
+		}
+
+		typesList = append(typesList, t)
 	}
 
 	sort.Slice(typesList, func(i, j int) bool {
@@ -364,6 +390,10 @@ func sortIDs(kindPath, typePath string) int {
 	})
 
 	typesList = append([]string{"TypeNone"}, typesList...)
+
+	if hasMaxTypes {
+		typesList = append(typesList, "MaxTypes")
+	}
 
 	var kindBuf bytes.Buffer
 
@@ -382,6 +412,10 @@ func sortIDs(kindPath, typePath string) int {
 	kindBuf.WriteString(")\n\nvar kindNames = [...]string{\n")
 
 	for _, k := range kinds {
+		if k == "MaxKinds" {
+			continue
+		}
+
 		fmt.Fprintf(&kindBuf, "\t%s: %s,\n", k, kindsMap[k])
 	}
 
@@ -428,6 +462,9 @@ func sortIDs(kindPath, typePath string) int {
 	typeBuf.WriteString(")\n\nvar typeNames = [...]string{\n")
 
 	for _, t := range typesList {
+		if t == "MaxTypes" {
+			continue
+		}
 		fmt.Fprintf(&typeBuf, "\t%s: %s,\n", t, typesMap[t])
 	}
 
@@ -457,13 +494,21 @@ func sortIDs(kindPath, typePath string) int {
 	var validTypes int
 
 	for _, t := range typesList {
+		if t == "MaxTypes" {
+			continue
+		}
+
 		if !ignoredTypes[t] {
 			validTypes++
 		}
 	}
 
-	// len(kinds) includes KindUnknown, so we subtract 1
-	return (len(kinds) - 1) + validTypes
+	kindCount := len(kinds) - 1 // subtract KindUnknown
+	if hasMaxKinds {
+		kindCount-- // subtract MaxKinds
+	}
+
+	return kindCount + validTypes
 }
 
 func sortRegistrations(dir string) {
