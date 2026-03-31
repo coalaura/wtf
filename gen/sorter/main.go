@@ -49,6 +49,7 @@ var ignoredTypes = map[string]bool{
 	"TypeVersion1":   true,
 	"TypeVersion2":   true,
 	"TypeVersion3":   true,
+	"TypeVersion4":   true,
 	"TypeVersion5":   true,
 	"TypeVersion7":   true,
 	"TypeVersion8":   true,
@@ -158,6 +159,9 @@ var ignoredTypes = map[string]bool{
 	"TypeClojureScript":              true,
 	"TypeFSharpSource":               true,
 	"TypeShellcheckDirective":        true,
+	"TypeZigSource":                  true,
+	"TypeSoliditySource":             true,
+	"TypeNimSource":                  true,
 
 	// Templates / Components
 	"TypeVueComponent":       true,
