@@ -202,6 +202,8 @@ var ignoredTypes = map[string]bool{
 	"TypeDiffPatch":     true,
 	"TypeGitDiff":       true,
 	"TypeCommitMessage": true,
+	"TypeGeoJSON":       true,
+	"TypeTopoJSON":      true,
 
 	// Configuration Files
 	"TypeSSHConfig": true,
