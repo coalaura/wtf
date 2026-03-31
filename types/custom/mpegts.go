@@ -8,7 +8,7 @@ func DetectMPEGTransport(b types.Buffer) *types.Metadata {
 	}
 
 	if b.Len() >= 4+3*192 && b[4] == 0x47 && b[196] == 0x47 && b[388] == 0x47 {
-		return &types.Metadata{Kind: types.KindMPEG2TransportStream, Type: types.TypeM2TSBDAV, Confidence: types.ConfidenceMedium}
+		return &types.Metadata{Kind: types.KindMPEG2TransportStream, Type: types.TypeBDAV, Confidence: types.ConfidenceMedium}
 	}
 
 	return nil

@@ -15,10 +15,10 @@ func DetectAC3(b Buffer) *Metadata {
 	if b.Len() >= 6 && b[0] == 0x0b && b[1] == 0x77 {
 		bsid := (b[5] >> 3) & 0x1f
 		if bsid <= 10 {
-			return &Metadata{Kind: KindMPEGAudioFrame, Type: TypeAC3}
+			return &Metadata{Kind: KindMPEGAudioFrame, Type: TypeAC3Audio}
 		}
 
-		return &Metadata{Kind: KindMPEGAudioFrame, Type: TypeEAC3}
+		return &Metadata{Kind: KindMPEGAudioFrame, Type: TypeEAC3Audio}
 	}
 
 	return nil
@@ -1150,7 +1150,7 @@ func DetectMPEGTransport(b Buffer) *Metadata {
 	}
 
 	if b.Len() >= 4+3*192 && b[4] == 0x47 && b[196] == 0x47 && b[388] == 0x47 {
-		return &Metadata{Kind: KindMPEG2TransportStream, Type: TypeM2TSBDAV, Confidence: ConfidenceMedium}
+		return &Metadata{Kind: KindMPEG2TransportStream, Type: TypeBDAV, Confidence: ConfidenceMedium}
 	}
 
 	return nil
@@ -2500,7 +2500,7 @@ func DetectTorrent(b Buffer) *Metadata {
 		return nil
 	}
 
-	return &Metadata{Kind: KindTorrent}
+	return &Metadata{Kind: KindTorrentDocument}
 }
 
 func DetectXMLSubtypes(b Buffer) *Metadata {

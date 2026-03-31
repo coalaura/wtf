@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -219,6 +220,93 @@ var ignoredTypes = map[string]bool{
 	"TypeBinary":      true,
 }
 
+var removeEntries = []string{
+	"KindCALSImage",
+	"KindDolphinRVZ",
+	"KindEFax",
+	"KindElectronicArtsBigArchive",
+	"KindExpertWitnessFormat",
+	"KindFlowCytometryStandard",
+	"KindGDSII",
+	"KindHealthLevel7",
+	"KindIdRoQVideo",
+	"KindLuraDocument",
+	"KindMacOSEventsLog",
+	"KindMicrosoftInfo",
+	"KindMicrosoftWinMobileNoteDocument",
+	"KindNationalImageryTransmission",
+	"KindNationalTransferFormat",
+	"KindNintendoBCFNT",
+	"KindNintendoBFLYT",
+	"KindNintendoBRRES",
+	"KindNintendoTPL",
+	"KindOpenStreetMapPBF",
+	"KindPacketSnifferXCP",
+	"KindPathWayMap",
+	"KindPowerISODAA",
+	"KindQuickReport",
+	"KindRagePackageFormat",
+	"KindRealMedia",
+	"KindRuntimeSoftwareImage",
+	"KindTargetExpress",
+	"KindUniversalDiskFormat",
+	"KindVBScriptEncoded",
+	"KindVCard",
+	"KindValvePak",
+	"KindVideoCD",
+	"KindWalkmanMP3",
+	"KindWebArchive",
+	"KindWebVTTSubtitle",
+	"KindWhereIsItCatalog",
+	"KindWiiGameCubeTHP",
+	"KindWinPharoahCapture",
+	"KindWinPharoahFilter",
+	"KindWindowsResource",
+	"KindWindowsShortcut",
+	"KindWwisePackage",
+	"KindXPCOMLibraries",
+	"KindZBackup",
+	"TypeAC3",
+	"TypeADTS",
+	"TypeB4",
+	"TypeBA2",
+	"TypeBethesdaArchive2",
+	"TypeBlockedGNUZipFormat",
+	"TypeBrotherPEC",
+	"TypeBrotherPES",
+	"TypeCAT",
+	"TypeCE",
+	"TypeCOWD",
+	"TypeDSAKey",
+	"TypeEAC3",
+	"TypeECKey",
+	"TypeHDPhotoImage",
+	"TypeHighEfficiency",
+	"TypeIMMM",
+	"TypeInternalWAD",
+	"TypeKDB",
+	"TypeKDBX",
+	"TypeKDM",
+	"TypeLIST",
+	"TypeM2TSBDAV",
+	"TypeOBJ",
+	"TypePSB",
+	"TypePSD",
+	"TypePatchWAD",
+	"TypePortableArbitraryMap",
+	"TypeQCOW1",
+	"TypeQCOW2",
+	"TypeRPF0",
+	"TypeRPF2",
+	"TypeRPF3",
+	"TypeRPF4",
+	"TypeRPF6",
+	"TypeRPF7",
+	"TypeRSAKey",
+	"TypeVMDK",
+	"TypeVMDKDescription",
+}
+
 func main() {
 	fmt.Println("Sorting ids_kind.go and ids_type.go...")
 	count := sortIDs("./ids_kind.go", "./ids_type.go")
@@ -349,7 +437,7 @@ func sortIDs(kindPath, typePath string) int {
 	)
 
 	for k := range kindsMap {
-		if k == "KindUnknown" {
+		if k == "KindUnknown" || slices.Contains(removeEntries, k) {
 			continue
 		}
 
@@ -378,7 +466,7 @@ func sortIDs(kindPath, typePath string) int {
 	)
 
 	for t := range typesMap {
-		if t == "TypeNone" {
+		if t == "TypeNone" || slices.Contains(removeEntries, t) {
 			continue
 		}
 

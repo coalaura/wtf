@@ -3,10 +3,10 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
-	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf0})
-	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf1})
-	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf8})
-	types.RegisterSignature(types.KindAACAudio, types.TypeADTS, 0, []byte{0xff, 0xf9})
+	types.RegisterSignature(types.KindAACAudio, types.TypeAudioDataTransportStream, 0, []byte{0xff, 0xf0})
+	types.RegisterSignature(types.KindAACAudio, types.TypeAudioDataTransportStream, 0, []byte{0xff, 0xf1})
+	types.RegisterSignature(types.KindAACAudio, types.TypeAudioDataTransportStream, 0, []byte{0xff, 0xf8})
+	types.RegisterSignature(types.KindAACAudio, types.TypeAudioDataTransportStream, 0, []byte{0xff, 0xf9})
 	types.RegisterSignature(types.KindAmigaOctaMED, types.TypeNone, 0, []byte("MMD0"))
 	types.RegisterSignature(types.KindAmigaOctaMED, types.TypeNone, 0, []byte("MMD1"))
 	types.RegisterSignature(types.KindAmigaOctaMED, types.TypeNone, 0, []byte("MMD2"))
@@ -104,7 +104,7 @@ func init() {
 	types.RegisterSignature(types.KindVocaloidProject, types.TypeNone, 0, []byte("VSQ4"))
 	types.RegisterSignature(types.KindVocalTecAudio, types.TypeNone, 0, []byte("[VMD]"))
 	types.RegisterSignature(types.KindVOCAudio, types.TypeNone, 0, []byte("Creative Voice File\x1a"))
-	types.RegisterSignature(types.KindWalkmanMP3, types.TypeNone, 0, []byte("WMMP"))
+	types.RegisterSignature(types.KindWalkmanMP3Audio, types.TypeNone, 0, []byte("WMMP"))
 	types.RegisterSignature(types.KindWavPackAudio, types.TypeNone, 0, []byte("wvpk"))
 	types.RegisterSignature(types.KindWavPackCorrection, types.TypeNone, 0, []byte("wvpc"))
 	types.RegisterSignature(types.KindWwiseSoundBank, types.TypeNone, 0, []byte("BKHD"))

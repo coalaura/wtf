@@ -13,9 +13,8 @@ const (
 	Type64Bit
 	Type64BitBigEndian
 	Type64BitLittleEndian
-	TypeAC3
+	TypeAC3Audio
 	TypeAdobeDNG
-	TypeADTS
 	TypeAfterEffectsProject
 	TypeAIFCAudio
 	TypeAIFFAudio
@@ -31,13 +30,13 @@ const (
 	TypeArchLinuxPackage
 	TypeASCII
 	TypeAsciiDoc
+	TypeAudioDataTransportStream
 	TypeAVIFImage
 	TypeAVIFImageSequence
 	TypeAVIVideo
-	TypeB4
-	TypeBA2
 	TypeBashScript
 	TypeBatchScript
+	TypeBDAV
 	TypeBGZF
 	TypeBigEndian
 	TypeBigTIFF
@@ -49,21 +48,21 @@ const (
 	TypeBlockDevice
 	TypeByteSwapped
 	TypeCanonRAW3Image
-	TypeCAT
+	TypeCatalog
 	TypeCDAAudio
-	TypeCE
 	TypeCeltx
 	TypeCharacterDevice
 	TypeClojureScript
 	TypeCMakeScript
 	TypeCodestream
+	TypeCOFFObject
 	TypeComicBook
 	TypeCommitMessage
 	TypeCondaPackage
 	TypeContainer
+	TypeCopyOnWrite
 	TypeCoqSource
 	TypeCorelDRAWDocument
-	TypeCOWD
 	TypeCPPSource
 	TypeCSharpSource
 	TypeCSource
@@ -71,6 +70,7 @@ const (
 	TypeCSVData
 	TypeCubaseProject
 	TypeDartSource
+	TypeDescription
 	TypeDiffPatch
 	TypeDirectory
 	TypeDjangoTemplate
@@ -79,7 +79,7 @@ const (
 	TypeDownloadableSounds
 	TypeDSA
 	TypeDSIKModule
-	TypeEAC3
+	TypeEAC3Audio
 	TypeEC
 	TypeElixirScript
 	TypeEmacsLispScript
@@ -121,7 +121,7 @@ const (
 	TypeHTTPLog
 	TypeIdrisSource
 	TypeILBMImage
-	TypeIMMM
+	TypeIMMMFormat
 	TypeINIConfiguration
 	TypeIOSApplicationArchive
 	TypeIWAD
@@ -133,25 +133,23 @@ const (
 	TypeJinjaTemplate
 	TypeJSON5Source
 	TypeJSONCSource
-	TypeKDB
-	TypeKDBX
-	TypeKDM
+	TypeKDMV
 	TypeKerasModel
 	TypeKMZArchive
 	TypeKotlinSource
 	TypeKritaDocument
+	TypeLargeDocument
 	TypeLaTeXDocument
 	TypeLatin1
 	TypeLeanSource
 	TypeLegacy
-	TypeLIST
+	TypeList
 	TypeLittleEndian
 	TypeLogData
 	TypeLOVEGame
 	TypeLuaScript
 	TypeLZ4Legacy
 	TypeLZMACompressed
-	TypeM2TSBDAV
 	TypeM4VVideo
 	TypeMakefile
 	TypeMarkdownDocument
@@ -201,7 +199,6 @@ const (
 	TypeNixExpression
 	TypeNpmPackage
 	TypeNuGetPackage
-	TypeOBJ
 	TypeObjectiveCSource
 	TypeOCIImageLayout
 	TypeOldASCII
@@ -247,28 +244,18 @@ const (
 	TypeProcreate
 	TypePropertiesFile
 	TypeProtocolBuffer
-	TypePSB
-	TypePSD
 	TypePSVita
 	TypePWAD
 	TypePythonScript
 	TypePythonSourceDistribution
 	TypePythonWheel
 	TypePyTorchModel
-	TypeQCOW1
-	TypeQCOW2
 	TypeQCPAudio
 	TypeQuickTimeMovie
 	TypeReactComponent
 	TypeReStructuredText
 	TypeRF64Audio
 	TypeRIFFPalette
-	TypeRPF0
-	TypeRPF2
-	TypeRPF3
-	TypeRPF4
-	TypeRPF6
-	TypeRPF7
 	TypeRSA
 	TypeRScript
 	TypeRubyScript
@@ -308,6 +295,7 @@ const (
 	TypeUTF8
 	TypeVagrantBox
 	TypeVerilogSource
+	TypeVersion0
 	TypeVersion035
 	TypeVersion036
 	TypeVersion037
@@ -320,13 +308,14 @@ const (
 	TypeVersion3
 	TypeVersion4
 	TypeVersion5
+	TypeVersion6
 	TypeVersion7
 	TypeVersion8
+	TypeVersionB4
+	TypeVersionCE
 	TypeVHDLSource
 	TypeVimScript
 	TypeVisualStudioExtension
-	TypeVMDK
-	TypeVMDKDescription
 	TypeVorbisAudio
 	TypeVueComponent
 	TypeWAVAudio
@@ -334,8 +323,6 @@ const (
 	TypeWebPImage
 	TypeWestwoodVQA
 	TypeWindowsAnimatedCursor
-	TypeWindowsCursor
-	TypeWindowsIcon
 	TypeWindowsLE
 	TypeWindowsLX
 	TypeWindowsMetafile
@@ -362,9 +349,8 @@ var typeNames = [...]string{
 	Type64Bit:                              "64-bit",
 	Type64BitBigEndian:                     "64-bit Big-Endian",
 	Type64BitLittleEndian:                  "64-bit Little-Endian",
-	TypeAC3:                                "AC-3",
+	TypeAC3Audio:                           "AC-3 Audio",
 	TypeAdobeDNG:                           "Adobe DNG",
-	TypeADTS:                               "ADTS",
 	TypeAfterEffectsProject:                "After Effects Project",
 	TypeAIFCAudio:                          "AIFC Audio",
 	TypeAIFFAudio:                          "AIFF Audio",
@@ -380,13 +366,13 @@ var typeNames = [...]string{
 	TypeArchLinuxPackage:                   "Arch Linux Package",
 	TypeASCII:                              "ASCII",
 	TypeAsciiDoc:                           "AsciiDoc",
+	TypeAudioDataTransportStream:           "Audio Data Transport Stream",
 	TypeAVIFImage:                          "AVIF Image",
 	TypeAVIFImageSequence:                  "AVIF Image Sequence",
 	TypeAVIVideo:                           "AVI Video",
-	TypeB4:                                 "B4",
-	TypeBA2:                                "Bethesda Archive 2",
 	TypeBashScript:                         "Bash Script",
 	TypeBatchScript:                        "Batch Script",
+	TypeBDAV:                               "BDAV",
 	TypeBGZF:                               "BGZF",
 	TypeBigEndian:                          "Big-Endian",
 	TypeBigTIFF:                            "BigTIFF",
@@ -398,21 +384,21 @@ var typeNames = [...]string{
 	TypeBlockDevice:                        "Block Device",
 	TypeByteSwapped:                        "Byte-Swapped",
 	TypeCanonRAW3Image:                     "Canon RAW 3 Image",
-	TypeCAT:                                "CAT",
+	TypeCatalog:                            "Catalog",
 	TypeCDAAudio:                           "CD Audio",
-	TypeCE:                                 "CE",
 	TypeCeltx:                              "Celtx Project",
 	TypeCharacterDevice:                    "Character Device",
 	TypeClojureScript:                      "Clojure Script",
 	TypeCMakeScript:                        "CMake Script",
 	TypeCodestream:                         "Codestream",
+	TypeCOFFObject:                         "COFF Object",
 	TypeComicBook:                          "Comic Book",
 	TypeCommitMessage:                      "Commit Message",
 	TypeCondaPackage:                       "Conda Package",
 	TypeContainer:                          "Container",
+	TypeCopyOnWrite:                        "Copy-On-Write",
 	TypeCoqSource:                          "Coq Source",
 	TypeCorelDRAWDocument:                  "CorelDRAW Document",
-	TypeCOWD:                               "COWD",
 	TypeCPPSource:                          "C++ Source",
 	TypeCSharpSource:                       "C# Source",
 	TypeCSource:                            "C Source",
@@ -420,6 +406,7 @@ var typeNames = [...]string{
 	TypeCSVData:                            "CSV Data",
 	TypeCubaseProject:                      "Cubase Project",
 	TypeDartSource:                         "Dart Source",
+	TypeDescription:                        "Description",
 	TypeDiffPatch:                          "Diff/Patch",
 	TypeDirectory:                          "Directory",
 	TypeDjangoTemplate:                     "Django Template",
@@ -428,7 +415,7 @@ var typeNames = [...]string{
 	TypeDownloadableSounds:                 "Downloadable Sounds",
 	TypeDSA:                                "DSA",
 	TypeDSIKModule:                         "DSIK Module",
-	TypeEAC3:                               "E-AC-3",
+	TypeEAC3Audio:                          "E-AC-3 Audio",
 	TypeEC:                                 "EC",
 	TypeElixirScript:                       "Elixir Script",
 	TypeEmacsLispScript:                    "Emacs Lisp Script",
@@ -470,7 +457,7 @@ var typeNames = [...]string{
 	TypeHTTPLog:                            "HTTP Log",
 	TypeIdrisSource:                        "Idris Source",
 	TypeILBMImage:                          "ILBM Image",
-	TypeIMMM:                               "IMMM",
+	TypeIMMMFormat:                         "IMMM Format",
 	TypeINIConfiguration:                   "INI Configuration",
 	TypeIOSApplicationArchive:              "iOS Application Archive",
 	TypeIWAD:                               "IWAD",
@@ -482,25 +469,23 @@ var typeNames = [...]string{
 	TypeJinjaTemplate:                      "Jinja Template",
 	TypeJSON5Source:                        "JSON5 Source",
 	TypeJSONCSource:                        "JSONC Source",
-	TypeKDB:                                "KDB",
-	TypeKDBX:                               "KDBX",
-	TypeKDM:                                "KDM",
+	TypeKDMV:                               "KDMV",
 	TypeKerasModel:                         "Keras Model",
 	TypeKMZArchive:                         "KMZ Archive",
 	TypeKotlinSource:                       "Kotlin Source",
 	TypeKritaDocument:                      "Krita Document",
+	TypeLargeDocument:                      "Large Document Format",
 	TypeLaTeXDocument:                      "LaTeX Document",
 	TypeLatin1:                             "Latin-1",
 	TypeLeanSource:                         "Lean Source",
 	TypeLegacy:                             "Legacy",
-	TypeLIST:                               "LIST",
+	TypeList:                               "List",
 	TypeLittleEndian:                       "Little-Endian",
 	TypeLogData:                            "Log Data",
 	TypeLOVEGame:                           "LÖVE Game",
 	TypeLuaScript:                          "Lua Script",
 	TypeLZ4Legacy:                          "LZ4 Legacy",
 	TypeLZMACompressed:                     "LZMA Compressed",
-	TypeM2TSBDAV:                           "M2TS/BDAV",
 	TypeM4VVideo:                           "M4V Video",
 	TypeMakefile:                           "Makefile",
 	TypeMarkdownDocument:                   "Markdown Document",
@@ -550,7 +535,6 @@ var typeNames = [...]string{
 	TypeNixExpression:                               "Nix Expression",
 	TypeNpmPackage:                                  "npm Package",
 	TypeNuGetPackage:                                "NuGet Package",
-	TypeOBJ:                                         "COFF Object",
 	TypeObjectiveCSource:                            "Objective-C Source",
 	TypeOCIImageLayout:                              "OCI Image Layout",
 	TypeOldASCII:                                    "Old ASCII",
@@ -596,28 +580,18 @@ var typeNames = [...]string{
 	TypeProcreate:                                   "Procreate Artwork",
 	TypePropertiesFile:                              "Properties File",
 	TypeProtocolBuffer:                              "Protocol Buffer",
-	TypePSB:                                         "PSB",
-	TypePSD:                                         "PSD",
 	TypePSVita:                                      "PS Vita Package",
 	TypePWAD:                                        "PWAD",
 	TypePythonScript:                                "Python Script",
 	TypePythonSourceDistribution:                    "Python Source Distribution",
 	TypePythonWheel:                                 "Python Wheel",
 	TypePyTorchModel:                                "PyTorch Model",
-	TypeQCOW1:                                       "QCOW1",
-	TypeQCOW2:                                       "QCOW2",
 	TypeQCPAudio:                                    "QCP Audio",
 	TypeQuickTimeMovie:                              "QuickTime Movie",
 	TypeReactComponent:                              "React Component",
 	TypeReStructuredText:                            "reStructuredText",
 	TypeRF64Audio:                                   "RF64 Audio",
 	TypeRIFFPalette:                                 "Palette",
-	TypeRPF0:                                        "RPF0",
-	TypeRPF2:                                        "RPF2",
-	TypeRPF3:                                        "RPF3",
-	TypeRPF4:                                        "RPF4",
-	TypeRPF6:                                        "RPF6",
-	TypeRPF7:                                        "RPF7",
 	TypeRSA:                                         "RSA",
 	TypeRScript:                                     "R Script",
 	TypeRubyScript:                                  "Ruby Script",
@@ -657,6 +631,7 @@ var typeNames = [...]string{
 	TypeUTF8:                                        "UTF-8",
 	TypeVagrantBox:                                  "Vagrant Box",
 	TypeVerilogSource:                               "Verilog Source",
+	TypeVersion0:                                    "Version 0",
 	TypeVersion035:                                  "Version 035",
 	TypeVersion036:                                  "Version 036",
 	TypeVersion037:                                  "Version 037",
@@ -669,13 +644,14 @@ var typeNames = [...]string{
 	TypeVersion3:                                    "Version 3",
 	TypeVersion4:                                    "Version 4",
 	TypeVersion5:                                    "Version 5",
+	TypeVersion6:                                    "Version 6",
 	TypeVersion7:                                    "Version 7",
 	TypeVersion8:                                    "Version 8",
+	TypeVersionB4:                                   "Version B4",
+	TypeVersionCE:                                   "Version CE",
 	TypeVHDLSource:                                  "VHDL Source",
 	TypeVimScript:                                   "Vim Script",
 	TypeVisualStudioExtension:                       "Visual Studio Extension",
-	TypeVMDK:                                        "VMDK",
-	TypeVMDKDescription:                             "VMDK Description",
 	TypeVorbisAudio:                                 "Vorbis Audio",
 	TypeVueComponent:                                "Vue Component",
 	TypeWAVAudio:                                    "WAV Audio",
@@ -683,8 +659,6 @@ var typeNames = [...]string{
 	TypeWebPImage:                                   "WebP Image",
 	TypeWestwoodVQA:                                 "Westwood VQA Video",
 	TypeWindowsAnimatedCursor:                       "Windows Animated Cursor",
-	TypeWindowsCursor:                               "Windows Cursor",
-	TypeWindowsIcon:                                 "Windows Icon",
 	TypeWindowsLE:                                   "Linear Executable (LE)",
 	TypeWindowsLX:                                   "OS/2 Linear Executable (LX)",
 	TypeWindowsMetafile:                             "Windows Metafile",
