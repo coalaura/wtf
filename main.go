@@ -1,6 +1,8 @@
+// Replace main.go entirely with this simplified version
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -26,9 +28,10 @@ type kindGroup struct {
 
 func main() {
 	var (
-		targetFile string
-		porcelain  bool
-		timing     bool
+		targetFile   string
+		porcelain    bool
+		timing       bool
+		deepAnalysis bool
 	)
 
 	for _, arg := range os.Args[1:] {
@@ -40,6 +43,7 @@ func main() {
 			log.Println("  -l, --list       List all supported formats and sub-formats")
 			log.Println("  -p, --porcelain  Print easily parseable output (tab-separated: Kind\\tType)")
 			log.Println("  -t, --time       Print time taken (read / sniff; disabled by -p)")
+			log.Println("  -d, --deep       Enable deep analysis (entropy, byte distribution) for unknown files")
 			log.Println("  -v, --version    Print version information")
 			log.Println("  -h, --help       Print this help message")
 
@@ -56,30 +60,29 @@ func main() {
 			porcelain = true
 		case "-t", "--time":
 			timing = true
+		case "-d", "--deep":
+			deepAnalysis = true
 		default:
-			if targetFile == "" && (len(arg) == 0 || arg[0] != '-') {
+			if len(arg) == 0 || arg[0] != '-' {
+				if targetFile != "" {
+					log.Errorln("Usage: wtf [flags] <file>")
+
+					os.Exit(1)
+				}
+
 				targetFile = arg
 			} else {
-				log.Errorln("Unknown argument or multiple files specified: ", arg)
+				log.Errorln("Unknown argument: ", arg)
 
 				os.Exit(1)
 			}
 		}
 	}
 
-	if targetFile == "" {
-		log.Errorln("Usage: wtf [flags] <file>")
+	processFile(targetFile, porcelain, timing, deepAnalysis)
+}
 
-		os.Exit(1)
-	}
-
-	path, err := filepath.Abs(targetFile)
-	if err != nil {
-		log.Errorln(err)
-
-		os.Exit(1)
-	}
-
+func processFile(path string, porcelain bool, timing bool, deepAnalysis bool) {
 	name := filepath.Base(path)
 
 	t0 := time.Now()
@@ -119,8 +122,8 @@ func main() {
 
 	buf := make([]byte, readSize)
 
-	n, err := file.Read(buf)
-	if err != nil && err != io.EOF {
+	n, err := io.ReadFull(file, buf)
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
 		log.Errorln(err)
 
 		os.Exit(1)
@@ -130,7 +133,7 @@ func main() {
 	t1 := time.Now()
 
 	meta, err = types.Detect(name, buf[:n])
-	if err != nil {
+	if err != nil && !errors.Is(err, types.ErrUnknownFormat) {
 		if porcelain {
 			log.Println("Unknown\t")
 		} else {
@@ -141,6 +144,23 @@ func main() {
 	}
 
 	d1 := time.Since(t1)
+
+	if deepAnalysis || errors.Is(err, types.ErrUnknownFormat) {
+		deep := types.DetectDeepAnalysis(types.Buffer(buf[:n]))
+		if deep != nil {
+			meta = deep
+		}
+	}
+
+	if meta == nil {
+		if porcelain {
+			log.Println("Unknown\t")
+		} else {
+			log.Errorln(types.ErrUnknownFormat)
+		}
+
+		os.Exit(1)
+	}
 
 	printMeta(meta, formatTimings(d0, d1, timing), porcelain)
 }

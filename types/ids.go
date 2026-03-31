@@ -242,6 +242,7 @@ const (
 	KindHDF5Data
 	KindHealthLevel7
 	KindHFSPlusFilesystem
+	KindHighEntropyData
 	KindHTMLDocument
 	KindHuskygramPoem
 	KindHusqvarnaDesigner
@@ -738,9 +739,12 @@ const (
 	TypeAndroidPackageX
 	TypeAndroidSplitAPKSet
 	TypeAndroidSystemPackage
+	TypeAngularComponent
+	TypeApacheLog
 	TypeAPPXPackage
 	TypeArchLinuxPackage
 	TypeASCII
+	TypeAsciiDoc
 	TypeAVIFImage
 	TypeAVIFImageSequence
 	TypeAVIVideo
@@ -750,6 +754,7 @@ const (
 	TypeBGZF
 	TypeBigEndian
 	TypeBigTIFF
+	TypeBinary
 	TypeBinaryBigEndian
 	TypeBinaryLittleEndian
 	TypeBlackmagicRAWVideo
@@ -760,26 +765,36 @@ const (
 	TypeCDAAudio
 	TypeCE
 	TypeCharacterDevice
+	TypeClojureScript
 	TypeCMakeScript
 	TypeCodestream
 	TypeComicBook
+	TypeCommitMessage
 	TypeCondaPackage
 	TypeContainer
+	TypeCoqSource
 	TypeCorelDRAWDocument
 	TypeCOWD
 	TypeCPPSource
 	TypeCSharpSource
 	TypeCSource
 	TypeCSS
+	TypeCSVData
 	TypeCubaseProject
 	TypeDartSource
+	TypeDiffPatch
 	TypeDirectory
+	TypeDjangoTemplate
+	TypeDockerComposeConfiguration
 	TypeDockerfile
 	TypeDownloadableSounds
 	TypeDSA
 	TypeEAC3
 	TypeEC
+	TypeElixirScript
+	TypeEmacsLispScript
 	TypeEmpty
+	TypeEncrypted
 	TypeEnhancedMetafile
 	TypeEPUBDocument
 	TypeExt2
@@ -791,15 +806,27 @@ const (
 	TypeFAT16
 	TypeFAT32
 	TypeFirefoxExtension
+	TypeFishScript
 	TypeFLACAudio
 	TypeForgeMod
+	TypeFSharpSource
 	TypeGIF87a
 	TypeGIF89a
+	TypeGitConfig
+	TypeGitDiff
 	TypeGoSource
+	TypeGoTemplate
 	TypeGraphQL
+	TypeGraphQLSchema
+	TypeGuileScript
+	TypeHandlebarsTemplate
+	TypeHaskellSource
 	TypeHDPhoto
 	TypeHE
 	TypeHEIFImage
+	TypeHighEntropy
+	TypeHTTPLog
+	TypeIdrisSource
 	TypeILBMImage
 	TypeIMMM
 	TypeINIConfiguration
@@ -810,6 +837,9 @@ const (
 	TypeJavaScriptSource
 	TypeJavaSource
 	TypeJavaWebArchive
+	TypeJinjaTemplate
+	TypeJSON5Source
+	TypeJSONCSource
 	TypeKDB
 	TypeKDBX
 	TypeKDM
@@ -817,9 +847,13 @@ const (
 	TypeKMZArchive
 	TypeKotlinSource
 	TypeKritaDocument
+	TypeLaTeXDocument
+	TypeLatin1
+	TypeLeanSource
 	TypeLegacy
 	TypeLIST
 	TypeLittleEndian
+	TypeLogData
 	TypeLOVEGame
 	TypeLuaScript
 	TypeLZ4Legacy
@@ -867,7 +901,9 @@ const (
 	TypeNanosecondLittleEndian
 	TypeNewASCII
 	TypeNewASCIIWithCRC
+	TypeNginxLog
 	TypeNikonRAW
+	TypeNixExpression
 	TypeNpmPackage
 	TypeNuGetPackage
 	TypeOBJ
@@ -875,6 +911,7 @@ const (
 	TypeOCIImageLayout
 	TypeOldASCII
 	TypeOlympusRAW
+	TypeOpenAPISpecification
 	TypeOpenDocumentChart
 	TypeOpenDocumentDatabase
 	TypeOpenDocumentFormula
@@ -885,6 +922,7 @@ const (
 	TypeOpenDocumentText
 	TypeOpenRasterImage
 	TypeOpusAudio
+	TypeOrgMode
 	TypePAM
 	TypePanasonicRAW
 	TypePBMASCII
@@ -909,6 +947,8 @@ const (
 	TypePowerShellScript
 	TypePPMASCII
 	TypePPMBinary
+	TypePropertiesFile
+	TypeProtocolBuffer
 	TypePSB
 	TypePSD
 	TypePWAD
@@ -920,12 +960,15 @@ const (
 	TypeQCOW2
 	TypeQCPAudio
 	TypeQuickTimeMovie
+	TypeReactComponent
+	TypeReStructuredText
 	TypeRIFFPalette
 	TypeRSA
 	TypeRScript
 	TypeRubyScript
 	TypeRustSource
 	TypeScalaSource
+	TypeShellcheckDirective
 	TypeSkinnableFrame
 	TypeSlackwarePackage
 	TypeSocket
@@ -935,15 +978,27 @@ const (
 	TypeSpecial
 	TypeSpeexAudio
 	TypeSQLScript
+	TypeSSHConfig
+	TypeSvelteComponent
 	TypeSwiftSource
 	TypeSymbolicLink
+	TypeSystemVerilogSource
 	TypeTerraformConfiguration
+	TypeTerraformModule
+	TypeTeXDocument
 	TypeTheoraVideo
+	TypeThriftInterface
 	TypeTOMLConfiguration
+	TypeTSVData
 	TypeTypeScriptSource
 	TypeUncompressed
+	TypeUTF16BE
+	TypeUTF16LE
+	TypeUTF32BE
+	TypeUTF32LE
 	TypeUTF8
 	TypeVagrantBox
+	TypeVerilogSource
 	TypeVersion035
 	TypeVersion036
 	TypeVersion037
@@ -957,10 +1012,13 @@ const (
 	TypeVersion5
 	TypeVersion7
 	TypeVersion8
+	TypeVHDLSource
+	TypeVimScript
 	TypeVisualStudioExtension
 	TypeVMDK
 	TypeVMDKDescription
 	TypeVorbisAudio
+	TypeVueComponent
 	TypeWAVAudio
 	TypeWebMVideo
 	TypeWebPImage
@@ -977,6 +1035,7 @@ const (
 	TypeXSLTStylesheet
 	TypeYAMLConfiguration
 	TypeZlibCompressed
+	TypeZshScript
 )
 
 var kindNames = [...]string{
@@ -1218,6 +1277,7 @@ var kindNames = [...]string{
 	KindHDF5Data:                            "HDF5 Data",
 	KindHealthLevel7:                        "Health Level-7 Data",
 	KindHFSPlusFilesystem:                   "HFS+ Filesystem",
+	KindHighEntropyData:                     "High Entropy Data",
 	KindHTMLDocument:                        "HTML Document",
 	KindHuskygramPoem:                       "Huskygram Poem",
 	KindHusqvarnaDesigner:                   "Husqvarna Designer",
@@ -1714,9 +1774,12 @@ var typeNames = [...]string{
 	TypeAndroidPackageX:                    "XAPK Package",
 	TypeAndroidSplitAPKSet:                 "APKS Package",
 	TypeAndroidSystemPackage:               "Android System Package",
+	TypeAngularComponent:                   "Angular Component",
+	TypeApacheLog:                          "Apache Log",
 	TypeAPPXPackage:                        "APPX Package",
 	TypeArchLinuxPackage:                   "Arch Linux Package",
 	TypeASCII:                              "ASCII",
+	TypeAsciiDoc:                           "AsciiDoc",
 	TypeAVIFImage:                          "AVIF Image",
 	TypeAVIFImageSequence:                  "AVIF Image Sequence",
 	TypeAVIVideo:                           "AVI Video",
@@ -1726,6 +1789,7 @@ var typeNames = [...]string{
 	TypeBGZF:                               "BGZF",
 	TypeBigEndian:                          "Big-Endian",
 	TypeBigTIFF:                            "BigTIFF",
+	TypeBinary:                             "Binary",
 	TypeBinaryBigEndian:                    "Binary Big-Endian",
 	TypeBinaryLittleEndian:                 "Binary Little-Endian",
 	TypeBlackmagicRAWVideo:                 "Blackmagic RAW Video",
@@ -1736,26 +1800,36 @@ var typeNames = [...]string{
 	TypeCDAAudio:                           "CD Audio",
 	TypeCE:                                 "CE",
 	TypeCharacterDevice:                    "Character Device",
+	TypeClojureScript:                      "Clojure Script",
 	TypeCMakeScript:                        "CMake Script",
 	TypeCodestream:                         "Codestream",
 	TypeComicBook:                          "Comic Book",
+	TypeCommitMessage:                      "Commit Message",
 	TypeCondaPackage:                       "Conda Package",
 	TypeContainer:                          "Container",
+	TypeCoqSource:                          "Coq Source",
 	TypeCorelDRAWDocument:                  "CorelDRAW Document",
 	TypeCOWD:                               "COWD",
 	TypeCPPSource:                          "C++ Source",
 	TypeCSharpSource:                       "C# Source",
 	TypeCSource:                            "C Source",
 	TypeCSS:                                "Cascading Style Sheets",
+	TypeCSVData:                            "CSV Data",
 	TypeCubaseProject:                      "Cubase Project",
 	TypeDartSource:                         "Dart Source",
+	TypeDiffPatch:                          "Diff/Patch",
 	TypeDirectory:                          "Directory",
+	TypeDjangoTemplate:                     "Django Template",
+	TypeDockerComposeConfiguration:         "Docker Compose Configuration",
 	TypeDockerfile:                         "Dockerfile",
 	TypeDownloadableSounds:                 "Downloadable Sounds",
 	TypeDSA:                                "DSA",
 	TypeEAC3:                               "E-AC-3",
 	TypeEC:                                 "EC",
+	TypeElixirScript:                       "Elixir Script",
+	TypeEmacsLispScript:                    "Emacs Lisp Script",
 	TypeEmpty:                              "Empty",
+	TypeEncrypted:                          "Encrypted",
 	TypeEnhancedMetafile:                   "Enhanced Metafile",
 	TypeEPUBDocument:                       "EPUB Document",
 	TypeExt2:                               "ext2",
@@ -1767,15 +1841,27 @@ var typeNames = [...]string{
 	TypeFAT16:                              "FAT16",
 	TypeFAT32:                              "FAT32",
 	TypeFirefoxExtension:                   "Firefox Extension",
+	TypeFishScript:                         "Fish Script",
 	TypeFLACAudio:                          "FLAC Audio",
 	TypeForgeMod:                           "Forge Mod",
+	TypeFSharpSource:                       "F# Source",
 	TypeGIF87a:                             "GIF87a",
 	TypeGIF89a:                             "GIF89a",
+	TypeGitConfig:                          "Git Configuration",
+	TypeGitDiff:                            "Git Diff",
 	TypeGoSource:                           "Go Source",
+	TypeGoTemplate:                         "Go Template",
 	TypeGraphQL:                            "GraphQL",
+	TypeGraphQLSchema:                      "GraphQL Schema",
+	TypeGuileScript:                        "Guile Script",
+	TypeHandlebarsTemplate:                 "Handlebars Template",
+	TypeHaskellSource:                      "Haskell Source",
 	TypeHDPhoto:                            "HD Photo",
 	TypeHE:                                 "HE",
 	TypeHEIFImage:                          "HEIF Image",
+	TypeHighEntropy:                        "High Entropy",
+	TypeHTTPLog:                            "HTTP Log",
+	TypeIdrisSource:                        "Idris Source",
 	TypeILBMImage:                          "ILBM Image",
 	TypeIMMM:                               "IMMM",
 	TypeINIConfiguration:                   "INI Configuration",
@@ -1786,6 +1872,9 @@ var typeNames = [...]string{
 	TypeJavaScriptSource:                   "JavaScript Source",
 	TypeJavaSource:                         "Java Source",
 	TypeJavaWebArchive:                     "Java Web Archive",
+	TypeJinjaTemplate:                      "Jinja Template",
+	TypeJSON5Source:                        "JSON5 Source",
+	TypeJSONCSource:                        "JSONC Source",
 	TypeKDB:                                "KDB",
 	TypeKDBX:                               "KDBX",
 	TypeKDM:                                "KDM",
@@ -1793,9 +1882,13 @@ var typeNames = [...]string{
 	TypeKMZArchive:                         "KMZ Archive",
 	TypeKotlinSource:                       "Kotlin Source",
 	TypeKritaDocument:                      "Krita Document",
+	TypeLaTeXDocument:                      "LaTeX Document",
+	TypeLatin1:                             "Latin-1",
+	TypeLeanSource:                         "Lean Source",
 	TypeLegacy:                             "Legacy",
 	TypeLIST:                               "LIST",
 	TypeLittleEndian:                       "Little-Endian",
+	TypeLogData:                            "Log Data",
 	TypeLOVEGame:                           "LÖVE Game",
 	TypeLuaScript:                          "Lua Script",
 	TypeLZ4Legacy:                          "LZ4 Legacy",
@@ -1843,7 +1936,9 @@ var typeNames = [...]string{
 	TypeNanosecondLittleEndian:                      "Nanosecond Little-Endian",
 	TypeNewASCII:                                    "New ASCII",
 	TypeNewASCIIWithCRC:                             "New ASCII with CRC",
+	TypeNginxLog:                                    "Nginx Log",
 	TypeNikonRAW:                                    "Nikon RAW",
+	TypeNixExpression:                               "Nix Expression",
 	TypeNpmPackage:                                  "npm Package",
 	TypeNuGetPackage:                                "NuGet Package",
 	TypeOBJ:                                         "COFF Object",
@@ -1851,6 +1946,7 @@ var typeNames = [...]string{
 	TypeOCIImageLayout:                              "OCI Image Layout",
 	TypeOldASCII:                                    "Old ASCII",
 	TypeOlympusRAW:                                  "Olympus RAW",
+	TypeOpenAPISpecification:                        "OpenAPI Specification",
 	TypeOpenDocumentChart:                           "OpenDocument Chart",
 	TypeOpenDocumentDatabase:                        "OpenDocument Database",
 	TypeOpenDocumentFormula:                         "OpenDocument Formula",
@@ -1861,6 +1957,7 @@ var typeNames = [...]string{
 	TypeOpenDocumentText:                            "OpenDocument Text",
 	TypeOpenRasterImage:                             "OpenRaster Image",
 	TypeOpusAudio:                                   "Opus Audio",
+	TypeOrgMode:                                     "Org Mode",
 	TypePAM:                                         "PAM",
 	TypePanasonicRAW:                                "Panasonic RAW",
 	TypePBMASCII:                                    "PBM ASCII",
@@ -1885,6 +1982,8 @@ var typeNames = [...]string{
 	TypePowerShellScript:                            "PowerShell Script",
 	TypePPMASCII:                                    "PPM ASCII",
 	TypePPMBinary:                                   "PPM binary",
+	TypePropertiesFile:                              "Properties File",
+	TypeProtocolBuffer:                              "Protocol Buffer",
 	TypePSB:                                         "PSB",
 	TypePSD:                                         "PSD",
 	TypePWAD:                                        "PWAD",
@@ -1896,12 +1995,15 @@ var typeNames = [...]string{
 	TypeQCOW2:                                       "QCOW2",
 	TypeQCPAudio:                                    "QCP Audio",
 	TypeQuickTimeMovie:                              "QuickTime Movie",
+	TypeReactComponent:                              "React Component",
+	TypeReStructuredText:                            "reStructuredText",
 	TypeRIFFPalette:                                 "Palette",
 	TypeRSA:                                         "RSA",
 	TypeRScript:                                     "R Script",
 	TypeRubyScript:                                  "Ruby Script",
 	TypeRustSource:                                  "Rust Source",
 	TypeScalaSource:                                 "Scala Source",
+	TypeShellcheckDirective:                         "Shellcheck Directive",
 	TypeSkinnableFrame:                              "Skinnable Frame",
 	TypeSlackwarePackage:                            "Slackware Package",
 	TypeSocket:                                      "Socket",
@@ -1911,15 +2013,27 @@ var typeNames = [...]string{
 	TypeSpecial:                                     "Special",
 	TypeSpeexAudio:                                  "Speex Audio",
 	TypeSQLScript:                                   "SQL Script",
+	TypeSSHConfig:                                   "SSH Configuration",
+	TypeSvelteComponent:                             "Svelte Component",
 	TypeSwiftSource:                                 "Swift Source",
 	TypeSymbolicLink:                                "Symbolic Link",
+	TypeSystemVerilogSource:                         "SystemVerilog Source",
 	TypeTerraformConfiguration:                      "Terraform Configuration",
+	TypeTerraformModule:                             "Terraform Module",
+	TypeTeXDocument:                                 "TeX Document",
 	TypeTheoraVideo:                                 "Theora Video",
+	TypeThriftInterface:                             "Thrift Interface",
 	TypeTOMLConfiguration:                           "TOML Configuration",
+	TypeTSVData:                                     "TSV Data",
 	TypeTypeScriptSource:                            "TypeScript Source",
 	TypeUncompressed:                                "Uncompressed",
+	TypeUTF16BE:                                     "UTF-16 Big-Endian",
+	TypeUTF16LE:                                     "UTF-16 Little-Endian",
+	TypeUTF32BE:                                     "UTF-32 Big-Endian",
+	TypeUTF32LE:                                     "UTF-32 Little-Endian",
 	TypeUTF8:                                        "UTF-8",
 	TypeVagrantBox:                                  "Vagrant Box",
+	TypeVerilogSource:                               "Verilog Source",
 	TypeVersion035:                                  "Version 035",
 	TypeVersion036:                                  "Version 036",
 	TypeVersion037:                                  "Version 037",
@@ -1933,10 +2047,13 @@ var typeNames = [...]string{
 	TypeVersion5:                                    "Version 5",
 	TypeVersion7:                                    "Version 7",
 	TypeVersion8:                                    "Version 8",
+	TypeVHDLSource:                                  "VHDL Source",
+	TypeVimScript:                                   "Vim Script",
 	TypeVisualStudioExtension:                       "Visual Studio Extension",
 	TypeVMDK:                                        "VMDK",
 	TypeVMDKDescription:                             "VMDK Description",
 	TypeVorbisAudio:                                 "Vorbis Audio",
+	TypeVueComponent:                                "Vue Component",
 	TypeWAVAudio:                                    "WAV Audio",
 	TypeWebMVideo:                                   "WebM Video",
 	TypeWebPImage:                                   "WebP Image",
@@ -1953,6 +2070,7 @@ var typeNames = [...]string{
 	TypeXSLTStylesheet:                              "XSLT Stylesheet",
 	TypeYAMLConfiguration:                           "YAML Configuration",
 	TypeZlibCompressed:                              "Zlib Compressed",
+	TypeZshScript:                                   "Zsh Script",
 }
 
 func (k KindID) String() string {

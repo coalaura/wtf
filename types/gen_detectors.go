@@ -4,7 +4,10 @@ package types
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
 	"slices"
+	"sort"
+	"unicode/utf16"
 	"unicode/utf8"
 )
 
@@ -53,6 +56,74 @@ func isValidAV1OBUHeader(header, expectedType byte) bool {
 	obuType := (header >> 3) & 0x0F
 
 	return obuType == expectedType
+}
+
+func DetectDeepAnalysis(b Buffer) *Metadata {
+	if b.Len() < 64 {
+		return nil
+	}
+
+	result := CalculateEntropy(b)
+	if result == nil {
+		return nil
+	}
+
+	if b.Len() < 512 {
+		return nil
+	}
+
+	if isKnownBinaryPattern(b) {
+		return nil
+	}
+
+	if result.IsEncrypted {
+		return &Metadata{
+			Kind:       KindHighEntropyData,
+			Type:       TypeEncrypted,
+			Confidence: ConfidenceLow,
+		}
+	}
+
+	if result.IsHighEntropy {
+
+		return &Metadata{
+			Kind:       KindHighEntropyData,
+			Type:       TypeHighEntropy,
+			Confidence: ConfidenceLow,
+		}
+	}
+
+	if result.ZeroBytes > 0 || result.PrintableBytes*100/b.Len() < 50 {
+		return &Metadata{
+			Kind:       KindHighEntropyData,
+			Type:       TypeBinary,
+			Confidence: ConfidenceLow,
+		}
+	}
+
+	return nil
+}
+
+func isKnownBinaryPattern(b Buffer) bool {
+
+	if b.Len() >= 64 {
+
+		allSame := true
+		first := b[0]
+
+		for i := 1; i < 32 && i < b.Len(); i++ {
+			if b[i] != first {
+				allSame = false
+				break
+			}
+		}
+
+		if allSame {
+			return true
+		}
+	}
+
+	return false
 }
 
 func DetectAppleDiskImage(b Buffer) *Metadata {
@@ -149,6 +220,395 @@ func elfType(class byte, data byte) TypeID {
 	default:
 		return TypeNone
 	}
+}
+
+func DetectTextEncoding(b Buffer) (TypeID, bool) {
+	if b.Len() < 2 {
+		return TypeNone, false
+	}
+
+	if b.Has(0, []byte{0xff, 0xfe, 0x00, 0x00}) {
+		return TypeUTF32LE, true
+	}
+
+	if b.Has(0, []byte{0x00, 0x00, 0xfe, 0xff}) {
+		return TypeUTF32BE, true
+	}
+
+	if b.Has(0, []byte{0xff, 0xfe}) {
+		return TypeUTF16LE, true
+	}
+
+	if b.Has(0, []byte{0xfe, 0xff}) {
+		return TypeUTF16BE, true
+	}
+
+	if b.Has(0, []byte{0xef, 0xbb, 0xbf}) {
+		return TypeUTF8, true
+	}
+
+	if isLikelyUTF16LE(b) {
+		return TypeUTF16LE, true
+	}
+
+	if isLikelyUTF16BE(b) {
+		return TypeUTF16BE, true
+	}
+
+	return TypeNone, false
+}
+
+func isLikelyUTF16LE(b Buffer) bool {
+	limit := min(b.Len(), 4096)
+	if limit < 4 {
+		return false
+	}
+
+	data := b[:limit]
+
+	var (
+		asciiPatterns int
+		nullInOdd     int
+		totalChecked  int
+	)
+
+	for i := 0; i+1 < len(data); i += 2 {
+		totalChecked++
+
+		if data[i] >= 0x20 && data[i] <= 0x7e && data[i+1] == 0x00 {
+			asciiPatterns++
+		}
+
+		if data[i+1] == 0x00 && data[i] != 0x00 {
+			nullInOdd++
+		}
+	}
+
+	if totalChecked == 0 {
+		return false
+	}
+
+	if nullInOdd == 0 {
+		return false
+	}
+
+	nullRatio := float64(nullInOdd) / float64(totalChecked)
+	asciiRatio := float64(asciiPatterns) / float64(totalChecked)
+
+	if asciiRatio > 0.7 {
+		return true
+	}
+
+	if nullRatio > 0.4 && asciiRatio > 0.3 {
+		return true
+	}
+
+	return false
+}
+
+func isLikelyUTF16BE(b Buffer) bool {
+	limit := min(b.Len(), 4096)
+	if limit < 4 {
+		return false
+	}
+
+	data := b[:limit]
+
+	var (
+		asciiPatterns int
+		nullInEven    int
+		totalChecked  int
+	)
+
+	for i := 0; i+1 < len(data); i += 2 {
+		totalChecked++
+
+		if data[i] == 0x00 && data[i+1] >= 0x20 && data[i+1] <= 0x7e {
+			asciiPatterns++
+		}
+
+		if data[i] == 0x00 && data[i+1] != 0x00 {
+			nullInEven++
+		}
+	}
+
+	if totalChecked == 0 {
+		return false
+	}
+
+	if nullInEven == 0 {
+		return false
+	}
+
+	nullRatio := float64(nullInEven) / float64(totalChecked)
+	asciiRatio := float64(asciiPatterns) / float64(totalChecked)
+
+	if asciiRatio > 0.7 {
+		return true
+	}
+
+	if nullRatio > 0.4 && asciiRatio > 0.3 {
+		return true
+	}
+
+	return false
+}
+
+func isLikelyLatin1(b Buffer) bool {
+	limit := min(b.Len(), 4096)
+	if limit == 0 {
+		return false
+	}
+
+	data := b[:limit]
+
+	if utf8.Valid(data) {
+		return false
+	}
+
+	var (
+		highBytes int
+		printable int
+	)
+
+	for _, c := range data {
+		if c == 0 {
+			return false
+		}
+
+		if c >= 0x80 {
+			highBytes++
+		}
+
+		if c == '\n' || c == '\r' || c == '\t' || (c >= 0x20 && c <= 0x7e) || c >= 0xa0 {
+			printable++
+		}
+	}
+
+	if highBytes == 0 {
+		return false
+	}
+
+	highRatio := float64(highBytes) / float64(limit)
+	printableRatio := float64(printable) / float64(limit)
+
+	if highRatio > 0.01 && highRatio < 0.5 && printableRatio > 0.9 {
+		return true
+	}
+
+	return false
+}
+
+func TryDecodeUTF16(b Buffer) ([]byte, TypeID, bool) {
+	if b.Len() < 2 {
+		return nil, TypeNone, false
+	}
+
+	var (
+		data []byte
+		typ  TypeID
+	)
+
+	if b.Has(0, []byte{0xff, 0xfe}) {
+		data = b[2:]
+		typ = TypeUTF16LE
+	} else if b.Has(0, []byte{0xfe, 0xff}) {
+		data = b[2:]
+		typ = TypeUTF16BE
+	} else if isLikelyUTF16LE(b) {
+		data = b
+		typ = TypeUTF16LE
+	} else if isLikelyUTF16BE(b) {
+		data = b
+		typ = TypeUTF16BE
+	} else {
+		return nil, TypeNone, false
+	}
+
+	if len(data)%2 != 0 {
+		data = data[:len(data)-1]
+	}
+
+	if len(data) == 0 {
+		return nil, typ, false
+	}
+
+	u16 := make([]uint16, len(data)/2)
+
+	for i := range u16 {
+		if typ == TypeUTF16LE {
+			u16[i] = uint16(data[i*2]) | uint16(data[i*2+1])<<8
+		} else {
+			u16[i] = uint16(data[i*2])<<8 | uint16(data[i*2+1])
+		}
+	}
+
+	runes := utf16.Decode(u16)
+
+	var buf bytes.Buffer
+
+	buf.Grow(len(runes) * 4)
+
+	for _, r := range runes {
+		buf.WriteRune(r)
+	}
+
+	return buf.Bytes(), typ, true
+}
+
+const (
+	entropyThresholdEncrypted = 7.9
+	entropyThresholdHigh      = 7.5
+	entropyThresholdMedium    = 6.0
+)
+
+type ByteFrequency [256]int
+
+type EntropyResult struct {
+	ShannonEntropy float64
+	IsEncrypted    bool
+	IsHighEntropy  bool
+	ByteFreq       ByteFrequency
+	ZeroBytes      int
+	PrintableBytes int
+	HighBytes      int
+}
+
+type byteCount struct {
+	byte  byte
+	count int
+}
+
+func CalculateEntropy(b Buffer) *EntropyResult {
+	if b.Len() == 0 {
+		return nil
+	}
+
+	limit := min(b.Len(), 65536)
+	data := b[:limit]
+
+	var (
+		freq      ByteFrequency
+		zeros     int
+		printable int
+		high      int
+	)
+
+	for _, c := range data {
+		freq[c]++
+
+		if c == 0 {
+			zeros++
+		}
+
+		if c >= 0x20 && c <= 0x7e || c == '\n' || c == '\r' || c == '\t' {
+			printable++
+		}
+
+		if c >= 0x80 {
+			high++
+		}
+	}
+
+	entropy := 0.0
+	total := float64(len(data))
+
+	for _, count := range freq {
+		if count == 0 {
+			continue
+		}
+
+		p := float64(count) / total
+		entropy -= p * math.Log2(p)
+	}
+
+	return &EntropyResult{
+		ShannonEntropy: entropy,
+		IsEncrypted:    entropy >= entropyThresholdEncrypted && zeros == 0,
+		IsHighEntropy:  entropy >= entropyThresholdHigh,
+		ByteFreq:       freq,
+		ZeroBytes:      zeros,
+		PrintableBytes: printable,
+		HighBytes:      high,
+	}
+}
+
+func DetectHighEntropy(b Buffer) *Metadata {
+	result := CalculateEntropy(b)
+	if result == nil {
+		return nil
+	}
+
+	if b.Len() < 256 {
+		return nil
+	}
+
+	if result.IsEncrypted {
+		return &Metadata{
+			Kind:       KindHighEntropyData,
+			Type:       TypeEncrypted,
+			Confidence: ConfidenceMedium,
+		}
+	}
+
+	if result.IsHighEntropy {
+		return &Metadata{
+			Kind:       KindHighEntropyData,
+			Type:       TypeHighEntropy,
+			Confidence: ConfidenceLow,
+		}
+	}
+
+	return nil
+}
+
+func GetByteDistributionSummary(b Buffer) map[string]float64 {
+	result := CalculateEntropy(b)
+	if result == nil {
+		return nil
+	}
+
+	total := float64(min(b.Len(), 65536))
+
+	summary := map[string]float64{
+		"entropy":         math.Round(result.ShannonEntropy*1000) / 1000,
+		"zero_ratio":      math.Round(float64(result.ZeroBytes)/total*10000) / 10000,
+		"printable_ratio": math.Round(float64(result.PrintableBytes)/total*10000) / 10000,
+		"high_byte_ratio": math.Round(float64(result.HighBytes)/total*10000) / 10000,
+	}
+
+	var uniqueBytes int
+
+	for _, count := range result.ByteFreq {
+		if count > 0 {
+			uniqueBytes++
+		}
+	}
+
+	summary["unique_byte_ratio"] = math.Round(float64(uniqueBytes)/256*10000) / 10000
+
+	var topBytes []byteCount
+
+	for i, count := range result.ByteFreq {
+		if count > 0 {
+			topBytes = append(topBytes, byteCount{byte(i), count})
+		}
+	}
+
+	sort.Slice(topBytes, func(i, j int) bool {
+		return topBytes[i].count > topBytes[j].count
+	})
+
+	for i, bc := range topBytes {
+		if i >= 5 {
+			break
+		}
+
+		key := string(rune('a'+i)) + "_most_freq"
+		summary[key] = math.Round(float64(bc.count)/total*10000) / 10000
+	}
+
+	return summary
 }
 
 const (
@@ -1143,30 +1603,64 @@ func DetectText(b Buffer) *Metadata {
 	}
 
 	var (
+		content  []byte
+		encoding TypeID
 		isASCII  bool
 		isUTF8   bool
-		textData []byte
+		isLatin1 bool
 	)
 
-	if b.Has(0, []byte{0xef, 0xbb, 0xbf}) {
-		textData = b[3:]
-
-		isUTF8 = isLikelyTextUTF8(textData)
+	detectedEncoding, hasEncoding := DetectTextEncoding(b)
+	if hasEncoding {
+		switch detectedEncoding {
+		case TypeUTF16LE, TypeUTF16BE:
+			decoded, _, ok := TryDecodeUTF16(b)
+			if ok && len(decoded) > 0 {
+				content = decoded
+				encoding = detectedEncoding
+			} else {
+				content = b
+			}
+		case TypeUTF32LE, TypeUTF32BE:
+			content = b
+			encoding = detectedEncoding
+		case TypeUTF8:
+			if b.Len() > 3 {
+				content = b[3:]
+			} else {
+				content = b
+			}
+			encoding = detectedEncoding
+		default:
+			content = b
+		}
 	} else {
-		textData = b
+		content = b
 
-		isASCII = isLikelyASCIIText(textData)
+		isASCII = isLikelyASCIIText(content)
 		if !isASCII {
-			isUTF8 = isLikelyTextUTF8(textData)
+			isUTF8 = isLikelyTextUTF8(content)
+		}
+
+		if !isASCII && !isUTF8 && isLikelyLatin1(b) {
+			isLatin1 = true
 		}
 	}
 
-	if !isASCII && !isUTF8 {
-		return nil
+	if encoding == TypeNone {
+		if isASCII {
+			encoding = TypeASCII
+		} else if isUTF8 {
+			encoding = TypeUTF8
+		} else if isLatin1 {
+			encoding = TypeLatin1
+		} else {
+			return nil
+		}
 	}
 
-	limit := min(len(textData), 4096)
-	subtype := detectTextSubtype(textData[:limit])
+	limit := min(len(content), 4096)
+	subtype := detectTextSubtype(content[:limit])
 
 	if subtype != TypeNone {
 		return &Metadata{
@@ -1176,14 +1670,9 @@ func DetectText(b Buffer) *Metadata {
 		}
 	}
 
-	fallbackType := TypeUTF8
-	if isASCII {
-		fallbackType = TypeASCII
-	}
-
 	return &Metadata{
 		Kind:       KindText,
-		Type:       fallbackType,
+		Type:       encoding,
 		Confidence: ConfidenceLow,
 	}
 }
@@ -1202,7 +1691,7 @@ func detectTextSubtype(data []byte) TypeID {
 
 		shebang := data[:lineEnd]
 
-		if bytes.Contains(shebang, []byte("bash")) || bytes.Contains(shebang, []byte("sh")) {
+		if bytes.Contains(shebang, []byte("bash")) || bytes.Contains(shebang, []byte("/sh")) {
 			return TypeBashScript
 		}
 
@@ -1230,8 +1719,44 @@ func detectTextSubtype(data []byte) TypeID {
 			return TypeLuaScript
 		}
 
-		if bytes.Contains(shebang, []byte("Rscript")) {
+		if bytes.Contains(shebang, []byte("Rscript")) || bytes.Contains(shebang, []byte("R ")) {
 			return TypeRScript
+		}
+
+		if bytes.Contains(shebang, []byte("fish")) {
+			return TypeFishScript
+		}
+
+		if bytes.Contains(shebang, []byte("zsh")) {
+			return TypeZshScript
+		}
+
+		if bytes.Contains(shebang, []byte("guile")) || bytes.Contains(shebang, []byte("scheme")) {
+			return TypeGuileScript
+		}
+
+		if bytes.Contains(shebang, []byte("emacs")) || bytes.Contains(shebang, []byte("elisp")) {
+			return TypeEmacsLispScript
+		}
+
+		if bytes.Contains(shebang, []byte("clojure")) || bytes.Contains(shebang, []byte("clj")) {
+			return TypeClojureScript
+		}
+
+		if bytes.Contains(shebang, []byte("elixir")) {
+			return TypeElixirScript
+		}
+
+		if bytes.Contains(shebang, []byte("haskell")) || bytes.Contains(shebang, []byte("runhaskell")) {
+			return TypeHaskellSource
+		}
+
+		if bytes.Contains(shebang, []byte("nix")) {
+			return TypeNixExpression
+		}
+
+		if bytes.Contains(shebang, []byte("fsharpi")) || bytes.Contains(shebang, []byte("fsharp")) {
+			return TypeFSharpSource
 		}
 	}
 
@@ -1243,7 +1768,24 @@ func detectTextSubtype(data []byte) TypeID {
 		return TypeDockerfile
 	}
 
+	if bytes.Contains(trimmed, []byte("version:")) && bytes.Contains(trimmed, []byte("services:")) {
+		return TypeDockerComposeConfiguration
+	}
+
 	if bytes.HasPrefix(trimmed, []byte("# ")) || bytes.HasPrefix(trimmed, []byte("## ")) {
+
+		if bytes.Contains(trimmed, []byte("- [ ]")) || bytes.Contains(trimmed, []byte("- [x]")) {
+			return TypeMarkdownDocument
+		}
+
+		if bytes.Contains(trimmed, []byte("```")) {
+			return TypeMarkdownDocument
+		}
+
+		if bytes.Contains(trimmed, []byte("| ")) && bytes.Contains(trimmed, []byte("|---")) {
+			return TypeMarkdownDocument
+		}
+
 		return TypeMarkdownDocument
 	}
 
@@ -1252,10 +1794,18 @@ func detectTextSubtype(data []byte) TypeID {
 			return TypeMarkdownDocument
 		}
 
+		if bytes.Contains(trimmed, []byte("apiVersion:")) || bytes.Contains(trimmed, []byte("kind:")) {
+			return TypeYAMLConfiguration
+		}
+
+		if bytes.Contains(trimmed, []byte("services:")) || bytes.Contains(trimmed, []byte("version:")) {
+			return TypeDockerComposeConfiguration
+		}
+
 		return TypeYAMLConfiguration
 	}
 
-	if bytes.HasPrefix(trimmed, []byte("CREATE TABLE")) || bytes.HasPrefix(trimmed, []byte("SELECT ")) || bytes.HasPrefix(trimmed, []byte("INSERT INTO")) || bytes.HasPrefix(trimmed, []byte("-- SQL")) {
+	if bytes.HasPrefix(trimmed, []byte("CREATE TABLE")) || bytes.HasPrefix(trimmed, []byte("SELECT ")) || bytes.HasPrefix(trimmed, []byte("INSERT INTO")) || bytes.HasPrefix(trimmed, []byte("-- SQL")) || bytes.HasPrefix(trimmed, []byte("ALTER TABLE")) || bytes.HasPrefix(trimmed, []byte("DROP TABLE")) {
 		return TypeSQLScript
 	}
 
@@ -1267,16 +1817,46 @@ func detectTextSubtype(data []byte) TypeID {
 		return TypeCMakeScript
 	}
 
-	if bytes.HasPrefix(trimmed, []byte("body {")) || bytes.HasPrefix(trimmed, []byte("@import url(")) || bytes.HasPrefix(trimmed, []byte("@media ")) || bytes.HasPrefix(trimmed, []byte(":root {")) {
+	if bytes.HasPrefix(trimmed, []byte("body {")) || bytes.HasPrefix(trimmed, []byte("@import url(")) || bytes.HasPrefix(trimmed, []byte("@media ")) || bytes.HasPrefix(trimmed, []byte(":root {")) || bytes.HasPrefix(trimmed, []byte("@keyframes")) {
 		return TypeCSS
 	}
 
-	if bytes.HasPrefix(trimmed, []byte("resource \"")) || bytes.HasPrefix(trimmed, []byte("variable \"")) || bytes.HasPrefix(trimmed, []byte("provider \"")) || bytes.HasPrefix(trimmed, []byte("terraform {")) {
+	if bytes.HasPrefix(trimmed, []byte("resource \"")) || bytes.HasPrefix(trimmed, []byte("variable \"")) || bytes.HasPrefix(trimmed, []byte("provider \"")) || bytes.HasPrefix(trimmed, []byte("terraform {")) || bytes.HasPrefix(trimmed, []byte("module \"")) {
+		if bytes.Contains(trimmed, []byte("module \"")) {
+			return TypeTerraformModule
+		}
+
 		return TypeTerraformConfiguration
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("schema {")) || bytes.HasPrefix(trimmed, []byte("type ")) && bytes.Contains(trimmed, []byte("{")) && bytes.Contains(trimmed, []byte("}")) {
+		return TypeGraphQLSchema
 	}
 
 	if bytes.HasPrefix(trimmed, []byte("query {")) || bytes.HasPrefix(trimmed, []byte("mutation {")) || bytes.HasPrefix(trimmed, []byte("fragment ")) {
 		return TypeGraphQL
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("syntax = \"proto")) || bytes.HasPrefix(trimmed, []byte("package ")) && bytes.Contains(trimmed, []byte("message ")) {
+		return TypeProtocolBuffer
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("namespace ")) && (bytes.Contains(trimmed, []byte("service ")) || bytes.Contains(trimmed, []byte("struct "))) {
+		return TypeThriftInterface
+	}
+
+	if bytes.Contains(trimmed, []byte("openapi:")) || bytes.Contains(trimmed, []byte("\"openapi\"")) || bytes.Contains(trimmed, []byte("swagger:")) {
+		return TypeOpenAPISpecification
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("# shellcheck")) {
+		return TypeShellcheckDirective
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("set ")) || bytes.HasPrefix(trimmed, []byte("let ")) || bytes.HasPrefix(trimmed, []byte("function! ")) || bytes.HasPrefix(trimmed, []byte("call ")) {
+		if bytes.Contains(trimmed, []byte("nmap ")) || bytes.Contains(trimmed, []byte("imap ")) || bytes.Contains(trimmed, []byte("vmap ")) || bytes.Contains(trimmed, []byte("syntax ")) {
+			return TypeVimScript
+		}
 	}
 
 	code := skipCStyleComments(trimmed)
@@ -1302,9 +1882,33 @@ func detectTextSubtype(data []byte) TypeID {
 		}
 	}
 
+	if bytes.HasPrefix(code, []byte("defmodule ")) {
+		return TypeElixirScript
+	}
+
+	if bytes.HasPrefix(code, []byte("module ")) && (bytes.Contains(code, []byte("where ")) || bytes.Contains(code, []byte("import "))) {
+		return TypeHaskellSource
+	}
+
+	if bytes.HasPrefix(code, []byte("(ns ")) {
+		return TypeClojureScript
+	}
+
 	if bytes.HasPrefix(code, []byte("#include <")) || bytes.HasPrefix(code, []byte("#include \"")) {
 		if bytes.Contains(code, []byte("std::")) || bytes.Contains(code, []byte("class ")) || bytes.Contains(code, []byte("template <")) {
 			return TypeCPPSource
+		}
+
+		if bytes.Contains(code, []byte("module ")) && bytes.Contains(code, []byte("endmodule")) {
+			if bytes.Contains(code, []byte("logic ")) || bytes.Contains(code, []byte("always_comb")) || bytes.Contains(code, []byte("always_ff")) {
+				return TypeSystemVerilogSource
+			}
+
+			return TypeVerilogSource
+		}
+
+		if bytes.Contains(code, []byte("entity ")) && bytes.Contains(code, []byte("end ")) {
+			return TypeVHDLSource
 		}
 
 		return TypeCSource
@@ -1326,6 +1930,36 @@ func detectTextSubtype(data []byte) TypeID {
 
 	if bytes.HasPrefix(code, []byte("fn main()")) || bytes.HasPrefix(code, []byte("use std::")) || bytes.HasPrefix(code, []byte("pub fn ")) || bytes.HasPrefix(code, []byte("#![")) || bytes.HasPrefix(code, []byte("#[derive(")) || bytes.HasPrefix(code, []byte("#[allow(")) {
 		return TypeRustSource
+	}
+
+	if bytes.HasPrefix(code, []byte("open ")) || bytes.HasPrefix(code, []byte("let ")) {
+		if bytes.Contains(code, []byte("type ")) && bytes.Contains(code, []byte("member ")) {
+			return TypeFSharpSource
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("{ config")) || bytes.HasPrefix(code, []byte("with import")) || bytes.HasPrefix(code, []byte("let ")) && bytes.Contains(code, []byte("in ")) {
+		if bytes.Contains(code, []byte("pkgs.")) || bytes.Contains(code, []byte("stdenv")) || bytes.Contains(code, []byte("fetchurl")) {
+			return TypeNixExpression
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("Theorem ")) || bytes.HasPrefix(code, []byte("Lemma ")) || bytes.HasPrefix(code, []byte("Definition ")) {
+		if bytes.Contains(code, []byte("Proof.")) {
+			return TypeCoqSource
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("theorem ")) || bytes.HasPrefix(code, []byte("lemma ")) || bytes.HasPrefix(code, []byte("def ")) {
+		if bytes.Contains(code, []byte("by ")) {
+			return TypeLeanSource
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("module ")) && bytes.Contains(code, []byte("where ")) {
+		if bytes.Contains(code, []byte("data ")) || bytes.Contains(code, []byte("total ")) {
+			return TypeIdrisSource
+		}
 	}
 
 	if bytes.HasPrefix(code, []byte("import ")) || bytes.HasPrefix(code, []byte("def ")) || bytes.HasPrefix(code, []byte("class ")) {
@@ -1356,6 +1990,72 @@ func detectTextSubtype(data []byte) TypeID {
 		}
 	}
 
+	if bytes.HasPrefix(code, []byte("import React")) || bytes.HasPrefix(code, []byte("from 'react")) || bytes.HasPrefix(code, []byte("from \"react")) {
+		if bytes.Contains(code, []byte("export default function")) || bytes.Contains(code, []byte("const ")) && bytes.Contains(code, []byte("= ()")) {
+			return TypeReactComponent
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("<template>")) || (bytes.HasPrefix(code, []byte("<script")) && bytes.Contains(code, []byte("</template>"))) {
+		if bytes.Contains(code, []byte("export default")) {
+			return TypeVueComponent
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("@Component(")) || bytes.HasPrefix(code, []byte("@NgModule(")) {
+		return TypeAngularComponent
+	}
+
+	if bytes.HasPrefix(code, []byte("<script>")) || bytes.HasPrefix(code, []byte("<svelte:")) {
+		return TypeSvelteComponent
+	}
+
+	if bytes.HasPrefix(code, []byte("{% extends")) || bytes.HasPrefix(code, []byte("{% block")) || bytes.HasPrefix(code, []byte("{% load")) {
+		return TypeDjangoTemplate
+	}
+
+	if bytes.HasPrefix(code, []byte("{# ")) || bytes.HasPrefix(code, []byte("{% ")) || bytes.HasPrefix(code, []byte("{{ ")) {
+		return TypeJinjaTemplate
+	}
+
+	if bytes.HasPrefix(code, []byte("{{define ")) || bytes.HasPrefix(code, []byte("{{if ")) || bytes.HasPrefix(code, []byte("{{range ")) || bytes.HasPrefix(code, []byte("{{template ")) {
+		return TypeGoTemplate
+	}
+
+	if bytes.HasPrefix(code, []byte("{{#each ")) || bytes.HasPrefix(code, []byte("{{#if ")) || bytes.HasPrefix(code, []byte("{{#with ")) {
+		return TypeHandlebarsTemplate
+	}
+
+	if bytes.HasPrefix(code, []byte("\\documentclass")) || bytes.HasPrefix(code, []byte("\\begin{document}")) {
+		return TypeLaTeXDocument
+	}
+
+	if bytes.HasPrefix(code, []byte("\\input ")) || bytes.HasPrefix(code, []byte("\\include ")) {
+		return TypeTeXDocument
+	}
+
+	if bytes.HasPrefix(code, []byte(".. ")) || bytes.HasPrefix(code, []byte("=======")) || bytes.HasPrefix(code, []byte("-------")) {
+		return TypeReStructuredText
+	}
+
+	if bytes.HasPrefix(code, []byte("= ")) || bytes.HasPrefix(code, []byte("== ")) || bytes.HasPrefix(code, []byte(":")) && bytes.Contains(code, []byte(": ")) {
+		return TypeAsciiDoc
+	}
+
+	if bytes.HasPrefix(code, []byte("#+TITLE:")) || bytes.HasPrefix(code, []byte("#+BEGIN_")) || bytes.HasPrefix(code, []byte("* ")) {
+		return TypeOrgMode
+	}
+
+	if (trimmed[0] == '{' || trimmed[0] == '[') && (bytes.Contains(trimmed, []byte("//")) || bytes.Contains(trimmed, []byte("/*"))) {
+		if bytes.Contains(trimmed, []byte(`":`)) || bytes.Contains(trimmed, []byte(`": `)) {
+			return TypeJSONCSource
+		}
+	}
+
+	if (trimmed[0] == '{' || trimmed[0] == '[') && bytes.Contains(trimmed, []byte("':")) {
+		return TypeJSON5Source
+	}
+
 	if bytes.HasPrefix(code, []byte("const ")) || bytes.HasPrefix(code, []byte("let ")) || bytes.HasPrefix(code, []byte("var ")) || bytes.HasPrefix(code, []byte("import ")) {
 		if bytes.Contains(code, []byte("interface ")) || bytes.Contains(code, []byte("type ")) || bytes.Contains(code, []byte(" as ")) || bytes.Contains(code, []byte(": string")) || bytes.Contains(code, []byte(": number")) || bytes.Contains(code, []byte(": boolean")) {
 			if bytes.Contains(code, []byte("=>")) || bytes.Contains(code, []byte("console.log")) || bytes.Contains(code, []byte("from '")) || bytes.Contains(code, []byte("from \"")) {
@@ -1375,6 +2075,14 @@ func detectTextSubtype(data []byte) TypeID {
 				return TypeTOMLConfiguration
 			}
 
+			if bytes.Contains(code, []byte("[remote")) || bytes.Contains(code, []byte("[branch")) || bytes.Contains(code, []byte("[core")) || bytes.Contains(code, []byte("[user")) {
+				return TypeGitConfig
+			}
+
+			if bytes.Contains(code, []byte("Host ")) || bytes.Contains(code, []byte("[host")) {
+				return TypeSSHConfig
+			}
+
 			return TypeINIConfiguration
 		}
 	}
@@ -1386,6 +2094,67 @@ func detectTextSubtype(data []byte) TypeID {
 	if bytes.Contains(code, []byte("Write-Host ")) || bytes.Contains(code, []byte("Get-")) || bytes.Contains(code, []byte("Set-")) || bytes.Contains(code, []byte("Out-Null")) {
 		if bytes.Contains(code, []byte("$")) && (bytes.Contains(code, []byte("-eq")) || bytes.Contains(code, []byte("-ne")) || bytes.Contains(code, []byte("param("))) {
 			return TypePowerShellScript
+		}
+	}
+
+	if bytes.HasPrefix(code, []byte("#")) && bytes.Contains(trimmed, []byte("=")) && !bytes.Contains(trimmed, []byte("==")) {
+		return TypePropertiesFile
+	}
+
+	if bytes.Count(trimmed, []byte(",")) > 3 && bytes.Count(trimmed, []byte("\n")) > 1 {
+		lines := bytes.Split(trimmed, []byte("\n"))
+		if len(lines) > 1 {
+			firstLineCommas := bytes.Count(lines[0], []byte(","))
+			secondLineCommas := bytes.Count(lines[1], []byte(","))
+
+			if firstLineCommas > 0 && firstLineCommas == secondLineCommas {
+				return TypeCSVData
+			}
+		}
+	}
+
+	if bytes.Count(trimmed, []byte("\t")) > 5 && bytes.Count(trimmed, []byte("\n")) > 2 {
+		lines := bytes.Split(trimmed, []byte("\n"))
+		if len(lines) > 2 {
+			firstLineTabs := bytes.Count(lines[0], []byte("\t"))
+			secondLineTabs := bytes.Count(lines[1], []byte("\t"))
+
+			if firstLineTabs >= 2 && firstLineTabs == secondLineTabs {
+				return TypeTSVData
+			}
+		}
+	}
+
+	if bytes.Contains(trimmed, []byte(" [INFO] ")) || bytes.Contains(trimmed, []byte(" [WARN] ")) || bytes.Contains(trimmed, []byte(" [ERROR] ")) || bytes.Contains(trimmed, []byte(" [DEBUG] ")) {
+		return TypeLogData
+	}
+
+	if bytes.Contains(trimmed, []byte("\"GET ")) || bytes.Contains(trimmed, []byte("\"POST ")) || bytes.Contains(trimmed, []byte("\"PUT ")) {
+		if bytes.Contains(trimmed, []byte("HTTP/")) {
+			return TypeApacheLog
+		}
+	}
+
+	if bytes.Contains(trimmed, []byte(" - - [")) && bytes.Contains(trimmed, []byte("] \"")) {
+		return TypeNginxLog
+	}
+
+	if bytes.Contains(trimmed, []byte("HTTP/1.")) && bytes.Contains(trimmed, []byte(" 200 ")) || bytes.Contains(trimmed, []byte(" 301 ")) || bytes.Contains(trimmed, []byte(" 404 ")) {
+		return TypeHTTPLog
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("diff --git")) || bytes.HasPrefix(trimmed, []byte("index ")) || bytes.HasPrefix(trimmed, []byte("--- a/")) || bytes.HasPrefix(trimmed, []byte("+++ b/")) {
+		return TypeGitDiff
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("--- ")) || bytes.HasPrefix(trimmed, []byte("+++ ")) || bytes.HasPrefix(trimmed, []byte("@@ ")) {
+		return TypeDiffPatch
+	}
+
+	if bytes.HasPrefix(trimmed, []byte("Merge ")) || (bytes.Contains(trimmed, []byte("\n\n")) && !bytes.Contains(trimmed, []byte("{")) && !bytes.Contains(trimmed, []byte("("))) {
+		lines := bytes.Split(trimmed, []byte("\n"))
+		if len(lines) > 0 && len(lines[0]) < 80 && !bytes.Contains(lines[0], []byte(":")) && !bytes.Contains(lines[0], []byte("=")) {
+			return TypeCommitMessage
 		}
 	}
 

@@ -16,6 +16,7 @@ var subtypeMap = map[KindID][]TypeID{
 	KindGHCiInterface:         {Type32Bit, Type64Bit},
 	KindGIFImage:              {TypeGIF87a, TypeGIF89a},
 	KindGzipData:              {TypeBGZF},
+	KindHighEntropyData:       {TypeBinary, TypeEncrypted, TypeHighEntropy},
 	KindICOCURImage:           {TypeWindowsCursor, TypeWindowsIcon},
 	KindIFFContainer:          {TypeAIFCAudio, TypeAIFFAudio, TypeCAT, TypeILBMImage, TypeLIST},
 	KindISOBaseMedia:          {Type3G2Video, Type3GPPVideo, TypeAVIFImage, TypeAVIFImageSequence, TypeBlackmagicRAWVideo, TypeCanonRAW3Image, TypeF4VVideo, TypeHEIFImage, TypeM4VVideo, TypeMP4Video, TypeMPEG4Audio, TypeMotionJPEG2000Video, TypeQuickTimeMovie},
