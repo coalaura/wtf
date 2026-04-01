@@ -50,3 +50,9 @@ if ! sudo install -m755 /tmp/wtf /usr/local/bin/wtf; then
 fi
 
 echo "wtf $VERSION installed to /usr/local/bin/wtf"
+
+if [ -f "$HOME/.bashrc" ] && ! grep -qF 'wtf --completion bash' "$HOME/.bashrc" 2>/dev/null; then
+	echo 'eval "$(wtf --completion bash)"' >> "$HOME/.bashrc"
+
+	echo "Added bash completion to ~/.bashrc"
+fi
