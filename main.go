@@ -1,4 +1,3 @@
-// Replace main.go entirely with this simplified version
 package main
 
 import (
@@ -20,6 +19,26 @@ var (
 )
 
 const MaxReadSize = 128 * 1024
+
+const bashCompletion = `_wtf() {
+    local cur prev
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    case "$prev" in
+        --completion)
+            COMPREPLY=($(compgen -W "bash" -- "$cur"))
+            return
+            ;;
+    esac
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "-l -p -t -d -v -h --help --version --completion" -- "$cur"))
+    else
+        compopt -o filenames
+        COMPREPLY=($(compgen -f -- "$cur"))
+    fi
+}
+complete -F _wtf wtf
+`
 
 type kindGroup struct {
 	kind  string
@@ -44,6 +63,7 @@ func main() {
 			log.Println("  -p, --porcelain  Print easily parseable output (tab-separated: Kind\\tType)")
 			log.Println("  -t, --time       Print time taken (read / sniff; disabled by -p)")
 			log.Println("  -d, --deep       Enable deep analysis (entropy, byte distribution) for unknown files")
+			log.Println("      --completion Print shell completion script (bash)")
 			log.Println("  -v, --version    Print version information")
 			log.Println("  -h, --help       Print this help message")
 
@@ -54,6 +74,16 @@ func main() {
 			os.Exit(0)
 		case "-l", "--list":
 			listFormats()
+
+			os.Exit(0)
+		case "--completion":
+			if len(os.Args) < 3 || os.Args[2] != "bash" {
+				log.Errorln("Usage: wtf --completion bash")
+
+				os.Exit(1)
+			}
+
+			fmt.Print(bashCompletion)
 
 			os.Exit(0)
 		case "-p", "--porcelain":
