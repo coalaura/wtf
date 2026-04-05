@@ -30,6 +30,7 @@ const (
 	TypeArchLinuxPackage
 	TypeASCII
 	TypeAsciiDoc
+	TypeAtari800
 	TypeAudioDataTransportStream
 	TypeAVIFImage
 	TypeAVIFImageSequence
@@ -58,6 +59,7 @@ const (
 	TypeCOFFObject
 	TypeComicBook
 	TypeCommitMessage
+	TypeCommodore64
 	TypeCondaPackage
 	TypeContainer
 	TypeCopyOnWrite
@@ -101,6 +103,8 @@ const (
 	TypeFlatpak
 	TypeForgeMod
 	TypeFSharpSource
+	TypeGameMakerStudio
+	TypeGameMakerStudio2
 	TypeGeoJSON
 	TypeGeoPackage
 	TypeGIF87a
@@ -112,6 +116,8 @@ const (
 	TypeGraphQL
 	TypeGraphQLSchema
 	TypeGuileScript
+	TypeHalfLife1
+	TypeHalfLife2
 	TypeHandlebarsTemplate
 	TypeHaskellSource
 	TypeHDPhoto
@@ -201,6 +207,8 @@ const (
 	TypeNuGetPackage
 	TypeObjectiveCSource
 	TypeOCIImageLayout
+	TypeOggSkeleton3
+	TypeOggSkeleton4
 	TypeOldASCII
 	TypeOlympusRAW
 	TypeOpenAPISpecification
@@ -271,6 +279,7 @@ const (
 	TypeSoundFont2
 	TypeSpecial
 	TypeSpeexAudio
+	TypeSpineBinary
 	TypeSQLScript
 	TypeSSHConfig
 	TypeStudioOne
@@ -372,6 +381,7 @@ var typeNames = [...]string{
 	TypeArchLinuxPackage:                   "Arch Linux Package",
 	TypeASCII:                              "ASCII",
 	TypeAsciiDoc:                           "AsciiDoc",
+	TypeAtari800:                           "Atari 800",
 	TypeAudioDataTransportStream:           "Audio Data Transport Stream",
 	TypeAVIFImage:                          "AVIF Image",
 	TypeAVIFImageSequence:                  "AVIF Image Sequence",
@@ -400,6 +410,7 @@ var typeNames = [...]string{
 	TypeCOFFObject:                         "COFF Object",
 	TypeComicBook:                          "Comic Book",
 	TypeCommitMessage:                      "Commit Message",
+	TypeCommodore64:                        "Commodore 64",
 	TypeCondaPackage:                       "Conda Package",
 	TypeContainer:                          "Container",
 	TypeCopyOnWrite:                        "Copy-On-Write",
@@ -443,6 +454,8 @@ var typeNames = [...]string{
 	TypeFlatpak:                            "Flatpak Bundle",
 	TypeForgeMod:                           "Forge Mod",
 	TypeFSharpSource:                       "F# Source",
+	TypeGameMakerStudio:                    "GameMaker Studio",
+	TypeGameMakerStudio2:                   "GameMaker Studio 2",
 	TypeGeoJSON:                            "GeoJSON",
 	TypeGeoPackage:                         "GeoPackage",
 	TypeGIF87a:                             "GIF87a",
@@ -454,6 +467,8 @@ var typeNames = [...]string{
 	TypeGraphQL:                            "GraphQL",
 	TypeGraphQLSchema:                      "GraphQL Schema",
 	TypeGuileScript:                        "Guile Script",
+	TypeHalfLife1:                          "Half-Life 1",
+	TypeHalfLife2:                          "Half-Life 2",
 	TypeHandlebarsTemplate:                 "Handlebars Template",
 	TypeHaskellSource:                      "Haskell Source",
 	TypeHDPhoto:                            "HD Photo",
@@ -543,6 +558,8 @@ var typeNames = [...]string{
 	TypeNuGetPackage:                                "NuGet Package",
 	TypeObjectiveCSource:                            "Objective-C Source",
 	TypeOCIImageLayout:                              "OCI Image Layout",
+	TypeOggSkeleton3:                                "Ogg Skeleton 3.0",
+	TypeOggSkeleton4:                                "Ogg Skeleton 4.0",
 	TypeOldASCII:                                    "Old ASCII",
 	TypeOlympusRAW:                                  "Olympus RAW",
 	TypeOpenAPISpecification:                        "OpenAPI Specification",
@@ -613,6 +630,7 @@ var typeNames = [...]string{
 	TypeSoundFont2:                                  "SoundFont 2",
 	TypeSpecial:                                     "Special",
 	TypeSpeexAudio:                                  "Speex Audio",
+	TypeSpineBinary:                                 "Spine Binary",
 	TypeSQLScript:                                   "SQL Script",
 	TypeSSHConfig:                                   "SSH Configuration",
 	TypeStudioOne:                                   "Studio One Song",

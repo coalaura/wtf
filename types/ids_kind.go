@@ -6,6 +6,7 @@ const (
 	KindUnknown KindID = iota
 	Kind1PasswordCloudKeychain
 	Kind1PasswordKeychain
+	Kind3DStudioMaxModel
 	Kind7ZipArchive
 	KindAACAudio
 	KindAccessDataFTKEvidence
@@ -78,6 +79,7 @@ const (
 	KindASTCTextureImage
 	KindAsylumMusicFormat
 	KindAtari7800ROM
+	KindAtariDiskImage
 	KindAtariJaguarROM
 	KindAtariLynxROM
 	KindAtariTOSExecutable
@@ -86,6 +88,9 @@ const (
 	KindAudacityBlock
 	KindAutoCADDrawing
 	KindAutoCADDXFDrawing
+	KindAutodesk123DDesign
+	KindAutodeskAliasStudio
+	KindAutodeskInventor
 	KindAV1Video
 	KindAVG6IntegrityDatabase
 	KindAvidDNxHD
@@ -109,6 +114,7 @@ const (
 	KindBitcoinWallet
 	KindBitLockerDiskEncryption
 	KindBlackBerryBackup
+	KindBlenderCache
 	KindBlenderProject
 	KindBlinkArchive
 	KindBlizzardM2Model
@@ -145,6 +151,8 @@ const (
 	KindCloneCDControl
 	KindCLOOPImage
 	KindColladaModel
+	KindCommodore64DiskImage
+	KindCommodore64Program
 	KindCommodore64TapeImage
 	KindCommodore64TapeRAWImage
 	KindCommodoreSIDAudio
@@ -249,6 +257,7 @@ const (
 	KindGamebryoModel
 	KindGameCubeROM
 	KindGameMakerData
+	KindGameMakerStudioProject
 	KindGDBMDatabase
 	KindGDSIIICLayout
 	KindGEMRasterImage
@@ -289,6 +298,7 @@ const (
 	KindH265Video
 	KindHadoopRC
 	KindHadoopSequence
+	KindHalfLifeModel
 	KindHamarsoftArchive
 	KindHarvardGraphicsImage
 	KindHDF4Data
@@ -401,6 +411,7 @@ const (
 	KindMATLABData
 	KindMayaASCIIModel
 	KindMayaBinaryModel
+	KindMayaProject
 	KindMBOXEmailFolder
 	KindMBOXTableOfContents
 	KindMCAPCapture
@@ -432,6 +443,7 @@ const (
 	KindMIDISequence
 	KindMilesSoundSystem
 	KindMilestonesProject
+	KindMinecraftLevel
 	KindMinixFilesystem
 	KindMinoltaRAWImage
 	KindMNGImage
@@ -473,11 +485,13 @@ const (
 	KindNIfTIMedicalImage
 	KindNILFS2Filesystem
 	KindNintendo3DSROM
+	KindNintendo64DiskDrive
 	KindNintendo64ROM
 	KindNintendoBCFNTFont
 	KindNintendoBFLYTLayout
 	KindNintendoBRRESResource
 	KindNintendoContentArchive
+	KindNintendoDSBTIImage
 	KindNintendoDSiROM
 	KindNintendoDSROM
 	KindNintendoRARCArchive
@@ -503,6 +517,7 @@ const (
 	KindNVIDIASceneGraph
 	KindOCamlObject
 	KindOggContainer
+	KindOggSkeleton
 	KindOktalyzerModule
 	KindOLECompoundDocument
 	KindOpenEXRImage
@@ -624,6 +639,9 @@ const (
 	KindROOTData
 	KindROSBag
 	KindRPGMakerArchive
+	KindRPGVXAceProject
+	KindRPGVXProject
+	KindRPGXPProject
 	KindRPMPackage
 	KindRSSFeed
 	KindRubyGemPackage
@@ -674,6 +692,7 @@ const (
 	KindSourceEngineModel
 	KindSpeedtouchFirmware
 	KindSPIFFImage
+	KindSpineAnimation
 	KindSPSSData
 	KindSPSSPortableData
 	KindSPSSTemplate
@@ -809,6 +828,7 @@ const (
 	KindWinNTRegistryUndo
 	KindWinPharaohCapture
 	KindWinPharaohFilter
+	KindWinRARRecoveryRecord
 	KindWiredTigerDatabase
 	KindWOFF2Font
 	KindWOFFFont
@@ -859,6 +879,7 @@ var kindNames = [...]string{
 	KindUnknown:                             "Unknown",
 	Kind1PasswordCloudKeychain:              "1Password Cloud Keychain",
 	Kind1PasswordKeychain:                   "1Password Keychain",
+	Kind3DStudioMaxModel:                    "3D Studio Max Model",
 	Kind7ZipArchive:                         "7-Zip Archive",
 	KindAACAudio:                            "AAC Audio",
 	KindAccessDataFTKEvidence:               "AccessData FTK Evidence",
@@ -931,6 +952,7 @@ var kindNames = [...]string{
 	KindASTCTextureImage:                    "ASTC Texture Image",
 	KindAsylumMusicFormat:                   "Asylum Music Format",
 	KindAtari7800ROM:                        "Atari 7800 ROM",
+	KindAtariDiskImage:                      "Atari Disk Image",
 	KindAtariJaguarROM:                      "Atari Jaguar ROM",
 	KindAtariLynxROM:                        "Atari Lynx ROM",
 	KindAtariTOSExecutable:                  "Atari TOS Executable",
@@ -939,6 +961,9 @@ var kindNames = [...]string{
 	KindAudacityBlock:                       "Audacity Block",
 	KindAutoCADDrawing:                      "AutoCAD Drawing",
 	KindAutoCADDXFDrawing:                   "AutoCAD DXF Drawing",
+	KindAutodesk123DDesign:                  "Autodesk 123D Design",
+	KindAutodeskAliasStudio:                 "Autodesk AliasStudio",
+	KindAutodeskInventor:                    "Autodesk Inventor",
 	KindAV1Video:                            "AV1 Video",
 	KindAVG6IntegrityDatabase:               "AVG6 Integrity Database",
 	KindAvidDNxHD:                           "Avid DNxHD Video",
@@ -962,6 +987,7 @@ var kindNames = [...]string{
 	KindBitcoinWallet:                       "Bitcoin Wallet",
 	KindBitLockerDiskEncryption:             "BitLocker Disk Encryption",
 	KindBlackBerryBackup:                    "BlackBerry Backup",
+	KindBlenderCache:                        "Blender Cache",
 	KindBlenderProject:                      "Blender",
 	KindBlinkArchive:                        "Blink Archive",
 	KindBlizzardM2Model:                     "Blizzard M2 Model",
@@ -998,6 +1024,8 @@ var kindNames = [...]string{
 	KindCloneCDControl:                      "CloneCD Control",
 	KindCLOOPImage:                          "CLOOP Image",
 	KindColladaModel:                        "COLLADA Model",
+	KindCommodore64DiskImage:                "Commodore 64 Disk Image",
+	KindCommodore64Program:                  "Commodore 64 Program",
 	KindCommodore64TapeImage:                "Commodore 64 Tape Image",
 	KindCommodore64TapeRAWImage:             "Commodore 64 Tape RAW Image",
 	KindCommodoreSIDAudio:                   "Commodore SID Audio",
@@ -1102,6 +1130,7 @@ var kindNames = [...]string{
 	KindGamebryoModel:                       "Gamebryo Model",
 	KindGameCubeROM:                         "GameCube ROM",
 	KindGameMakerData:                       "GameMaker Data",
+	KindGameMakerStudioProject:              "GameMaker Studio Project",
 	KindGDBMDatabase:                        "GDBM Database",
 	KindGDSIIICLayout:                       "GDSII IC Layout",
 	KindGEMRasterImage:                      "GEM Raster Image",
@@ -1142,6 +1171,7 @@ var kindNames = [...]string{
 	KindH265Video:                           "H.265 Video",
 	KindHadoopRC:                            "Hadoop RC",
 	KindHadoopSequence:                      "Hadoop Sequence",
+	KindHalfLifeModel:                       "Half-Life Model",
 	KindHamarsoftArchive:                    "Hamarsoft Archive",
 	KindHarvardGraphicsImage:                "Harvard Graphics Image",
 	KindHDF4Data:                            "HDF4 Data",
@@ -1254,6 +1284,7 @@ var kindNames = [...]string{
 	KindMATLABData:                          "MATLAB Data",
 	KindMayaASCIIModel:                      "Maya ASCII Model",
 	KindMayaBinaryModel:                     "Maya Binary Model",
+	KindMayaProject:                         "Maya Project",
 	KindMBOXEmailFolder:                     "MBOX Email Folder",
 	KindMBOXTableOfContents:                 "MBOX Table of Contents",
 	KindMCAPCapture:                         "MCAP Capture",
@@ -1285,6 +1316,7 @@ var kindNames = [...]string{
 	KindMIDISequence:                        "MIDI Sequence",
 	KindMilesSoundSystem:                    "Miles Sound System Audio",
 	KindMilestonesProject:                   "Milestones Project",
+	KindMinecraftLevel:                      "Minecraft Level",
 	KindMinixFilesystem:                     "Minix Filesystem",
 	KindMinoltaRAWImage:                     "Minolta RAW Image",
 	KindMNGImage:                            "MNG Image",
@@ -1326,11 +1358,13 @@ var kindNames = [...]string{
 	KindNIfTIMedicalImage:                   "NIfTI Medical Image",
 	KindNILFS2Filesystem:                    "NILFS2 Filesystem",
 	KindNintendo3DSROM:                      "Nintendo 3DS ROM",
+	KindNintendo64DiskDrive:                 "Nintendo 64 Disk Drive",
 	KindNintendo64ROM:                       "Nintendo 64 ROM",
 	KindNintendoBCFNTFont:                   "Nintendo BCFNT Font",
 	KindNintendoBFLYTLayout:                 "Nintendo BFLYT Layout",
 	KindNintendoBRRESResource:               "Nintendo BRRES Resource",
 	KindNintendoContentArchive:              "Nintendo Content Archive",
+	KindNintendoDSBTIImage:                  "Nintendo DS BTI Image",
 	KindNintendoDSiROM:                      "Nintendo DSi ROM",
 	KindNintendoDSROM:                       "Nintendo DS ROM",
 	KindNintendoRARCArchive:                 "Nintendo RARC Archive",
@@ -1356,6 +1390,7 @@ var kindNames = [...]string{
 	KindNVIDIASceneGraph:                    "NVIDIA Scene Graph",
 	KindOCamlObject:                         "OCaml Object",
 	KindOggContainer:                        "Ogg Container",
+	KindOggSkeleton:                         "Ogg Skeleton",
 	KindOktalyzerModule:                     "Oktalyzer Module",
 	KindOLECompoundDocument:                 "OLE Compound Document",
 	KindOpenEXRImage:                        "OpenEXR Image",
@@ -1477,6 +1512,9 @@ var kindNames = [...]string{
 	KindROOTData:                            "ROOT Data",
 	KindROSBag:                              "ROS Bag",
 	KindRPGMakerArchive:                     "RPG Maker Archive",
+	KindRPGVXAceProject:                     "RPG Maker VX Ace Project",
+	KindRPGVXProject:                        "RPG Maker VX Project",
+	KindRPGXPProject:                        "RPG Maker XP Project",
 	KindRPMPackage:                          "RPM Package",
 	KindRSSFeed:                             "RSS Feed",
 	KindRubyGemPackage:                      "RubyGem Package",
@@ -1527,6 +1565,7 @@ var kindNames = [...]string{
 	KindSourceEngineModel:                   "Source Engine Model",
 	KindSpeedtouchFirmware:                  "Speedtouch Firmware",
 	KindSPIFFImage:                          "SPIFF Image",
+	KindSpineAnimation:                      "Spine Animation",
 	KindSPSSData:                            "SPSS Data",
 	KindSPSSPortableData:                    "SPSS Portable Data",
 	KindSPSSTemplate:                        "SPSS Template",
@@ -1662,6 +1701,7 @@ var kindNames = [...]string{
 	KindWinNTRegistryUndo:                   "WinNT Registry Undo",
 	KindWinPharaohCapture:                   "WinPharaoh Capture",
 	KindWinPharaohFilter:                    "WinPharaoh Filter",
+	KindWinRARRecoveryRecord:                "WinRAR Recovery Record",
 	KindWiredTigerDatabase:                  "WiredTiger Database",
 	KindWOFF2Font:                           "WOFF2 Font",
 	KindWOFFFont:                            "WOFF Font",

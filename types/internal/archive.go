@@ -126,6 +126,7 @@ func init() {
 	types.RegisterSignature(types.KindWADArchive, types.TypeIWAD, 0, []byte("IWAD"))
 	types.RegisterSignature(types.KindWADArchive, types.TypePWAD, 0, []byte("PWAD"))
 	types.RegisterSignature(types.KindWindowsImagingFormat, types.TypeNone, 0, []byte("MSWIM\x00\x00\x00"))
+	types.RegisterSignature(types.KindWinRARRecoveryRecord, types.TypeNone, 0, []byte("Rar!\x1a\x07\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00"))
 	types.RegisterSignature(types.KindXARArchive, types.TypeNone, 0, []byte("xar!"))
 	types.RegisterSignature(types.KindXZArchive, types.TypeNone, 0, []byte{0xfd, '7', 'z', 'X', 'Z', 0x00})
 	types.RegisterSignature(types.KindYACArchive, types.TypeNone, 0, []byte("YAC\x01"))

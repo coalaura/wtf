@@ -93,6 +93,6 @@ func main() {
 
 ## Coverage
 
-**wtf** detects over **1020+ file formats** across a broad set of categories, including archives, packages, filesystems, disk images, documents, databases, audio, video, images, fonts, executables, forensic artifacts and text/source files.
+**wtf** detects over **1050+ file formats** across a broad set of categories, including archives, packages, filesystems, disk images, documents, databases, audio, video, images, fonts, executables, forensic artifacts and text/source files.
 
 The project intentionally does **not** maintain a giant hand-written format list in the README. Coverage changes frequently and the detector set keeps growing. The goal is broad, precise detection with minimal false positives, using fixed signatures wherever possible and custom structural detection only when a format cannot be represented cleanly otherwise.

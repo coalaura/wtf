@@ -77,6 +77,7 @@ func init() {
 	types.RegisterSignature(types.KindMrSIDImage, types.TypeNone, 0, []byte("msid"))
 	types.RegisterSignature(types.KindNIfTIMedicalImage, types.TypeNone, 344, []byte("n+1\x00"))
 	types.RegisterSignature(types.KindNIfTIMedicalImage, types.TypeNone, 344, []byte("ni1\x00"))
+	types.RegisterSignature(types.KindNintendoDSBTIImage, types.TypeNone, 0, []byte("BTI\x00"))
 	types.RegisterSignature(types.KindNintendoTPLImage, types.TypeNone, 0, []byte{0x00, 0x20, 0xaf, 0x30})
 	types.RegisterSignature(types.KindNOAARasterChart, types.TypeNone, 0, []byte("!\r\nCRR/This elec"))
 	types.RegisterSignature(types.KindNRRDMedicalImage, types.TypeNone, 0, []byte("NRRD"))
@@ -135,6 +136,8 @@ func init() {
 	types.RegisterMaskedSignature(types.KindDjVuDocument, types.TypeNone, 0, []byte("FORM\x00\x00\x00\x00THUM"), []byte{0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindIFFContainer, types.TypeILBMImage, 0, []byte("FORM\x00\x00\x00\x00ILBM"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindMetafileImage, types.TypeEnhancedMetafile, 0, []byte{0x01, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0x45, 0x4d, 0x46}, []byte{0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
+	types.RegisterMaskedSignature(types.KindOggSkeleton, types.TypeOggSkeleton3, 0, []byte("fishead\x00\x00\x00\x00\x03\x00\x00\x00"), []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
+	types.RegisterMaskedSignature(types.KindOggSkeleton, types.TypeOggSkeleton4, 0, []byte("fishead\x00\x00\x00\x00\x04\x00\x00\x00"), []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeRIFFPalette, 0, []byte("RIFF\x00\x00\x00\x00PAL "), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 	types.RegisterMaskedSignature(types.KindRIFFContainer, types.TypeWebPImage, 0, []byte("RIFF\x00\x00\x00\x00WEBP"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 

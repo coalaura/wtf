@@ -1,0 +1,15 @@
+package internal
+
+import "github.com/coalaura/wtf/types"
+
+func init() {
+	types.RegisterSignature(types.Kind3DStudioMaxModel, types.TypeNone, 0, []byte{0x4d, 0x4d})
+	types.RegisterSignature(types.KindAutodesk123DDesign, types.TypeNone, 0, []byte("123D\x00"))
+	types.RegisterSignature(types.KindAutodeskAliasStudio, types.TypeNone, 0, []byte("AliasStudio"))
+	types.RegisterSignature(types.KindAutodeskInventor, types.TypeNone, 0, []byte{0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1})
+	types.RegisterSignature(types.KindBlenderCache, types.TypeNone, 0, []byte("BPHYSICS"))
+	types.RegisterSignature(types.KindHalfLifeModel, types.TypeHalfLife1, 0, []byte("IDST\x00\x00\x00\x00"))
+	types.RegisterSignature(types.KindHalfLifeModel, types.TypeHalfLife2, 0, []byte("IDST\x01\x00\x00\x00"))
+	types.RegisterSignature(types.KindMayaProject, types.TypeNone, 0, []byte("MayaProject\x00"))
+	types.RegisterSignature(types.KindSpineAnimation, types.TypeSpineBinary, 0, []byte{0x13, 0x53, 0x70, 0x69, 0x6e, 0x65, 0x20, 0x41, 0x6e, 0x69, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e})
+}
