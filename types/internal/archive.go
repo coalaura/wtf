@@ -26,6 +26,7 @@ func init() {
 	types.RegisterSignature(types.KindBzip2Archive, types.TypeNone, 0, []byte("BZh"))
 	types.RegisterSignature(types.KindBzip3Archive, types.TypeNone, 0, []byte("BZ3v1"))
 	types.RegisterSignature(types.KindCabinetArchive, types.TypeNone, 0, []byte("MSCF"))
+	types.RegisterSignature(types.KindCLOOPImage, types.TypeNone, 0x0c, []byte("\x0brecovery\x00"))
 	types.RegisterSignature(types.KindCPIOArchive, types.TypeBinaryBigEndian, 0, []byte{0x71, 0xc7})
 	types.RegisterSignature(types.KindCPIOArchive, types.TypeBinaryLittleEndian, 0, []byte{0xc7, 0x71})
 	types.RegisterSignature(types.KindCPIOArchive, types.TypeNewASCII, 0, []byte("070701"))
@@ -67,6 +68,7 @@ func init() {
 	types.RegisterSignature(types.KindLZFArchive, types.TypeNone, 0, []byte("ZV\x00"))
 	types.RegisterSignature(types.KindLZFArchive, types.TypeNone, 0, []byte("ZV\x01"))
 	types.RegisterSignature(types.KindLZFSEData, types.TypeNone, 0, []byte("bvx2"))
+	types.RegisterSignature(types.KindLZHAMArchive, types.TypeNone, 0, []byte("LZH0"))
 	types.RegisterSignature(types.KindLZIPArchive, types.TypeNone, 0, []byte("LZIP"))
 	types.RegisterSignature(types.KindLZOPArchive, types.TypeNone, 0, []byte{0x89, 'L', 'Z', 'O', 0x00, 0x0d, 0x0a, 0x1a, 0x0a})
 	types.RegisterSignature(types.KindLZXArchive, types.TypeNone, 0, []byte("LZX"))
@@ -139,4 +141,6 @@ func init() {
 	types.RegisterSignature(types.KindZstandardDictionary, types.TypeNone, 0, []byte{0x37, 0xa4, 0x30, 0xec})
 
 	types.RegisterMaskedSignature(types.KindGzipData, types.TypeBGZF, 0, []byte{0x1f, 0x8b, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'B', 'C', 0x02, 0x00}, []byte{0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})
+
+	types.RegisterWeakMaskedSignature(types.KindBrotliData, types.TypeNone, 0, []byte{0x00, 0x00, 0x00, 0x00}, []byte{0x0f, 0xff, 0xff, 0xff})
 }

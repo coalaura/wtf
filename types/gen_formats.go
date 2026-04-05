@@ -54,6 +54,7 @@ var subtypeMap = map[KindID][]TypeID{
 	KindSQLiteDatabase:           {TypeGeoPackage, TypeMBTiles},
 	KindShockwaveFlash:           {TypeLZMACompressed, TypeUncompressed, TypeZlibCompressed},
 	KindTARArchive:               {TypeArchLinuxPackage, TypeComicBook, TypeCondaPackage, TypeFlatpak, TypeNpmPackage, TypeOCIImageLayout, TypePythonSourceDistribution, TypeSlackwarePackage, TypeVagrantBox},
+	KindTICalculatorProgram:      {TypeTI83, TypeTI83Plus, TypeTI89, TypeTI92, TypeTI92Plus, TypeVoyage200},
 	KindTIFFImage:                {TypeAdobeDNG, TypeBigEndian, TypeBigTIFF, TypeLittleEndian, TypeNikonRAW, TypeOlympusRAW, TypePanasonicRAW, TypePentaxRAW, TypeSonyRAW, TypeSonyRAWSR2},
 	KindVMwareDiskImage:          {TypeCopyOnWrite, TypeDescription, TypeKDMV},
 	KindVisualStudioSolution:     {TypeWorkspace},

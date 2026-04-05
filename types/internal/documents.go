@@ -8,6 +8,7 @@ func init() {
 	types.RegisterSignature(types.KindAdobeFrameMakerDocument, types.TypeNone, 0, []byte("<MakerFi"))
 	types.RegisterSignature(types.KindAdobeInDesignDocument, types.TypeNone, 0, []byte{0x06, 0x06, 0xed, 0xf5, 0xd8, 0x1d, 0x46, 0xe5, 0xbd, 0x31, 0xef, 0xe7, 0xfe, 0x74, 0xb7, 0x1d})
 	types.RegisterSignature(types.KindAlembicModel, types.TypeNone, 0, []byte("OgA\x00"))
+	types.RegisterSignature(types.KindAmigaGuideDocument, types.TypeNone, 0, []byte("AmigaGuide"))
 	types.RegisterSignature(types.KindApacheArrow, types.TypeNone, 0, []byte("ARROW1"))
 	types.RegisterSignature(types.KindApacheParquet, types.TypeNone, 0, []byte("PAR1"))
 	types.RegisterSignature(types.KindAppleBinaryPropertyList, types.TypeNone, 0, []byte("bplist00"))

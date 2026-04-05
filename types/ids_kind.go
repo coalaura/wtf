@@ -24,6 +24,7 @@ const (
 	KindALZArchive
 	KindAmigaDiskImage
 	KindAmigaDiskMasherArchive
+	KindAmigaGuideDocument
 	KindAmigaHardDiskImage
 	KindAmigaHunkExecutable
 	KindAmigaIcon
@@ -89,6 +90,7 @@ const (
 	KindAVG6IntegrityDatabase
 	KindAvidDNxHD
 	KindAvroObjectContainer
+	KindAYAudio
 	KindB1Archive
 	KindBadgerDB
 	KindBAMData
@@ -120,6 +122,7 @@ const (
 	KindBPGImage
 	KindBroadbandEBookDocument
 	KindBrotherEmbroidery
+	KindBrotliData
 	KindBtrfsFilesystem
 	KindBUFR
 	KindBzip2Archive
@@ -140,6 +143,7 @@ const (
 	KindClamAVDatabase
 	KindClipStudioPaintImage
 	KindCloneCDControl
+	KindCLOOPImage
 	KindColladaModel
 	KindCommodore64TapeImage
 	KindCommodore64TapeRAWImage
@@ -185,6 +189,7 @@ const (
 	KindDSFAudio
 	KindDSTCompression
 	KindDTSAudio
+	KindDTSHDAudio
 	KindDVRMSVideo
 	KindEasyStreetDrawDrawing
 	KindEBMLContainer
@@ -289,8 +294,10 @@ const (
 	KindHDF4Data
 	KindHDF5Data
 	KindHealthLevel7Data
+	KindHESAudio
 	KindHFSPlusFilesystem
 	KindHighEntropyData
+	KindHP48Program
 	KindHTMLDocument
 	KindHuskygramPoem
 	KindHusqvarnaDesigner
@@ -341,6 +348,7 @@ const (
 	KindKGBArchive
 	KindKodakPhotoCD
 	KindKorgAudio
+	KindKSSAudio
 	KindKTXTextureImage
 	KindKyotoCabinetDatabase
 	KindLevelDB
@@ -368,6 +376,7 @@ const (
 	KindLZ4Frame
 	KindLZFArchive
 	KindLZFSEData
+	KindLZHAMArchive
 	KindLZIPArchive
 	KindLZMAData
 	KindLZOPArchive
@@ -525,6 +534,7 @@ const (
 	KindPCXImage
 	KindPDFDocument
 	KindPeaZipArchive
+	KindPEFExecutable
 	KindPEMCertificate
 	KindPEMPrivateKey
 	KindPerfectOfficeDocument
@@ -648,6 +658,7 @@ const (
 	KindSmackerVideo
 	KindSmartDrawDrawing
 	KindSnappyFramedData
+	KindSNDHAudio
 	KindSnes9xSavestate
 	KindSNESSPCAudio
 	KindSnoopCapture
@@ -699,12 +710,14 @@ const (
 	KindText
 	KindTheBatIndex
 	KindThunderbirdMailSummary
+	KindTICalculatorProgram
 	KindTIFFImage
 	KindTimezoneData
 	KindTokyoCabinetDatabase
 	KindTomTomTrafficData
 	KindTorrentDocument
 	KindTransportNeutralEncapsulationFormat
+	KindTrueHDAudio
 	KindTrueTypeCollection
 	KindTrueTypeFont
 	KindTTAAudio
@@ -864,6 +877,7 @@ var kindNames = [...]string{
 	KindALZArchive:                          "ALZ Archive",
 	KindAmigaDiskImage:                      "Amiga Disk Image",
 	KindAmigaDiskMasherArchive:              "Amiga DiskMasher Archive",
+	KindAmigaGuideDocument:                  "AmigaGuide Document",
 	KindAmigaHardDiskImage:                  "Amiga Hard Disk Image",
 	KindAmigaHunkExecutable:                 "Amiga Hunk Executable",
 	KindAmigaIcon:                           "Amiga Icon",
@@ -929,6 +943,7 @@ var kindNames = [...]string{
 	KindAVG6IntegrityDatabase:               "AVG6 Integrity Database",
 	KindAvidDNxHD:                           "Avid DNxHD Video",
 	KindAvroObjectContainer:                 "Avro Object Container",
+	KindAYAudio:                             "AY Audio",
 	KindB1Archive:                           "B1 Archive",
 	KindBadgerDB:                            "BadgerDB Database",
 	KindBAMData:                             "BAM Data",
@@ -960,6 +975,7 @@ var kindNames = [...]string{
 	KindBPGImage:                            "BPG Image",
 	KindBroadbandEBookDocument:              "Broadband eBook Document",
 	KindBrotherEmbroidery:                   "Brother Embroidery",
+	KindBrotliData:                          "Brotli Data",
 	KindBtrfsFilesystem:                     "Btrfs Filesystem",
 	KindBUFR:                                "BUFR Data",
 	KindBzip2Archive:                        "Bzip2 Archive",
@@ -980,6 +996,7 @@ var kindNames = [...]string{
 	KindClamAVDatabase:                      "ClamAV Database",
 	KindClipStudioPaintImage:                "Clip Studio Paint Image",
 	KindCloneCDControl:                      "CloneCD Control",
+	KindCLOOPImage:                          "CLOOP Image",
 	KindColladaModel:                        "COLLADA Model",
 	KindCommodore64TapeImage:                "Commodore 64 Tape Image",
 	KindCommodore64TapeRAWImage:             "Commodore 64 Tape RAW Image",
@@ -1025,6 +1042,7 @@ var kindNames = [...]string{
 	KindDSFAudio:                            "DSF Audio",
 	KindDSTCompression:                      "DST Compression",
 	KindDTSAudio:                            "DTS Audio",
+	KindDTSHDAudio:                          "DTS-HD Audio",
 	KindDVRMSVideo:                          "DVR-MS Video",
 	KindEasyStreetDrawDrawing:               "Easy Street Draw Drawing",
 	KindEBMLContainer:                       "EBML Container",
@@ -1129,8 +1147,10 @@ var kindNames = [...]string{
 	KindHDF4Data:                            "HDF4 Data",
 	KindHDF5Data:                            "HDF5 Data",
 	KindHealthLevel7Data:                    "Health Level-7 Data",
+	KindHESAudio:                            "HES Audio",
 	KindHFSPlusFilesystem:                   "HFS+ Filesystem",
 	KindHighEntropyData:                     "High Entropy Data",
+	KindHP48Program:                         "HP48 Program",
 	KindHTMLDocument:                        "HTML Document",
 	KindHuskygramPoem:                       "Huskygram Poem",
 	KindHusqvarnaDesigner:                   "Husqvarna Designer",
@@ -1181,6 +1201,7 @@ var kindNames = [...]string{
 	KindKGBArchive:                          "KGB Archive",
 	KindKodakPhotoCD:                        "Kodak PhotoCD",
 	KindKorgAudio:                           "Korg Audio",
+	KindKSSAudio:                            "KSS Audio",
 	KindKTXTextureImage:                     "KTX Texture Image",
 	KindKyotoCabinetDatabase:                "Kyoto Cabinet Database",
 	KindLevelDB:                             "LevelDB / RocksDB",
@@ -1208,6 +1229,7 @@ var kindNames = [...]string{
 	KindLZ4Frame:                            "LZ4 Frame",
 	KindLZFArchive:                          "LZF Archive",
 	KindLZFSEData:                           "LZFSE Data",
+	KindLZHAMArchive:                        "LZHAM Archive",
 	KindLZIPArchive:                         "LZIP Archive",
 	KindLZMAData:                            "LZMA Data",
 	KindLZOPArchive:                         "LZOP Archive",
@@ -1365,6 +1387,7 @@ var kindNames = [...]string{
 	KindPCXImage:                            "PCX Image",
 	KindPDFDocument:                         "PDF Document",
 	KindPeaZipArchive:                       "PeaZip Archive",
+	KindPEFExecutable:                       "PEF Executable",
 	KindPEMCertificate:                      "PEM Certificate",
 	KindPEMPrivateKey:                       "PEM Private Key",
 	KindPerfectOfficeDocument:               "Perfect Office Document",
@@ -1488,6 +1511,7 @@ var kindNames = [...]string{
 	KindSmackerVideo:                        "Smacker Video",
 	KindSmartDrawDrawing:                    "SmartDraw Drawing",
 	KindSnappyFramedData:                    "Snappy Framed Data",
+	KindSNDHAudio:                           "SNDH Audio",
 	KindSnes9xSavestate:                     "Snes9x Savestate",
 	KindSNESSPCAudio:                        "SNES SPC Audio",
 	KindSnoopCapture:                        "Snoop Capture",
@@ -1539,12 +1563,14 @@ var kindNames = [...]string{
 	KindText:                                "Text",
 	KindTheBatIndex:                         "The Bat! Index",
 	KindThunderbirdMailSummary:              "Thunderbird Mail Summary",
+	KindTICalculatorProgram:                 "TI Calculator Program",
 	KindTIFFImage:                           "TIFF Image",
 	KindTimezoneData:                        "Timezone Data",
 	KindTokyoCabinetDatabase:                "Tokyo Cabinet Database",
 	KindTomTomTrafficData:                   "TomTom Traffic",
 	KindTorrentDocument:                     "Torrent Document",
 	KindTransportNeutralEncapsulationFormat: "Transport Neutral Encapsulation Format",
+	KindTrueHDAudio:                         "TrueHD Audio",
 	KindTrueTypeCollection:                  "TrueType Collection",
 	KindTrueTypeFont:                        "TrueType Font",
 	KindTTAAudio:                            "TTA Audio",

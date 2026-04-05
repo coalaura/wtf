@@ -67,7 +67,7 @@ func init() {
 	types.RegisterSignature(types.KindVHDDiskImage, types.TypeNone, 0, []byte("conectix"))
 	types.RegisterSignature(types.KindVHDDiskImage, types.TypeNone, 0, []byte("cxsparse"))
 	types.RegisterSignature(types.KindVHDXDiskImage, types.TypeNone, 0, []byte("vhdxfile"))
-	types.RegisterSignature(types.KindVirtualBoxDiskImage, types.TypeNone, 0, []byte("<<< Oracle VM VirtualBox Disk Image >>>\n"))
+	types.RegisterSignature(types.KindVirtualBoxDiskImage, types.TypeNone, 0, []byte{0x7f, 0x10, 0xda, 0xbe})
 	types.RegisterSignature(types.KindVirtualBoxSavedState, types.TypeNone, 0, []byte("\x7fVBOXS"))
 	types.RegisterSignature(types.KindVMwareDiskImage, types.TypeCopyOnWrite, 0, []byte("COWD"))
 	types.RegisterSignature(types.KindVMwareDiskImage, types.TypeDescription, 0, []byte("# Disk D"))

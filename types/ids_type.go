@@ -283,6 +283,11 @@ const (
 	TypeTeXDocument
 	TypeTheoraVideo
 	TypeThriftInterface
+	TypeTI83
+	TypeTI83Plus
+	TypeTI89
+	TypeTI92
+	TypeTI92Plus
 	TypeTOMLConfiguration
 	TypeTopoJSON
 	TypeTSVData
@@ -317,6 +322,7 @@ const (
 	TypeVimScript
 	TypeVisualStudioExtension
 	TypeVorbisAudio
+	TypeVoyage200
 	TypeVueComponent
 	TypeWAVAudio
 	TypeWebMVideo
@@ -619,6 +625,11 @@ var typeNames = [...]string{
 	TypeTeXDocument:                                 "TeX Document",
 	TypeTheoraVideo:                                 "Theora Video",
 	TypeThriftInterface:                             "Thrift Interface",
+	TypeTI83:                                        "TI-83",
+	TypeTI83Plus:                                    "TI-83 Plus",
+	TypeTI89:                                        "TI-89",
+	TypeTI92:                                        "TI-92",
+	TypeTI92Plus:                                    "TI-92 Plus",
 	TypeTOMLConfiguration:                           "TOML Configuration",
 	TypeTopoJSON:                                    "TopoJSON",
 	TypeTSVData:                                     "TSV Data",
@@ -653,6 +664,7 @@ var typeNames = [...]string{
 	TypeVimScript:                                   "Vim Script",
 	TypeVisualStudioExtension:                       "Visual Studio Extension",
 	TypeVorbisAudio:                                 "Vorbis Audio",
+	TypeVoyage200:                                   "Voyage 200",
 	TypeVueComponent:                                "Vue Component",
 	TypeWAVAudio:                                    "WAV Audio",
 	TypeWebMVideo:                                   "WebM Video",
