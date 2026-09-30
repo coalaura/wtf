@@ -1,6 +1,6 @@
 ![img](banner.png)
 
-**wtf** (*what's this file*) is a tiny, "hardware-accelerated" file sniffer for Go.
+**wtf** (*what's this file*) is a tiny, "hardware-accelerated" file sniffer built in Go.
 
 ## Blazing Fast
 
