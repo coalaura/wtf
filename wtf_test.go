@@ -214,14 +214,17 @@ func TestTIFFCountOverflow(t *testing.T) {
 func TestDetectCollisions(t *testing.T) {
 	payload := make([]byte, 2048)
 	copy(payload[1080-30-len("payload"):], []byte{0x53, 0xef})
+
 	zipPayload := collisionZIP(t, map[string][]byte{"payload": payload}, zip.Store)
 	quotedMIME := collisionZIP(t, map[string][]byte{"notes.txt": []byte("application/vnd.ms-word.document.macroEnabled.main+xml")}, zip.Store)
 	project := collisionZIP(t, map[string][]byte{"project.json": []byte("{}"), "payload/data.txt": []byte("data")}, zip.Deflate)
+
 	template := collisionZIP(t, map[string][]byte{
 		"[Content_Types].xml": []byte(`<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml"/></Types>`),
 		"_rels/.rels":         []byte(`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`),
 		"word/document.xml":   []byte(`<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>`),
 	}, zip.Deflate)
+
 	cases := []collisionCase{
 		{name: "zip-ext", data: zipPayload, kind: types.KindZIPArchive},
 		{name: "quoted-mime", data: quotedMIME, kind: types.KindZIPArchive},
