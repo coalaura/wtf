@@ -260,7 +260,7 @@ func TestDetectCollisions(t *testing.T) {
 	footerZIP := collisionZIP(t, map[string][]byte{"payload": []byte("data")}, zip.Store)
 	binary.LittleEndian.PutUint16(footerZIP[len(footerZIP)-2:], 8)
 	footerZIP = append(footerZIP, 0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb)
-	hdfText := append(bytes.Repeat([]byte{'x'}, 463), []byte("\x89HDF\r\n\x1a\n")...)
+	hdfText := append(bytes.Repeat([]byte{'x'}, 463), collisionHDF5(3, 0, 0, 256, 48)...)
 
 	template := collisionZIP(t, map[string][]byte{
 		"[Content_Types].xml": []byte(`<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml"/></Types>`),
@@ -268,21 +268,51 @@ func TestDetectCollisions(t *testing.T) {
 		"word/document.xml":   []byte(`<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>`),
 	}, zip.Deflate)
 
+	zip64Template := collisionZIP64(t, template)
+	extraOffset := bytes.Index(zip64Template, []byte("[Content_Types].xml")) + len("[Content_Types].xml")
+	zip64Missing := bytes.Clone(zip64Template)
+	binary.LittleEndian.PutUint16(zip64Missing[extraOffset:], 2)
+	zip64Truncated := bytes.Clone(zip64Template)
+	binary.LittleEndian.PutUint16(zip64Truncated[extraOffset+2:], 15)
+	zip64Contradictory := bytes.Clone(zip64Template)
+	zip64Contradictory[extraOffset+12] ^= 1
+	zip64Oversized := bytes.Clone(zip64Template)
+	binary.LittleEndian.PutUint64(zip64Oversized[extraOffset+4:], ^uint64(0))
+
 	cases := []collisionCase{
 		{name: "zip-ext", data: zipPayload, kind: types.KindZIPArchive},
 		{name: "zip-leveldb", data: footerZIP, kind: types.KindZIPArchive},
 		{name: "png-hdf5", data: collisionPNG(t, hdfText), kind: types.KindPNGImage},
+		{name: "hdf5-relocated-v2", data: collisionHDF5(2, 512, 0, 256, 48), kind: types.KindHDF5Data},
+		{name: "hdf5-relocated-v3", data: collisionHDF5(3, 512, 0, 256, 48), kind: types.KindHDF5Data},
+		{name: "hdf5-relocated-backward", data: collisionHDF5(3, 512, 1024, 1280, 48), kind: types.KindHDF5Data},
+		{name: "hdf5-end-underflow", data: collisionHDF5(3, 512, 512, 256, 48), forbidden: types.KindHDF5Data},
+		{name: "hdf5-end-overflow", data: collisionHDF5(3, 512, 0, ^uint64(0), 48), forbidden: types.KindHDF5Data},
+		{name: "hdf5-end-truncated", data: collisionHDF5(3, 512, 0, 257, 48), forbidden: types.KindHDF5Data},
+		{name: "hdf5-root-outside", data: collisionHDF5(3, 512, 0, 256, 256), forbidden: types.KindHDF5Data},
 		{name: "tar-metadata", data: collisionTAR(t, "metadata"), kind: types.KindTARArchive},
 		{name: "tar-deploy", data: collisionTAR(t, "deploy"), kind: types.KindTARArchive},
 		{name: "quoted-mime", data: quotedMIME, kind: types.KindZIPArchive},
 		{name: "generic-project", data: project, kind: types.KindZIPArchive},
 		{name: "deflated-template", data: template, kind: types.KindZIPArchive, typ: types.TypeMicrosoftWordTemplate},
+		{name: "zip64-template", data: zip64Template, kind: types.KindZIPArchive, typ: types.TypeMicrosoftWordTemplate},
+		{name: "zip64-missing", data: zip64Missing, kind: types.KindZIPArchive},
+		{name: "zip64-truncated", data: zip64Truncated, kind: types.KindZIPArchive},
+		{name: "zip64-contradictory", data: zip64Contradictory, kind: types.KindZIPArchive},
+		{name: "zip64-oversized", data: zip64Oversized, kind: types.KindZIPArchive},
 		{name: "boolean-not-font", data: []byte("true"), kind: types.KindJSONDocument},
 		{name: "json-array", data: []byte(" \n[1, null, {}]\t"), kind: types.KindJSONDocument},
 		{name: "json-empty", data: []byte("{}"), kind: types.KindJSONDocument},
 		{name: "geojson-false", data: []byte(`{"type":"FeatureCollection","features":false}`), kind: types.KindJSONDocument},
 		{name: "geojson-features", data: []byte(`{"type":"FeatureCollection","features":[]}`), kind: types.KindJSONDocument, typ: types.TypeGeoJSON},
 		{name: "geojson-geometries", data: []byte(`{"type":"GeometryCollection","geometries":[]}`), kind: types.KindJSONDocument, typ: types.TypeGeoJSON},
+		{name: "geojson-point", data: []byte(`{"type":"Point","coordinates": [1,2]}`), kind: types.KindJSONDocument, typ: types.TypeGeoJSON},
+		{name: "geojson-point-false", data: []byte(`{"type":"Point","coordinates":false}`), kind: types.KindJSONDocument},
+		{name: "geojson-point-null", data: []byte(`{"type":"Point","coordinates":null}`), kind: types.KindJSONDocument},
+		{name: "geojson-feature", data: []byte(`{"type":"Feature","geometry":{"type":"Point","coordinates":[1,2]}}`), kind: types.KindJSONDocument, typ: types.TypeGeoJSON},
+		{name: "geojson-feature-null", data: []byte(`{"type":"Feature","geometry": null}`), kind: types.KindJSONDocument, typ: types.TypeGeoJSON},
+		{name: "geojson-feature-number", data: []byte(`{"type":"Feature","geometry":7}`), kind: types.KindJSONDocument},
+		{name: "geojson-feature-missing", data: []byte(`{"type":"Feature"}`), kind: types.KindJSONDocument},
 		{name: "json-malformed", data: []byte(`{"type":"FeatureCollection","features":}`), forbidden: types.KindJSONDocument},
 		{name: "resources-key", data: []byte(`{"resources":[]}`), kind: types.KindJSONDocument},
 		{name: "xml-comment", data: []byte("\xef\xbb\xbf<?xml version=\"1.0\"?><!-- <svg --> <root/>"), kind: types.KindXMLDocument},
@@ -375,6 +405,20 @@ func TestZIPReadBudget(t *testing.T) {
 	}
 }
 
+func collisionHDF5(version byte, offset int, base uint64, end uint64, root uint64) []byte {
+	data := make([]byte, offset+256)
+	header := data[offset:]
+	copy(header, "\x89HDF\r\n\x1a\n")
+	header[8] = version
+	header[9] = 8
+	header[10] = 8
+	binary.LittleEndian.PutUint64(header[12:], base)
+	binary.LittleEndian.PutUint64(header[28:], end)
+	binary.LittleEndian.PutUint64(header[36:], root)
+
+	return data
+}
+
 func collisionPNG(t *testing.T, text []byte) []byte {
 	t.Helper()
 
@@ -436,6 +480,61 @@ func collisionZIP(t *testing.T, files map[string][]byte, method uint16) []byte {
 	}
 
 	err := writer.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return output.Bytes()
+}
+
+func collisionZIP64(t *testing.T, data []byte) []byte {
+	t.Helper()
+
+	archive, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var output bytes.Buffer
+
+	writer := zip.NewWriter(&output)
+
+	for _, file := range archive.File {
+		header := file.FileHeader
+		header.Flags &^= 8
+		header.Extra = make([]byte, 20)
+		binary.LittleEndian.PutUint16(header.Extra, 1)
+		binary.LittleEndian.PutUint16(header.Extra[2:], 16)
+		binary.LittleEndian.PutUint64(header.Extra[4:], file.UncompressedSize64)
+		binary.LittleEndian.PutUint64(header.Extra[12:], file.CompressedSize64)
+
+		localOffset := output.Len()
+
+		entry, err := writer.CreateRaw(&header)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		raw, err := file.OpenRaw()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, err = io.Copy(entry, raw)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = writer.Flush()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		binary.LittleEndian.PutUint32(output.Bytes()[localOffset+18:], 0xffffffff)
+		binary.LittleEndian.PutUint32(output.Bytes()[localOffset+22:], 0xffffffff)
+	}
+
+	err = writer.Close()
 	if err != nil {
 		t.Fatal(err)
 	}

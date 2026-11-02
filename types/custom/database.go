@@ -137,7 +137,15 @@ func validHDF5Superblock(header []byte, offset uint64, size uint64) bool {
 	end := hdf5Address(header[endStart : endStart+width])
 	root := hdf5Address(header[rootStart : rootStart+width])
 
-	return base == offset && end > offset+uint64(rootStart+width) && end <= size && root > 0 && root < end-base
+	if end <= base || offset > size {
+		return false
+	}
+
+	// EOF uses the stored base; the root address is relative to that base.
+	// Bound the relocated extent by subtraction so neither translation can wrap.
+	extent := end - base
+
+	return extent > uint64(rootStart+width) && extent <= size-offset && root > 0 && root < extent
 }
 
 func validHDF5Width(width int) bool {

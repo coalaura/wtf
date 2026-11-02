@@ -251,7 +251,13 @@ func validHDF5Superblock(header []byte, offset uint64, size uint64) bool {
 	end := hdf5Address(header[endStart : endStart+width])
 	root := hdf5Address(header[rootStart : rootStart+width])
 
-	return base == offset && end > offset+uint64(rootStart+width) && end <= size && root > 0 && root < end-base
+	if end <= base || offset > size {
+		return false
+	}
+
+	extent := end - base
+
+	return extent > uint64(rootStart+width) && extent <= size-offset && root > 0 && root < extent
 }
 
 func validHDF5Width(width int) bool {
@@ -1619,11 +1625,11 @@ func DetectJSON(b Buffer) *Metadata {
 				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
 			}
 		case "Feature":
-			if len(identity.Geometry) > 0 {
+			if len(identity.Geometry) > 0 && (identity.Geometry[0] == '{' || string(identity.Geometry) == "null") {
 				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
 			}
 		case "Point", "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon":
-			if len(identity.Coordinates) > 0 {
+			if len(identity.Coordinates) > 0 && identity.Coordinates[0] == '[' {
 				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
 			}
 		case "Topology":
@@ -2600,8 +2606,22 @@ func zipPart(reader io.ReaderAt, centralOffset int64, central []byte, name strin
 		return nil
 	}
 
-	if flags&8 == 0 && (localChecksum != checksum || localCompressedSize != compressedSize || localUncompressedSize != uncompressedSize) {
-		return nil
+	if flags&8 == 0 {
+		if localChecksum != checksum || localCompressedSize != 0xffffffff && localCompressedSize != compressedSize || localUncompressedSize != 0xffffffff && localUncompressedSize != uncompressedSize {
+			return nil
+		}
+
+		if localCompressedSize == 0xffffffff || localUncompressedSize == 0xffffffff {
+			extra := make(Buffer, int(extraLength))
+			if !readAtExactly(reader, extra, dataOffset-int64(extraLength)) {
+				return nil
+			}
+
+			zip64UncompressedSize, zip64CompressedSize, ok := zip64LocalSizes(extra)
+			if !ok || zip64CompressedSize != uint64(compressedSize) || zip64UncompressedSize != uint64(uncompressedSize) {
+				return nil
+			}
+		}
 	}
 
 	compressed := make([]byte, int(compressedSize))
@@ -2629,6 +2649,38 @@ func zipPart(reader io.ReaderAt, centralOffset int64, central []byte, name strin
 	}
 
 	return output
+}
+
+func zip64LocalSizes(extra Buffer) (uint64, uint64, bool) {
+	var (
+		uncompressedSize uint64
+		compressedSize   uint64
+		found            bool
+	)
+
+	for len(extra) > 0 {
+		field, fieldOK := extra.U16LE(0)
+		length, lengthOK := extra.U16LE(2)
+
+		if !fieldOK || !lengthOK || int(length) > len(extra)-4 {
+			return 0, 0, false
+		}
+
+		if field == 0x0001 {
+
+			if found || length != 16 {
+				return 0, 0, false
+			}
+
+			uncompressedSize = binary.LittleEndian.Uint64(extra[4:])
+			compressedSize = binary.LittleEndian.Uint64(extra[12:])
+			found = true
+		}
+
+		extra = extra[4+int(length):]
+	}
+
+	return uncompressedSize, compressedSize, found
 }
 
 func DetectPCX(b Buffer) *Metadata {

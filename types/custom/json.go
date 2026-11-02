@@ -38,11 +38,11 @@ func DetectJSON(b types.Buffer) *types.Metadata {
 				return &types.Metadata{Kind: types.KindJSONDocument, Type: types.TypeGeoJSON}
 			}
 		case "Feature":
-			if len(identity.Geometry) > 0 {
+			if len(identity.Geometry) > 0 && (identity.Geometry[0] == '{' || string(identity.Geometry) == "null") {
 				return &types.Metadata{Kind: types.KindJSONDocument, Type: types.TypeGeoJSON}
 			}
 		case "Point", "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon":
-			if len(identity.Coordinates) > 0 {
+			if len(identity.Coordinates) > 0 && identity.Coordinates[0] == '[' {
 				return &types.Metadata{Kind: types.KindJSONDocument, Type: types.TypeGeoJSON}
 			}
 		case "Topology":

@@ -3,6 +3,7 @@ package custom
 import (
 	"bytes"
 	"compress/flate"
+	"encoding/binary"
 	"encoding/xml"
 	"hash/crc32"
 	"io"
@@ -189,8 +190,22 @@ func zipPart(reader io.ReaderAt, centralOffset int64, central []byte, name strin
 		return nil
 	}
 
-	if flags&8 == 0 && (localChecksum != checksum || localCompressedSize != compressedSize || localUncompressedSize != uncompressedSize) {
-		return nil
+	if flags&8 == 0 {
+		if localChecksum != checksum || localCompressedSize != 0xffffffff && localCompressedSize != compressedSize || localUncompressedSize != 0xffffffff && localUncompressedSize != uncompressedSize {
+			return nil
+		}
+
+		if localCompressedSize == 0xffffffff || localUncompressedSize == 0xffffffff {
+			extra := make(types.Buffer, int(extraLength))
+			if !readAtExactly(reader, extra, dataOffset-int64(extraLength)) {
+				return nil
+			}
+
+			zip64UncompressedSize, zip64CompressedSize, ok := zip64LocalSizes(extra)
+			if !ok || zip64CompressedSize != uint64(compressedSize) || zip64UncompressedSize != uint64(uncompressedSize) {
+				return nil
+			}
+		}
 	}
 
 	compressed := make([]byte, int(compressedSize))
@@ -218,4 +233,36 @@ func zipPart(reader io.ReaderAt, centralOffset int64, central []byte, name strin
 	}
 
 	return output
+}
+
+func zip64LocalSizes(extra types.Buffer) (uint64, uint64, bool) {
+	var (
+		uncompressedSize uint64
+		compressedSize   uint64
+		found            bool
+	)
+
+	for len(extra) > 0 {
+		field, fieldOK := extra.U16LE(0)
+		length, lengthOK := extra.U16LE(2)
+
+		if !fieldOK || !lengthOK || int(length) > len(extra)-4 {
+			return 0, 0, false
+		}
+
+		if field == 0x0001 {
+			// Unlike central records, local ZIP64 fields must contain both sizes.
+			if found || length != 16 {
+				return 0, 0, false
+			}
+
+			uncompressedSize = binary.LittleEndian.Uint64(extra[4:])
+			compressedSize = binary.LittleEndian.Uint64(extra[12:])
+			found = true
+		}
+
+		extra = extra[4+int(length):]
+	}
+
+	return uncompressedSize, compressedSize, found
 }
