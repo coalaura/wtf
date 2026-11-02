@@ -132,7 +132,6 @@ func init() {
 	types.RegisterSignature(types.KindZOOArchive, types.TypeNone, 0, []byte("ZOO "))
 	types.RegisterSignature(types.KindZPAQArchive, types.TypeNone, 0, []byte("7kSt"))
 	types.RegisterSignature(types.KindZstandardArchive, types.TypeNone, 0, []byte{0x28, 0xb5, 0x2f, 0xfd})
-	types.RegisterSignature(types.KindZstandardArchive, types.TypeSkinnableFrame, 0, []byte{0x50, 0x2a, 0x4d, 0x18})
 	types.RegisterSignature(types.KindZstandardDictionary, types.TypeNone, 0, []byte{0x37, 0xa4, 0x30, 0xec})
 
 	types.RegisterMaskedSignature(types.KindGzipData, types.TypeBGZF, 0, []byte{0x1f, 0x8b, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'B', 'C', 0x02, 0x00}, []byte{0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff})

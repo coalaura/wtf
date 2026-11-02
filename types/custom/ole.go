@@ -35,11 +35,6 @@ func DetectOLE(b types.Buffer) *types.Metadata {
 		return meta
 	}
 
-	meta = detectOLESubtype(b)
-	if meta != nil {
-		return meta
-	}
-
 	return &types.Metadata{
 		Kind: types.KindOLECompoundDocument,
 	}
@@ -66,7 +61,7 @@ func detectOLESubtype(b types.Buffer) *types.Metadata {
 		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftInstallerPatch}
 	}
 
-	if containsOLE(b, oleOutlookMessage) {
+	if bytes.HasPrefix(b, oleOutlookMessage) {
 		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftOutlookMessage}
 	}
 
@@ -86,14 +81,7 @@ func detectOLESubtype(b types.Buffer) *types.Metadata {
 }
 
 func containsOLE(b types.Buffer, magic []byte) bool {
-	prefixEnd := min(b.Len(), maxScanSize)
-	if bytes.Contains(b[:prefixEnd], magic) {
-		return true
-	}
-
-	suffixStart := max(prefixEnd, b.Len()-maxScanSize)
-
-	return bytes.Contains(b[suffixStart:], magic)
+	return bytes.Equal(bytes.TrimRight(b, "\x00"), bytes.TrimRight(magic, "\x00"))
 }
 
 func detectOLEReaderAt(r io.ReaderAt, size int64) *types.Metadata {
@@ -250,9 +238,70 @@ func detectOLEReaderAt(r io.ReaderAt, size int64) *types.Metadata {
 		}
 	}
 
-	if meta := detectOLESubtype(types.Buffer(directory)); meta != nil {
-		return meta
+	if len(directory) < 128 || directory[66] != 5 {
+		return nil
 	}
 
-	return &types.Metadata{Kind: types.KindOLECompoundDocument}
+	root := types.Buffer(directory[:128])
+	if root.Has(80, oleMSI) {
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftInstaller}
+	}
+
+	if root.Has(80, []byte{0x86, 0x10, 0x0c, 0, 0, 0, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46}) {
+		return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftInstallerPatch}
+	}
+
+	if root.Has(84, []byte{0, 0, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46}) {
+		class, _ := root.U32LE(80)
+
+		switch class {
+		case 0x00020906, 0x00020900:
+			return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftWordDocument}
+		case 0x00020810, 0x00020820:
+			return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: types.TypeMicrosoftExcelWorkbook}
+		}
+	}
+
+	child, _ := root.U32LE(76)
+	pending := make([]uint32, 0, len(directory)/128)
+	pending = append(pending, child)
+	seen := make([]bool, len(directory)/128)
+
+	var subtype types.TypeID
+
+	for len(pending) > 0 {
+		index := pending[len(pending)-1]
+		pending = pending[:len(pending)-1]
+
+		if index == 0xffffffff {
+			continue
+		}
+
+		if index == 0 || uint64(index) >= uint64(len(seen)) || seen[index] {
+			return nil
+		}
+
+		seen[index] = true
+		entry := types.Buffer(directory[int(index)*128 : (int(index)+1)*128])
+		left, _ := entry.U32LE(68)
+		right, _ := entry.U32LE(72)
+		pending = append(pending, left, right)
+
+		if entry[66] != 2 {
+			continue
+		}
+
+		length, _ := entry.U16LE(64)
+
+		meta := detectOLESubtype(entry[:length])
+		if meta != nil {
+			if subtype != types.TypeNone && subtype != meta.Type {
+				return &types.Metadata{Kind: types.KindOLECompoundDocument}
+			}
+
+			subtype = meta.Type
+		}
+	}
+
+	return &types.Metadata{Kind: types.KindOLECompoundDocument, Type: subtype}
 }

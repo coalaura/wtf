@@ -132,6 +132,7 @@ func parseSignatures(dir string) *Generator {
 					isMask := funcName == "RegisterMaskedSignature" || funcName == "RegisterWeakMaskedSignature"
 
 					expectedArgs := 4
+
 					if isMask {
 						expectedArgs = 5
 					}
@@ -431,6 +432,7 @@ func generateOptimizedCode(gen *Generator, outPath string) {
 
 	// 3. Weak Custom Detectors (JSON, XML, etc.)
 	sort.Strings(gen.Weak)
+
 	for _, c := range gen.Weak {
 		fmt.Fprintf(&buf, "\tif meta := %s(b); meta != nil {\n\t\treturn meta\n\t}\n\n", c)
 	}
@@ -455,7 +457,8 @@ func generateOptimizedCode(gen *Generator, outPath string) {
 		os.Exit(1)
 	}
 
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	err = os.WriteFile(outPath, formatted, 0644)
+	if err != nil {
 		fmt.Printf("write error: %v\n", err)
 
 		os.Exit(1)
@@ -565,7 +568,8 @@ func mergeCustomDetectors(dir string, outPath string) {
 		os.Exit(1)
 	}
 
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	err = os.WriteFile(outPath, formatted, 0644)
+	if err != nil {
 		fmt.Printf("write error: %v\n", err)
 
 		os.Exit(1)
@@ -608,6 +612,7 @@ func stripPackageSelectors(source string) string {
 	for offset := 0; offset < len(source); {
 		if end, ok := remove[offset]; ok {
 			offset = end
+
 			continue
 		}
 
@@ -639,6 +644,8 @@ func generateFormatList(gen *Generator, outPath string) {
 	}
 
 	customTypes := extractTypesFromCustom("./custom")
+	cliTypes := extractTypesFromCustom("..")
+	customTypes["KindFilesystemEntry"] = cliTypes["KindFilesystemEntry"]
 
 	for kind, types := range customTypes {
 		sigTypes[kind] = append(sigTypes[kind], types...)
@@ -650,7 +657,7 @@ func generateFormatList(gen *Generator, outPath string) {
 		var unique []string
 
 		for _, t := range sigTypes[kind] {
-			if !seen[t] {
+			if t != "TypeNone" && !seen[t] {
 				seen[t] = true
 
 				unique = append(unique, t)
@@ -728,7 +735,8 @@ func generateFormatList(gen *Generator, outPath string) {
 		os.Exit(1)
 	}
 
-	if err := os.WriteFile(outPath, formatted, 0644); err != nil {
+	err = os.WriteFile(outPath, formatted, 0644)
+	if err != nil {
 		fmt.Printf("write error: %v\n", err)
 
 		os.Exit(1)

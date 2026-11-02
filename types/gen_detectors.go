@@ -2,15 +2,77 @@
 package types
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
+	"encoding/xml"
+	"errors"
 	"io"
 	"math"
+	"path"
 	"slices"
 	"sort"
+	"strconv"
+	"strings"
 	"unicode/utf16"
 	"unicode/utf8"
 )
+
+func DetectFLIC(b Buffer) *Metadata {
+	if b.Len() < 128 {
+		return nil
+	}
+
+	size, _ := b.U32LE(0)
+	magic, _ := b.U16LE(4)
+	frames, _ := b.U16LE(6)
+	width, _ := b.U16LE(8)
+	height, _ := b.U16LE(10)
+	depth, _ := b.U16LE(12)
+
+	validMagic := magic == 0xaf11 || magic == 0xaf12 || magic == 0xaf44
+	validDepth := depth == 8 || depth == 15 || depth == 16 || depth == 24 || depth == 32
+
+	if validMagic && validDepth && size >= 128 && frames > 0 && width > 0 && height > 0 {
+		return &Metadata{Kind: KindFLICAnimation}
+	}
+
+	return nil
+}
+
+func DetectSpine(b Buffer) *Metadata {
+	if b.Len() < 32 {
+		return nil
+	}
+
+	length := int(b[8]) - 1
+	if length < 5 || length > 13 || 9+length+16 > b.Len() || !b.Has(9, []byte("4.")) {
+		return nil
+	}
+
+	version := b[9 : 9+length]
+	if version[2] < '0' || version[2] > '2' || version[3] != '.' {
+		return nil
+	}
+
+	for _, character := range version[4:] {
+		if character < '0' || character > '9' {
+			return nil
+		}
+	}
+
+	for index := range 4 {
+		bits, _ := b.U32BE(9 + length + index*4)
+
+		value := math.Float32frombits(bits)
+		if math.IsNaN(float64(value)) || math.IsInf(float64(value), 0) || index >= 2 && value < 0 {
+			return nil
+		}
+	}
+
+	return &Metadata{Kind: KindSpineAnimation, Type: TypeSpineBinary, Confidence: ConfidenceMedium}
+}
 
 func DetectAC3(b Buffer) *Metadata {
 	if b.Len() >= 6 && b[0] == 0x0b && b[1] == 0x77 {
@@ -59,6 +121,101 @@ func isValidAV1OBUHeader(header, expectedType byte) bool {
 	return obuType == expectedType
 }
 
+func DetectDatabaseHeaders(b Buffer) *Metadata {
+	if b.Len() >= 28 {
+		magic, _ := b.U32LE(12)
+		version, _ := b.U32LE(16)
+		pageSize, _ := b.U32LE(20)
+
+		if berkeleyMagic(magic) && version > 0 && version <= 20 && validDatabasePageSize(pageSize) {
+			return &Metadata{Kind: KindBerkeleyDatabase, Type: TypeLittleEndian}
+		}
+
+		magic, _ = b.U32BE(12)
+		version, _ = b.U32BE(16)
+		pageSize, _ = b.U32BE(20)
+
+		if berkeleyMagic(magic) && version > 0 && version <= 20 && validDatabasePageSize(pageSize) {
+			return &Metadata{Kind: KindBerkeleyDatabase, Type: TypeBigEndian}
+		}
+
+		magic, _ = b.U32LE(16)
+		version, _ = b.U32LE(20)
+		pageSize, _ = b.U32LE(24)
+		flags, _ := b.U16LE(8)
+
+		if magic == 0xed0cdaed && version == 2 && flags == 4 && validDatabasePageSize(pageSize) {
+			return &Metadata{Kind: KindBoltDB}
+		}
+	}
+
+	if b.Has(0, []byte{0x3f, 0xd7, 0x6c, 0x17}) && b.Len() >= 10 {
+		nameLength := int(b[4])
+		if nameLength > 0 && nameLength < 128 && nameLength <= b.Len()-9 {
+			for _, character := range b[5 : 5+nameLength] {
+				if character < 0x20 || character > 0x7e {
+					return nil
+				}
+			}
+
+			return &Metadata{Kind: KindLuceneIndex}
+		}
+	}
+
+	return nil
+}
+
+func DetectHDF5(b Buffer) *Metadata {
+	for offset := 0; offset+8 <= b.Len(); {
+		if b.Has(offset, []byte{0x89, 'H', 'D', 'F', 13, 10, 26, 10}) {
+			return &Metadata{Kind: KindHDF5Data}
+		}
+
+		if offset == 0 {
+			offset = 512
+		} else {
+			offset *= 2
+		}
+	}
+
+	return nil
+}
+
+func DetectHDF5ReaderAt(b Buffer, reader io.ReaderAt, size int64) *Metadata {
+	meta := DetectHDF5(b)
+	if meta != nil {
+		return meta
+	}
+
+	var signature [8]byte
+
+	for offset := int64(512); offset <= size-8; {
+		if offset >= int64(b.Len()) && readAtExactly(reader, signature[:], offset) && bytesEqualHDF5(signature[:]) {
+			return &Metadata{Kind: KindHDF5Data}
+		}
+
+		if offset > (size-8)/2 {
+			break
+		}
+
+		offset *= 2
+	}
+
+	return nil
+}
+
+func bytesEqualHDF5(signature []byte) bool {
+	return string(signature) == "\x89HDF\r\n\x1a\n"
+}
+
+func berkeleyMagic(magic uint32) bool {
+	return magic == 0x00053162 || magic == 0x00061561 || magic == 0x00042253 || magic == 0x00040988
+}
+
+func validDatabasePageSize(size uint32) bool {
+	return size >= 512 && size <= 65536 && size&(size-1) == 0
+}
+
 func DetectDeepAnalysis(b Buffer) *Metadata {
 	if b.Len() < 64 {
 		return nil
@@ -75,14 +232,6 @@ func DetectDeepAnalysis(b Buffer) *Metadata {
 
 	if isKnownBinaryPattern(b) {
 		return nil
-	}
-
-	if result.IsEncrypted {
-		return &Metadata{
-			Kind:       KindHighEntropyData,
-			Type:       TypeEncrypted,
-			Confidence: ConfidenceLow,
-		}
 	}
 
 	if result.IsHighEntropy {
@@ -115,6 +264,7 @@ func isKnownBinaryPattern(b Buffer) bool {
 		for i := 1; i < 32 && i < b.Len(); i++ {
 			if b[i] != first {
 				allSame = false
+
 				break
 			}
 		}
@@ -186,8 +336,10 @@ func DetectELF(b Buffer) *Metadata {
 		}
 	}
 
-	class := byte(0)
-	data := byte(0)
+	var (
+		class byte
+		data  byte
+	)
 
 	if b.Len() > 4 {
 		class = b[4]
@@ -465,9 +617,8 @@ func TryDecodeUTF16(b Buffer) ([]byte, TypeID, bool) {
 }
 
 const (
-	entropyThresholdEncrypted = 7.9
-	entropyThresholdHigh      = 7.5
-	entropyThresholdMedium    = 6.0
+	entropyThresholdHigh   = 7.5
+	entropyThresholdMedium = 6.0
 )
 
 type ByteFrequency [256]int
@@ -532,7 +683,6 @@ func CalculateEntropy(b Buffer) *EntropyResult {
 
 	return &EntropyResult{
 		ShannonEntropy: entropy,
-		IsEncrypted:    entropy >= entropyThresholdEncrypted && zeros == 0,
 		IsHighEntropy:  entropy >= entropyThresholdHigh,
 		ByteFreq:       freq,
 		ZeroBytes:      zeros,
@@ -549,14 +699,6 @@ func DetectHighEntropy(b Buffer) *Metadata {
 
 	if b.Len() < 256 {
 		return nil
-	}
-
-	if result.IsEncrypted {
-		return &Metadata{
-			Kind:       KindHighEntropyData,
-			Type:       TypeEncrypted,
-			Confidence: ConfidenceMedium,
-		}
 	}
 
 	if result.IsHighEntropy {
@@ -624,7 +766,6 @@ const (
 	magicOffset      = superblockOffset + 56
 	compatOffset     = superblockOffset + 92
 	incompatOffset   = superblockOffset + 96
-	roCompatOffset   = superblockOffset + 100
 )
 
 func DetectExt(b Buffer) *Metadata {
@@ -634,6 +775,24 @@ func DetectExt(b Buffer) *Metadata {
 
 	magic, ok := b.U16LE(magicOffset)
 	if !ok || magic != 0xef53 {
+		return nil
+	}
+
+	inodes, _ := b.U32LE(superblockOffset)
+	blocks, _ := b.U32LE(superblockOffset + 4)
+	firstBlock, _ := b.U32LE(superblockOffset + 20)
+
+	blockShift, _ := b.U32LE(superblockOffset + 24)
+	blocksPerGroup, _ := b.U32LE(superblockOffset + 32)
+	inodesPerGroup, _ := b.U32LE(superblockOffset + 40)
+	revision, _ := b.U32LE(superblockOffset + 76)
+
+	if inodes == 0 || blocks == 0 || blockShift > 6 || revision > 1 || blocksPerGroup == 0 || inodesPerGroup == 0 {
+		return nil
+	}
+
+	blockSize := uint32(1024) << blockShift
+	if blocksPerGroup > blockSize*8 || inodesPerGroup > blockSize*8 || blocks <= firstBlock || blockShift == 0 && firstBlock != 1 || blockShift != 0 && firstBlock != 0 {
 		return nil
 	}
 
@@ -647,16 +806,11 @@ func DetectExt(b Buffer) *Metadata {
 		return nil
 	}
 
-	roCompat, ok := b.U32LE(roCompatOffset)
-	if !ok {
-		return nil
-	}
-
 	typ := TypeExt2
 
 	if incompat&0x40 != 0 {
 		typ = TypeExt4
-	} else if compat&0x4 != 0 || roCompat&0x4 != 0 {
+	} else if compat&0x4 != 0 {
 		typ = TypeExt3
 	}
 
@@ -671,7 +825,7 @@ func DetectFAT(b Buffer) *Metadata {
 		return nil
 	}
 
-	if !((b[0] == 0xeb && b[2] == 0x90) || b[0] == 0xe9) {
+	if (b[0] != 0xeb || b[2] != 0x90) && b[0] != 0xe9 {
 		return nil
 	}
 
@@ -707,6 +861,12 @@ func DetectFAT(b Buffer) *Metadata {
 
 func DetectH26x(b Buffer) *Metadata {
 	startCodeOffset := findAnnexBStartCode(b)
+
+	for startCodeOffset >= 0 && startCodeOffset+2 < b.Len() && b[startCodeOffset] == 9 && b[startCodeOffset+1]&0x1f == 0x10 {
+		b = b[startCodeOffset+2:]
+		startCodeOffset = findAnnexBStartCode(b)
+	}
+
 	if startCodeOffset == -1 {
 		return nil
 	}
@@ -717,7 +877,6 @@ func DetectH26x(b Buffer) *Metadata {
 	}
 
 	nalHeader := b[nalOffset]
-
 	if nalHeader&0x80 != 0 {
 		return nil
 	}
@@ -770,7 +929,280 @@ func findAnnexBStartCode(b Buffer) int {
 	return -1
 }
 
+func SkipID3(b Buffer) (Buffer, bool) {
+	return SkipID3ReaderAt(b, bytes.NewReader(b), int64(b.Len()))
+}
+
+func RefineID3Metadata(meta *Metadata) *Metadata {
+	if meta != nil && meta.Kind == KindMPEGAudio && meta.Type == TypeMPEGLayer3 {
+		return &Metadata{Kind: KindMPEGAudio, Type: TypeMP3ID3Tagged, Confidence: meta.Confidence}
+	}
+
+	return meta
+}
+
+func SkipID3ReaderAt(b Buffer, reader io.ReaderAt, size int64) (Buffer, bool) {
+	var offset int64
+
+	for tags := 0; b.Has(0, []byte("ID3")); tags++ {
+		if tags >= 16 || b.Len() < 10 || b[3] < 2 || b[3] > 4 || b[4] == 0xff || b[6]|b[7]|b[8]|b[9] >= 0x80 {
+			return nil, false
+		}
+
+		allowed := byte(0xc0)
+
+		switch b[3] {
+		case 3:
+			allowed = 0xe0
+		case 4:
+			allowed = 0xf0
+		}
+
+		if b[5] & ^allowed != 0 {
+			return nil, false
+		}
+
+		length := int64(b[6])<<21 | int64(b[7])<<14 | int64(b[8])<<7 | int64(b[9])
+		length += 10
+
+		footer := b[3] == 4 && b[5]&0x10 != 0
+		if footer {
+			length += 10
+		}
+
+		if length > size-offset {
+			return nil, false
+		}
+
+		if footer {
+			var trailer [10]byte
+
+			if !readAtExactly(reader, trailer[:], offset+length-10) || string(trailer[:3]) != "3DI" || !bytes.Equal(trailer[3:], b[3:10]) {
+				return nil, false
+			}
+		}
+
+		offset += length
+
+		if length <= int64(b.Len()) {
+			b = b[int(length):]
+		} else {
+			b = nil
+		}
+
+		remaining := int(min(size-offset, maxScanSize))
+		if b.Len() < remaining {
+			b = make([]byte, remaining)
+			if !readAtExactly(reader, b, offset) {
+				return nil, false
+			}
+		}
+	}
+
+	return b, offset > 0
+}
+
+func DetectJPEG(b Buffer) *Metadata {
+	if !b.Has(0, []byte{0xff, 0xd8, 0xff}) {
+		return nil
+	}
+
+	for offset := 2; offset+4 <= b.Len(); {
+		if b[offset] != 0xff {
+			break
+		}
+
+		marker := b[offset+1]
+		if marker == 0xff {
+			offset++
+
+			continue
+		}
+
+		length, _ := b.U16BE(offset + 2)
+		if length < 2 || int(length) > b.Len()-offset-2 {
+			break
+		}
+
+		if marker == 0xf7 && length >= 11 {
+			return &Metadata{Kind: KindJPEGLSImage}
+		}
+
+		if marker >= 0xc0 && marker <= 0xcf && marker != 0xc4 && marker != 0xc8 && marker != 0xcc && length >= 11 {
+			return &Metadata{Kind: KindJPEGImage}
+		}
+
+		if marker == 0xda || marker == 0xd9 {
+			break
+		}
+
+		offset += 2 + int(length)
+	}
+
+	return &Metadata{Kind: KindJPEGImage, Confidence: ConfidenceMedium}
+}
+
+func DetectRasterHeaders(b Buffer) *Metadata {
+	if b.Has(0, []byte("BM")) && b.Len() >= 26 {
+		fileSize, _ := b.U32LE(2)
+		reserved, _ := b.U32LE(6)
+		pixels, _ := b.U32LE(10)
+		dibSize, _ := b.U32LE(14)
+		validDIB := dibSize == 12 || dibSize == 40 || dibSize == 52 || dibSize == 56 || dibSize == 64 || dibSize == 108 || dibSize == 124
+
+		if validDIB && reserved == 0 && pixels >= 14+dibSize && fileSize > pixels && uint64(dibSize)+14 <= uint64(b.Len()) {
+			return &Metadata{Kind: KindBMPImage}
+		}
+	}
+
+	if b.Has(0, []byte{0, 0, 2, 0}) && b.Len() >= 22 {
+		count, _ := b.U16LE(4)
+		if count == 0 || int(count) > (b.Len()-6)/16 {
+			return nil
+		}
+
+		for index := range int(count) {
+			offset := 6 + index*16
+			length, _ := b.U32LE(offset + 8)
+			position, _ := b.U32LE(offset + 12)
+
+			if b[offset+3] != 0 || length < 8 || position < uint32(6+int(count)*16) {
+				return nil
+			}
+		}
+
+		return &Metadata{Kind: KindWindowsCursorImage}
+	}
+
+	if b.Has(0, []byte("8BPS")) && b.Len() >= 26 {
+		version, _ := b.U16BE(4)
+
+		reserved, _ := b.U32BE(6)
+		reservedEnd, _ := b.U16BE(10)
+		channels, _ := b.U16BE(12)
+		height, _ := b.U32BE(14)
+		width, _ := b.U32BE(18)
+
+		if reserved != 0 || reservedEnd != 0 || channels == 0 || channels > 56 || height == 0 || width == 0 {
+			return nil
+		}
+
+		switch version {
+		case 1:
+			return &Metadata{Kind: KindPhotoshopDocument}
+		case 2:
+			return &Metadata{Kind: KindPhotoshopDocument, Type: TypeLargeDocument}
+		}
+	}
+
+	if b.Len() >= 28 {
+		headerSize, _ := b.U32BE(0)
+		version, _ := b.U32BE(4)
+
+		width, _ := b.U32BE(8)
+		height, _ := b.U32BE(12)
+		channels, _ := b.U32BE(16)
+
+		if width == 0 || height == 0 || channels == 0 || channels > 4 || headerSize > uint32(b.Len()) {
+			return nil
+		}
+
+		if b.Has(20, []byte("GIMP")) && version == 2 && headerSize > 28 && (channels == 1 || channels == 4) {
+			return &Metadata{Kind: KindGIMPBrush}
+		}
+
+		if b.Has(20, []byte("GPAT")) && version == 1 && headerSize > 24 {
+			return &Metadata{Kind: KindGIMPPattern}
+		}
+	}
+
+	return nil
+}
+
+func DetectTrueType(b Buffer) *Metadata {
+	if !b.Has(0, []byte("true")) && !b.Has(0, []byte{0, 1, 0, 0}) {
+		return nil
+	}
+
+	count, ok := b.U16BE(4)
+	if !ok || count == 0 || int(count) > (b.Len()-12)/16 {
+		return nil
+	}
+
+	var (
+		hasHead   bool
+		hasCmap   bool
+		hasGlyphs bool
+	)
+
+	for index := range int(count) {
+		offset := 12 + index*16
+
+		position, _ := b.U32BE(offset + 8)
+		length, _ := b.U32BE(offset + 12)
+
+		if position < uint32(12+int(count)*16) || position%4 != 0 || length == 0 {
+			return nil
+		}
+
+		switch string(b[offset : offset+4]) {
+		case "head":
+			hasHead = true
+		case "cmap":
+			hasCmap = true
+		case "glyf":
+			hasGlyphs = true
+		}
+	}
+
+	if hasHead && hasCmap && hasGlyphs {
+		return &Metadata{Kind: KindTrueTypeFont}
+	}
+
+	return nil
+}
+
+func DetectXBM(b Buffer) *Metadata {
+	var (
+		name   string
+		width  bool
+		height bool
+	)
+
+	for line := range strings.SplitSeq(string(b), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) != 3 || fields[0] != "#define" {
+			continue
+		}
+
+		value, err := strconv.ParseUint(fields[2], 10, 32)
+		if err != nil || value == 0 {
+			continue
+		}
+
+		prefix, found := strings.CutSuffix(fields[1], "_width")
+		if found {
+			name = prefix
+			width = true
+		}
+
+		if name != "" && fields[1] == name+"_height" {
+			height = true
+		}
+	}
+
+	if width && height && bytes.Contains(b, []byte(name+"_bits")) && bytes.Contains(b, []byte("static")) && bytes.Contains(b, []byte("{")) && bytes.Contains(b, []byte("0x")) {
+		return &Metadata{Kind: KindXBitMapImage, Confidence: ConfidenceMedium}
+	}
+
+	return nil
+}
+
 func DetectISOBaseMedia(b Buffer) *Metadata {
+	if b.Has(0, []byte{0, 0, 0, 12, 'j', 'P', ' ', ' ', 13, 10, 135, 10}) {
+		b = b[12:]
+	}
+
 	if b.Len() < 16 {
 		return nil
 	}
@@ -905,12 +1337,130 @@ func DetectISOBaseMedia(b Buffer) *Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxLimit, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
-		return &Metadata{Kind: KindISOBaseMedia, Type: TypeMP4Video}
+		audio, video := isoTrackKinds(b, 0)
+		if video {
+			return &Metadata{Kind: KindISOBaseMedia, Type: TypeMP4Video}
+		}
+
+		if audio {
+			return &Metadata{Kind: KindISOBaseMedia, Type: TypeMPEG4Audio}
+		}
 	}
 
 	return &Metadata{
 		Kind: KindISOBaseMedia,
 	}
+}
+
+func DetectISOReaderAt(b Buffer, reader io.ReaderAt, size int64) *Metadata {
+	meta := DetectISOBaseMedia(b)
+	if meta == nil || meta.Type != TypeNone {
+		return meta
+	}
+
+	var (
+		header [16]byte
+		offset int64
+	)
+
+	for range 256 {
+		if size-offset < 8 || !readAtExactly(reader, header[:8], offset) {
+			break
+		}
+
+		length32, _ := Buffer(header[:]).U32BE(0)
+		length := uint64(length32)
+		headerSize := 8
+
+		if length == 1 {
+			if size-offset < 16 || !readAtExactly(reader, header[8:], offset+8) {
+				break
+			}
+
+			high, _ := Buffer(header[:]).U32BE(8)
+			low, _ := Buffer(header[:]).U32BE(12)
+			length = uint64(high)<<32 | uint64(low)
+			headerSize = 16
+		}
+
+		if length == 0 {
+			length = uint64(size - offset)
+		}
+
+		if length < uint64(headerSize) || length > uint64(size-offset) {
+			break
+		}
+
+		if string(header[4:8]) == "moov" && length <= maxScanSize {
+			box := make(Buffer, int(length))
+			if !readAtExactly(reader, box, offset) {
+				break
+			}
+
+			audio, video := isoTrackKinds(box, 0)
+			if video {
+				meta.Type = TypeMP4Video
+			} else if audio {
+				meta.Type = TypeMPEG4Audio
+			}
+
+			break
+		}
+
+		offset += int64(length)
+	}
+
+	return meta
+}
+
+func isoTrackKinds(b Buffer, depth int) (bool, bool) {
+	if depth > 4 {
+		return false, false
+	}
+
+	var (
+		audio bool
+		video bool
+	)
+
+	for offset := 0; offset+8 <= b.Len(); {
+		length32, _ := b.U32BE(offset)
+		length := uint64(length32)
+		header := 8
+
+		if length == 1 {
+			high, _ := b.U32BE(offset + 8)
+			low, _ := b.U32BE(offset + 12)
+			length = uint64(high)<<32 | uint64(low)
+			header = 16
+		}
+
+		if length == 0 {
+			length = uint64(b.Len() - offset)
+		}
+
+		if length < uint64(header) || length > uint64(b.Len()-offset) {
+			break
+		}
+
+		payload := b[offset+header : offset+int(length)]
+
+		switch string(b[offset+4 : offset+8]) {
+		case "moov", "trak", "mdia":
+			childAudio, childVideo := isoTrackKinds(payload, depth+1)
+			audio = audio || childAudio
+			video = video || childVideo
+		case "hdlr":
+			if depth == 3 && payload.Len() >= 12 {
+				audio = audio || payload.Has(8, []byte("soun"))
+				video = video || payload.Has(8, []byte("vide"))
+			}
+		}
+
+		offset += int(length)
+	}
+
+	return audio, video
 }
 
 func hasISOBrand(b Buffer, majorOffset int, compatOffset int, boxEnd int, brands ...string) bool {
@@ -945,22 +1495,52 @@ func hasISOBrandPrefix(b Buffer, majorOffset int, compatOffset int, boxEnd int, 
 	return false
 }
 
-func DetectJSON(b Buffer) *Metadata {
-	limit := min(b.Len(), 4096)
-	data := b[:limit]
+type jsonIdentity struct {
+	Type            string          `json:"type"`
+	ResourceType    string          `json:"resourceType"`
+	ResourceVersion string          `json:"resourceVersion"`
+	Features        json.RawMessage `json:"features"`
+	Geometry        json.RawMessage `json:"geometry"`
+	Coordinates     json.RawMessage `json:"coordinates"`
+	Objects         json.RawMessage `json:"objects"`
+	Arcs            json.RawMessage `json:"arcs"`
+	Resources       json.RawMessage `json:"resources"`
+}
 
-	trimmed := bytes.TrimSpace(data)
-	if len(trimmed) < 2 {
+func DetectJSON(b Buffer) *Metadata {
+	if !json.Valid(b) {
 		return nil
 	}
 
-	if trimmed[0] == '{' || trimmed[0] == '[' {
-		if bytes.Contains(trimmed, []byte(`":`)) || bytes.Contains(trimmed, []byte(`": `)) {
-			return &Metadata{Kind: KindJSONDocument, Confidence: ConfidenceMedium}
+	var identity jsonIdentity
+
+	err := json.Unmarshal(b, &identity)
+	if err == nil {
+		switch identity.Type {
+		case "FeatureCollection":
+			if len(identity.Features) > 0 {
+				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
+			}
+		case "Feature":
+			if len(identity.Geometry) > 0 {
+				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
+			}
+		case "Point", "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon":
+			if len(identity.Coordinates) > 0 {
+				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
+			}
+		case "Topology":
+			if len(identity.Objects) > 0 && len(identity.Arcs) > 0 {
+				return &Metadata{Kind: KindJSONDocument, Type: TypeTopoJSON}
+			}
+		}
+
+		if identity.ResourceType == "GMProject" && identity.ResourceVersion != "" && len(identity.Resources) > 0 {
+			return &Metadata{Kind: KindGameMakerStudioProject, Type: TypeGameMakerStudio2}
 		}
 	}
 
-	return nil
+	return &Metadata{Kind: KindJSONDocument}
 }
 
 const maxScanSize = 128 * 1024
@@ -1218,6 +1798,31 @@ func DetectNetpbm(b Buffer) *Metadata {
 		return nil
 	}
 
+	if b[1] == '7' {
+		if !validPAMHeader(b[3:]) {
+			return nil
+		}
+	} else {
+		offset := 2
+
+		width, ok := netpbmNumber(b, &offset)
+		if !ok || width == 0 {
+			return nil
+		}
+
+		height, ok := netpbmNumber(b, &offset)
+		if !ok || height == 0 {
+			return nil
+		}
+
+		if b[1] != '1' && b[1] != '4' {
+			maximum, ok := netpbmNumber(b, &offset)
+			if !ok || maximum == 0 || maximum > 65535 {
+				return nil
+			}
+		}
+	}
+
 	switch b[1] {
 	case '1':
 		return &Metadata{
@@ -1268,6 +1873,80 @@ func isNetpbmDelimiter(c byte) bool {
 	}
 }
 
+func netpbmNumber(b Buffer, offset *int) (uint64, bool) {
+	for *offset < b.Len() {
+		if isNetpbmDelimiter(b[*offset]) {
+			*offset++
+
+			continue
+		}
+
+		if b[*offset] == '#' {
+			end := bytes.IndexByte(b[*offset:], '\n')
+			if end < 0 {
+				return 0, false
+			}
+
+			*offset += end + 1
+
+			continue
+		}
+
+		break
+	}
+
+	start := *offset
+
+	for *offset < b.Len() && b[*offset] >= '0' && b[*offset] <= '9' {
+		*offset++
+	}
+
+	if start == *offset || *offset >= b.Len() || !isNetpbmDelimiter(b[*offset]) {
+		return 0, false
+	}
+
+	value, err := strconv.ParseUint(string(b[start:*offset]), 10, 32)
+	return value, err == nil
+}
+
+func validPAMHeader(data []byte) bool {
+	var (
+		width   bool
+		height  bool
+		depth   bool
+		maximum bool
+	)
+
+	for line := range strings.SplitSeq(string(data), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) == 1 && fields[0] == "ENDHDR" {
+			return width && height && depth && maximum
+		}
+
+		if len(fields) != 2 {
+			continue
+		}
+
+		value, err := strconv.ParseUint(fields[1], 10, 32)
+		if err != nil || value == 0 {
+			continue
+		}
+
+		switch fields[0] {
+		case "WIDTH":
+			width = true
+		case "HEIGHT":
+			height = true
+		case "DEPTH":
+			depth = true
+		case "MAXVAL":
+			maximum = value <= 65535
+		}
+	}
+
+	return false
+}
+
 func DetectOgg(b Buffer) *Metadata {
 	if b.Len() < 27 || !b.Has(0, []byte("OggS")) {
 		return nil
@@ -1282,6 +1961,7 @@ func DetectOgg(b Buffer) *Metadata {
 		}
 
 		segmentCount := int(b[offset+26])
+
 		headerEnd := offset + 27 + segmentCount
 		if headerEnd > limit {
 			break
@@ -1303,11 +1983,13 @@ func DetectOgg(b Buffer) *Metadata {
 
 		for _, size := range b[offset+27 : headerEnd] {
 			packetOffset += int(size)
+
 			if size == 255 {
 				continue
 			}
 
-			if meta := detectOggPacket(b[packetStart:packetOffset]); meta != nil {
+			meta := detectOggPacket(b[packetStart:packetOffset])
+			if meta != nil {
 				return meta
 			}
 
@@ -1374,11 +2056,6 @@ func DetectOLE(b Buffer) *Metadata {
 		return meta
 	}
 
-	meta = detectOLESubtype(b)
-	if meta != nil {
-		return meta
-	}
-
 	return &Metadata{
 		Kind: KindOLECompoundDocument,
 	}
@@ -1405,7 +2082,7 @@ func detectOLESubtype(b Buffer) *Metadata {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstallerPatch}
 	}
 
-	if containsOLE(b, oleOutlookMessage) {
+	if bytes.HasPrefix(b, oleOutlookMessage) {
 		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftOutlookMessage}
 	}
 
@@ -1425,14 +2102,7 @@ func detectOLESubtype(b Buffer) *Metadata {
 }
 
 func containsOLE(b Buffer, magic []byte) bool {
-	prefixEnd := min(b.Len(), maxScanSize)
-	if bytes.Contains(b[:prefixEnd], magic) {
-		return true
-	}
-
-	suffixStart := max(prefixEnd, b.Len()-maxScanSize)
-
-	return bytes.Contains(b[suffixStart:], magic)
+	return bytes.Equal(bytes.TrimRight(b, "\x00"), bytes.TrimRight(magic, "\x00"))
 }
 
 func detectOLEReaderAt(r io.ReaderAt, size int64) *Metadata {
@@ -1589,11 +2259,245 @@ func detectOLEReaderAt(r io.ReaderAt, size int64) *Metadata {
 		}
 	}
 
-	if meta := detectOLESubtype(Buffer(directory)); meta != nil {
-		return meta
+	if len(directory) < 128 || directory[66] != 5 {
+		return nil
 	}
 
-	return &Metadata{Kind: KindOLECompoundDocument}
+	root := Buffer(directory[:128])
+	if root.Has(80, oleMSI) {
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstaller}
+	}
+
+	if root.Has(80, []byte{0x86, 0x10, 0x0c, 0, 0, 0, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46}) {
+		return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftInstallerPatch}
+	}
+
+	if root.Has(84, []byte{0, 0, 0, 0, 0xc0, 0, 0, 0, 0, 0, 0, 0x46}) {
+		class, _ := root.U32LE(80)
+
+		switch class {
+		case 0x00020906, 0x00020900:
+			return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftWordDocument}
+		case 0x00020810, 0x00020820:
+			return &Metadata{Kind: KindOLECompoundDocument, Type: TypeMicrosoftExcelWorkbook}
+		}
+	}
+
+	child, _ := root.U32LE(76)
+	pending := make([]uint32, 0, len(directory)/128)
+	pending = append(pending, child)
+	seen := make([]bool, len(directory)/128)
+
+	var subtype TypeID
+
+	for len(pending) > 0 {
+		index := pending[len(pending)-1]
+		pending = pending[:len(pending)-1]
+
+		if index == 0xffffffff {
+			continue
+		}
+
+		if index == 0 || uint64(index) >= uint64(len(seen)) || seen[index] {
+			return nil
+		}
+
+		seen[index] = true
+		entry := Buffer(directory[int(index)*128 : (int(index)+1)*128])
+		left, _ := entry.U32LE(68)
+		right, _ := entry.U32LE(72)
+		pending = append(pending, left, right)
+
+		if entry[66] != 2 {
+			continue
+		}
+
+		length, _ := entry.U16LE(64)
+
+		meta := detectOLESubtype(entry[:length])
+		if meta != nil {
+			if subtype != TypeNone && subtype != meta.Type {
+				return &Metadata{Kind: KindOLECompoundDocument}
+			}
+
+			subtype = meta.Type
+		}
+	}
+
+	return &Metadata{Kind: KindOLECompoundDocument, Type: subtype}
+}
+
+type packageRelationships struct {
+	XMLName xml.Name              `xml:"http://schemas.openxmlformats.org/package/2006/relationships Relationships"`
+	Entries []packageRelationship `xml:"http://schemas.openxmlformats.org/package/2006/relationships Relationship"`
+}
+
+type packageRelationship struct {
+	Type       string `xml:"Type,attr"`
+	Target     string `xml:"Target,attr"`
+	TargetMode string `xml:"TargetMode,attr"`
+}
+
+type packageContentTypes struct {
+	XMLName   xml.Name          `xml:"http://schemas.openxmlformats.org/package/2006/content-types Types"`
+	Overrides []packageOverride `xml:"http://schemas.openxmlformats.org/package/2006/content-types Override"`
+}
+
+type packageOverride struct {
+	PartName    string `xml:"PartName,attr"`
+	ContentType string `xml:"ContentType,attr"`
+}
+
+func detectOOXML(reader io.ReaderAt, size int64, central []byte) *Metadata {
+	if len(central) > maxCentralSize {
+		return nil
+	}
+
+	archive, err := zip.NewReader(reader, size)
+	if err != nil {
+		return nil
+	}
+
+	manifest := zipPart(archive, "[Content_Types].xml")
+	relations := zipPart(archive, "_rels/.rels")
+
+	if manifest == nil || relations == nil {
+		return nil
+	}
+
+	var relationships packageRelationships
+
+	err = xml.Unmarshal(relations, &relationships)
+	if err != nil {
+		return nil
+	}
+
+	mainPart := ""
+
+	for _, relationship := range relationships.Entries {
+		if relationship.Type != "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" && relationship.Type != "http://purl.oclc.org/ooxml/officeDocument/relationships/officeDocument" && relationship.Type != "http://schemas.microsoft.com/xps/2005/06/fixedrepresentation" {
+			continue
+		}
+
+		if mainPart != "" || relationship.TargetMode == "External" || strings.ContainsAny(relationship.Target, "\\?#:") {
+			return nil
+		}
+
+		mainPart = path.Clean("/" + relationship.Target)
+	}
+
+	if mainPart == "" || !hasZIPPart(archive, strings.TrimPrefix(mainPart, "/")) {
+		return nil
+	}
+
+	var contentTypes packageContentTypes
+
+	err = xml.Unmarshal(manifest, &contentTypes)
+	if err != nil {
+		return nil
+	}
+
+	var subtype TypeID
+
+	for _, override := range contentTypes.Overrides {
+		if override.PartName != mainPart {
+			continue
+		}
+
+		if subtype != TypeNone {
+			return nil
+		}
+
+		switch override.ContentType {
+		case "application/vnd.ms-package.xps-fixeddocumentsequence+xml":
+			subtype = TypeXMLPaperSpecification
+		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml":
+			subtype = TypeMicrosoftWordDocument
+		case "application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml":
+			subtype = TypeMicrosoftWordTemplate
+		case "application/vnd.ms-word.document.macroEnabled.main+xml":
+			subtype = TypeMicrosoftWordMacroEnabledDocument
+		case "application/vnd.ms-word.template.macroEnabledTemplate.main+xml":
+			subtype = TypeMicrosoftWordMacroEnabledTemplate
+		case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml":
+			subtype = TypeMicrosoftExcelWorkbook
+		case "application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml":
+			subtype = TypeMicrosoftExcelTemplate
+		case "application/vnd.ms-excel.sheet.macroEnabled.main+xml":
+			subtype = TypeMicrosoftExcelMacroEnabledWorkbook
+		case "application/vnd.ms-excel.template.macroEnabled.main+xml":
+			subtype = TypeMicrosoftExcelMacroEnabledTemplate
+		case "application/vnd.ms-excel.addin.macroEnabled.main+xml":
+			subtype = TypeMicrosoftExcelAddIn
+		case "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml":
+			subtype = TypeMicrosoftPowerPointPresentation
+		case "application/vnd.openxmlformats-officedocument.presentationml.template.main+xml":
+			subtype = TypeMicrosoftPowerPointTemplate
+		case "application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml":
+			subtype = TypeMicrosoftPowerPointSlideshow
+		case "application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml":
+			subtype = TypeMicrosoftPowerPointMacroEnabledPresentation
+		case "application/vnd.ms-powerpoint.template.macroEnabled.main+xml":
+			subtype = TypeMicrosoftPowerPointMacroEnabledTemplate
+		case "application/vnd.ms-powerpoint.slideshow.macroEnabled.main+xml":
+			subtype = TypeMicrosoftPowerPointMacroEnabledSlideshow
+		case "application/vnd.ms-powerpoint.addin.macroEnabled.main+xml":
+			subtype = TypeMicrosoftPowerPointAddIn
+		}
+	}
+
+	if subtype == TypeNone {
+		return nil
+	}
+
+	return &Metadata{Kind: KindZIPArchive, Type: subtype}
+}
+
+func hasZIPPart(archive *zip.Reader, name string) bool {
+	count := 0
+
+	for _, file := range archive.File {
+		if file.Name == name {
+			count++
+		}
+	}
+
+	return count == 1
+}
+
+func zipPart(archive *zip.Reader, name string) []byte {
+	if !hasZIPPart(archive, name) {
+		return nil
+	}
+
+	for _, file := range archive.File {
+		if file.Name != name {
+			continue
+		}
+
+		if file.CompressedSize64 > maxScanSize || file.UncompressedSize64 > maxScanSize || file.Flags&1 != 0 {
+			return nil
+		}
+
+		reader, err := file.Open()
+		if err != nil {
+			return nil
+		}
+
+		var output bytes.Buffer
+
+		output.Grow(int(file.UncompressedSize64))
+		_, err = io.Copy(&output, io.LimitReader(reader, maxScanSize+1))
+		reader.Close()
+
+		if err != nil || output.Len() > maxScanSize {
+			return nil
+		}
+
+		return output.Bytes()
+	}
+
+	return nil
 }
 
 func DetectPCX(b Buffer) *Metadata {
@@ -1796,69 +2700,72 @@ func pe32PlusMachineType(machine uint16) TypeID {
 	}
 }
 
-func DetectPKCS12(b Buffer) *Metadata {
-	if b.Len() < 32 {
+func DetectPKCS12(buffer Buffer) *Metadata {
+	return detectPKCS12Sized(buffer, int64(buffer.Len()))
+}
+
+func detectPKCS12Sized(buffer Buffer, size int64) *Metadata {
+	offset, end, ok := asn1Header(buffer, 0, 0x30, size)
+	if !ok || end != size {
 		return nil
 	}
 
-	offset, length, ok := asn1Value(b, 0, 0x30)
+	version, versionEnd, ok := asn1Header(buffer, offset, 2, end)
+	if !ok || versionEnd != int64(version)+1 || !buffer.Has(version, []byte{3}) {
+		return nil
+	}
+
+	content, contentEnd, ok := asn1Header(buffer, version+1, 0x30, end)
 	if !ok {
 		return nil
 	}
 
-	end := offset + length
-
-	versionOffset, versionLength, ok := asn1Value(b, offset, 0x02)
-	if !ok || versionLength != 1 || versionOffset+versionLength > end || b[versionOffset] != 3 {
+	oid, oidEnd, ok := asn1Header(buffer, content, 6, contentEnd)
+	if !ok || oidEnd != int64(oid)+9 || !buffer.Has(oid, []byte{0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 1, 7, 1}) {
 		return nil
 	}
 
-	offset = versionOffset + versionLength
-
-	contentOffset, contentLength, ok := asn1Value(b, offset, 0x30)
-	if !ok || contentOffset+contentLength > end {
-		return nil
-	}
-
-	contentEnd := contentOffset + contentLength
-
-	oidOffset, oidLength, ok := asn1Value(b, contentOffset, 0x06)
-	if !ok || oidLength != 9 || oidOffset+oidLength > contentEnd || !b.Has(oidOffset, []byte{0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x01}) {
+	_, _, ok = asn1Header(buffer, oid+9, 0xa0, contentEnd)
+	if !ok {
 		return nil
 	}
 
 	return &Metadata{Kind: KindPKCS12}
 }
 
-func asn1Value(b Buffer, offset int, tag byte) (int, int, bool) {
-	if offset < 0 || offset+2 > b.Len() || b[offset] != tag {
+func asn1Header(buffer Buffer, offset int, tag byte, limit int64) (int, int64, bool) {
+	if offset < 0 || offset > buffer.Len()-2 || buffer[offset] != tag {
 		return 0, 0, false
 	}
 
-	length := int(b[offset+1])
-	headerSize := 2
+	length := int64(buffer[offset+1])
+	header := 2
 
 	if length&0x80 != 0 {
-		lengthBytes := length & 0x7f
-		if lengthBytes == 0 || lengthBytes > 4 || offset+2+lengthBytes > b.Len() {
+		count := int(length & 0x7f)
+		if count == 0 || count > 4 || count > buffer.Len()-offset-2 || buffer[offset+2] == 0 {
 			return 0, 0, false
 		}
 
 		length = 0
 
-		for i := range lengthBytes {
-			length = length<<8 | int(b[offset+2+i])
+		for index := range count {
+			length = length<<8 | int64(buffer[offset+2+index])
 		}
 
-		headerSize += lengthBytes
+		if length < 128 {
+			return 0, 0, false
+		}
+
+		header += count
 	}
 
-	valueOffset := offset + headerSize
-	if length < 0 || valueOffset > b.Len() || length > b.Len()-valueOffset {
+	start := offset + header
+	if int64(start) > limit || length > limit-int64(start) {
 		return 0, 0, false
 	}
 
-	return valueOffset, length, true
+	return start, int64(start) + length, true
 }
 
 var pycMagic = map[uint16]struct{}{
@@ -1873,7 +2780,7 @@ var pycMagic = map[uint16]struct{}{
 	3220: {}, 3230: {}, 3250: {}, 3260: {}, 3270: {}, 3280: {},
 	3290: {}, 3300: {}, 3310: {}, 3320: {}, 3330: {}, 3340: {},
 	3350: {}, 3360: {}, 3370: {}, 3390: {}, 3400: {}, 3410: {},
-	3420: {}, 3430: {}, 3450: {}, 3460: {}, 3470: {}, 3490: {},
+	3420: {}, 3430: {}, 3439: {}, 3450: {}, 3460: {}, 3470: {}, 3490: {}, 3495: {},
 	3500: {}, 3510: {}, 3520: {}, 3530: {}, 3531: {}, 3571: {}, 3627: {}, 3705: {},
 }
 
@@ -1933,6 +2840,35 @@ func DetectQNX4(b Buffer) *Metadata {
 	return nil
 }
 
+func DetectSkippableFrames(b Buffer) *Metadata {
+	var skipped bool
+
+	for b.Len() >= 8 && b[0]&0xf0 == 0x50 && b.Has(1, []byte{0x2a, 0x4d, 0x18}) {
+		skipped = true
+
+		length, _ := b.U32LE(4)
+		if uint64(length) > uint64(b.Len()-8) {
+			return &Metadata{Kind: KindZstandardLZ4Stream, Type: TypeSkinnableFrame, Confidence: ConfidenceMedium}
+		}
+
+		b = b[8+int(length):]
+	}
+
+	if !skipped {
+		return nil
+	}
+
+	if b.Has(0, []byte{0x28, 0xb5, 0x2f, 0xfd}) {
+		return &Metadata{Kind: KindZstandardArchive}
+	}
+
+	if b.Has(0, []byte{4, 0x22, 0x4d, 0x18}) {
+		return &Metadata{Kind: KindLZ4Frame}
+	}
+
+	return &Metadata{Kind: KindZstandardLZ4Stream, Type: TypeSkinnableFrame}
+}
+
 func DetectSQLiteSHM(b Buffer) *Metadata {
 	if b.Len() < 96 {
 		return nil
@@ -1959,13 +2895,18 @@ func DetectSQLiteSHM(b Buffer) *Metadata {
 }
 
 func DetectTar(b Buffer) *Metadata {
-	var isTar bool
+	var (
+		isTar        bool
+		hasOCILayout bool
+		hasOCIIndex  bool
+		hasOCIBlobs  bool
+	)
 
 	limit := min(b.Len(), maxScanSize)
 
 	for offset := 0; offset+512 <= limit; {
 		header := b[offset : offset+512]
-		if string(header[257:262]) != "ustar" || !validTarChecksum(header) {
+		if header[0] == 0 || !validTarChecksum(header) {
 			break
 		}
 
@@ -1976,7 +2917,12 @@ func DetectTar(b Buffer) *Metadata {
 			nameEnd = 100
 		}
 
-		prefixEnd := bytes.IndexByte(header[345:500], 0)
+		prefixEnd := 0
+
+		if string(header[257:262]) == "ustar" {
+			prefixEnd = bytes.IndexByte(header[345:500], 0)
+		}
+
 		if prefixEnd == -1 {
 			prefixEnd = 155
 		}
@@ -1988,8 +2934,12 @@ func DetectTar(b Buffer) *Metadata {
 			switch {
 			case tarPathEqual(prefix, name, "package/package.json"), tarPathEqual(prefix, name, "package.json"):
 				return &Metadata{Kind: KindTARArchive, Type: TypeNpmPackage}
-			case tarPathEqual(prefix, name, "oci-layout"), tarPathEqual(prefix, name, "index.json"), tarPathEqual(prefix, name, "manifest.json"):
-				return &Metadata{Kind: KindTARArchive, Type: TypeOCIImageLayout}
+			case tarPathEqual(prefix, name, "oci-layout"):
+				hasOCILayout = true
+			case tarPathEqual(prefix, name, "index.json"):
+				hasOCIIndex = true
+			case bytes.HasPrefix(name, []byte("blobs/sha256/")) || bytes.HasPrefix(prefix, []byte("blobs/sha256")):
+				hasOCIBlobs = true
 			case tarPathEqual(prefix, name, "PKG-INFO"), tarPathEqual(prefix, name, "setup.py"), tarPathEqual(prefix, name, "pyproject.toml"):
 				return &Metadata{Kind: KindTARArchive, Type: TypePythonSourceDistribution}
 			case tarPathEqual(prefix, name, "info/index.json"):
@@ -2012,15 +2962,29 @@ func DetectTar(b Buffer) *Metadata {
 			break
 		}
 
-		next := uint64(offset+512) + ((size + 511) / 512 * 512)
-		if next > uint64(limit) {
+		remaining := uint64(limit - offset - 512)
+		if size > remaining {
 			break
 		}
 
-		offset = int(next)
+		padded := (size + 511) / 512 * 512
+		if padded > remaining {
+			break
+		}
+
+		next := offset + 512 + int(padded)
+		if next <= offset {
+			break
+		}
+
+		offset = next
 	}
 
 	if isTar {
+		if hasOCILayout && hasOCIIndex && hasOCIBlobs {
+			return &Metadata{Kind: KindTARArchive, Type: TypeOCIImageLayout}
+		}
+
 		return &Metadata{Kind: KindTARArchive}
 	}
 
@@ -2033,8 +2997,10 @@ func validTarChecksum(header []byte) bool {
 		return false
 	}
 
-	var unsignedSum uint64
-	var signedSum int64
+	var (
+		unsignedSum uint64
+		signedSum   int64
+	)
 
 	for i, value := range header {
 		if i >= 148 && i < 156 {
@@ -2130,6 +3096,7 @@ func DetectText(b Buffer) *Metadata {
 			} else {
 				content = b
 			}
+
 			encoding = detectedEncoding
 		default:
 			content = b
@@ -2257,15 +3224,6 @@ func detectTextSubtype(data []byte) TypeID {
 
 		if bytes.Contains(shebang, []byte("fsharpi")) || bytes.Contains(shebang, []byte("fsharp")) {
 			return TypeFSharpSource
-		}
-	}
-
-	if bytes.HasPrefix(trimmed, []byte(`{"type":`)) || bytes.HasPrefix(trimmed, []byte(`{"type": `)) {
-		if bytes.Contains(trimmed, []byte(`"Topology"`)) || bytes.Contains(trimmed, []byte(`"transform"`)) {
-			return TypeTopoJSON
-		}
-		if bytes.Contains(trimmed, []byte(`"FeatureCollection"`)) || bytes.Contains(trimmed, []byte(`"Feature"`)) {
-			return TypeGeoJSON
 		}
 	}
 
@@ -2782,14 +3740,18 @@ func Detect3DStudio(b Buffer) *Metadata {
 	return &Metadata{Kind: Kind3DStudioMaxModel}
 }
 
-type tiffByteOrder uint8
-
 const (
 	tiffLittleEndian tiffByteOrder = iota
 	tiffBigEndian
 )
 
+type tiffByteOrder uint8
+
 func DetectTIFFSubtypes(b Buffer) *Metadata {
+	return DetectTIFFReaderAt(b, bytes.NewReader(b), int64(b.Len()))
+}
+
+func DetectTIFFReaderAt(b Buffer, reader io.ReaderAt, size int64) *Metadata {
 	if b.Has(0, []byte{'I', 'I', 'U', 0x00, 0x18, 0x00, 0x00, 0x00}) {
 		return &Metadata{Kind: KindTIFFImage, Type: TypePanasonicRAW}
 	}
@@ -2802,8 +3764,8 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 		return nil
 	}
 
-	if b.Has(0, []byte{'I', 'I', 0x2a, 0x00, 0x10, 0x00, 0x00, 0x00, 'C', 'R'}) {
-		return &Metadata{Kind: KindCanonRAWImage, Type: TypeHE}
+	if b.Has(0, []byte{'I', 'I', 0x2a, 0x00}) && b.Has(8, []byte{'C', 'R', 2, 0}) && b.Len() >= 16 {
+		return &Metadata{Kind: KindCanonRAWImage, Type: TypeCanonRAW2}
 	}
 
 	order, ifd0, ok := tiffHeaderInfo(b)
@@ -2820,7 +3782,9 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	makeValue, ok := tiffASCIIValueForTag(b, order, ifd0, 0x010f)
-	if ok {
+	budget := 32
+
+	if ok && tiffHasRawImage(reader, size, order, ifd0, 0, &budget) {
 		if bytes.HasPrefix(makeValue, []byte("NIKON")) || bytes.HasPrefix(makeValue, []byte("Nikon")) {
 			return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAW}
 		}
@@ -2834,39 +3798,8 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 		}
 
 		if bytes.HasPrefix(makeValue, []byte("SONY")) {
-			if bytes.Contains(makeValue, []byte("SR2")) {
-				return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAWSR2}
-			}
-
 			return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAW}
 		}
-	}
-
-	limit := min(b.Len(), 4096)
-	data := b[:limit]
-
-	if bytes.Contains(data, []byte("Nikon")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeNikonRAW}
-	}
-
-	if bytes.Contains(data, []byte("OLYMPUS")) || bytes.Contains(data, []byte("Olympus")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeOlympusRAW}
-	}
-
-	if bytes.Contains(data, []byte("PENTAX")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypePentaxRAW}
-	}
-
-	if bytes.Contains(data, []byte("SONY DSC")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAW}
-	}
-
-	if bytes.Contains(data, []byte("SONY SR2")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeSonyRAWSR2}
-	}
-
-	if bytes.Contains(data, []byte("DNGVersion")) {
-		return &Metadata{Kind: KindTIFFImage, Type: TypeAdobeDNG}
 	}
 
 	if b.Has(0, []byte{'I', 'I'}) {
@@ -2874,6 +3807,71 @@ func DetectTIFFSubtypes(b Buffer) *Metadata {
 	}
 
 	return &Metadata{Kind: KindTIFFImage, Type: TypeBigEndian}
+}
+
+func tiffHasRawImage(reader io.ReaderAt, size int64, order tiffByteOrder, ifdOffset uint32, depth int, budget *int) bool {
+	if depth > 4 || *budget == 0 || int64(ifdOffset)+2 > size {
+		return false
+	}
+
+	*budget--
+
+	var header [2]byte
+
+	if !readAtExactly(reader, header[:], int64(ifdOffset)) {
+		return false
+	}
+
+	count, _ := tiffU16(header[:], order, 0)
+
+	length := int(count) * 12
+	if length > 4096 || int64(length) > size-int64(ifdOffset)-2 {
+		return false
+	}
+
+	b := make(Buffer, length)
+	if !readAtExactly(reader, b, int64(ifdOffset)+2) {
+		return false
+	}
+
+	for index := range int(count) {
+		entry := index * 12
+
+		tag, _ := tiffU16(b, order, entry)
+		fieldType, _ := tiffU16(b, order, entry+2)
+		items, _ := tiffU32(b, order, entry+4)
+
+		if tag == 0x0106 && fieldType == 3 && items == 1 {
+			value, _ := tiffU16(b, order, entry+8)
+			if value == 32803 || value == 34892 {
+				return true
+			}
+		}
+
+		if tag == 0x014a && fieldType == 4 && items > 0 && items <= 16 {
+			var offsets [64]byte
+
+			values := b[entry+8 : entry+12]
+
+			if items > 1 {
+				position, _ := tiffU32(b, order, entry+8)
+				values = offsets[:int(items)*4]
+
+				if int64(position)+int64(len(values)) > size || !readAtExactly(reader, values, int64(position)) {
+					continue
+				}
+			}
+
+			for child := range int(items) {
+				childIFD, _ := tiffU32(values, order, child*4)
+				if childIFD > ifdOffset && tiffHasRawImage(reader, size, order, childIFD, depth+1, budget) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 func tiffHeaderInfo(b Buffer) (tiffByteOrder, uint32, bool) {
@@ -2906,6 +3904,7 @@ func tiffHasTag(b Buffer, order tiffByteOrder, ifdOffset uint32, tag uint16) boo
 
 	entryBase := int(ifdOffset) + 2
 	entryEnd := entryBase + int(count)*12
+
 	if entryBase < 0 || entryEnd > b.Len() {
 		return false
 	}
@@ -2971,12 +3970,12 @@ func tiffASCIIValueForTag(b Buffer, order tiffByteOrder, ifdOffset uint32, tag u
 			return nil, false
 		}
 
-		start := int(valueOffset)
-		end := start + int(valueCount)
-
-		if start < 0 || end > b.Len() {
+		if uint64(valueOffset) > uint64(b.Len()) || uint64(valueCount) > uint64(b.Len())-uint64(valueOffset) {
 			return nil, false
 		}
+
+		start := int(valueOffset)
+		end := start + int(valueCount)
 
 		return bytes.TrimRight(b[start:end], "\x00"), true
 	}
@@ -3019,68 +4018,130 @@ func DetectTorrent(b Buffer) *Metadata {
 	return &Metadata{Kind: KindTorrentDocument}
 }
 
-func DetectXMLSubtypes(b Buffer) *Metadata {
-	limit := min(b.Len(), 1024)
-	data := b[:limit]
+func DetectFileTrailer(buffer Buffer) *Metadata {
+	meta := DetectAppleDiskImage(buffer)
+	if meta != nil {
+		return meta
+	}
 
-	trimmed := bytes.TrimSpace(data)
-	if len(trimmed) < 5 || trimmed[0] != '<' {
+	if buffer.Len() >= 48 && buffer.Has(buffer.Len()-8, []byte{0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb}) {
+		return &Metadata{Kind: KindLevelDB}
+	}
+
+	if buffer.Len() < 512 {
 		return nil
 	}
 
-	isXML := bytes.HasPrefix(trimmed, []byte("<?xml")) || bytes.HasPrefix(trimmed, []byte("<!DOCTYPE"))
+	foot := buffer[buffer.Len()-512:]
+	version, _ := foot.U32BE(12)
+	diskType, _ := foot.U32BE(60)
+	checksum, _ := foot.U32BE(64)
 
-	if isXML || bytes.HasPrefix(trimmed, []byte("<svg")) {
-		if bytes.Contains(data, []byte("<svg")) {
-			return &Metadata{Kind: KindSVGImage, Confidence: ConfidenceMedium}
+	if !foot.Has(0, []byte("conectix")) || version != 0x00010000 || diskType < 2 || diskType > 4 {
+		return nil
+	}
+
+	var sum uint32
+
+	for index, value := range foot {
+		if index < 64 || index >= 68 {
+			sum += uint32(value)
 		}
 	}
 
-	if isXML {
-		if bytes.Contains(data, []byte("<plist")) || bytes.Contains(data, []byte("<!DOCTYPE plist")) {
-			return &Metadata{Kind: KindAppleXMLPropertyList, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<kml")) {
-			return &Metadata{Kind: KindKeyholeMarkupLanguage, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<gpx")) {
-			return &Metadata{Kind: KindGPSExchangeFormat, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<rss")) {
-			return &Metadata{Kind: KindRSSFeed, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<feed")) {
-			return &Metadata{Kind: KindAtomFeed, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<xsl:stylesheet")) || bytes.Contains(data, []byte("<xsl:transform")) {
-			return &Metadata{Kind: KindXMLDocument, Type: TypeXSLTStylesheet, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<soap:Envelope")) {
-			return &Metadata{Kind: KindSOAPMessage, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<COLLADA")) {
-			return &Metadata{Kind: KindColladaModel, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<X3D")) {
-			return &Metadata{Kind: KindX3DModel, Confidence: ConfidenceMedium}
-		}
-
-		if bytes.Contains(data, []byte("<gml:")) {
-			return &Metadata{Kind: KindGeographyMarkupLanguage, Confidence: ConfidenceMedium}
-		}
-
-		return &Metadata{Kind: KindXMLDocument, Confidence: ConfidenceMedium}
+	if ^sum != checksum {
+		return nil
 	}
 
-	return nil
+	return &Metadata{Kind: KindVHDDiskImage}
+}
+
+func DetectXMLSubtypes(b Buffer) *Metadata {
+	data := bytes.TrimPrefix(b, []byte{0xef, 0xbb, 0xbf})
+
+	if b.Has(0, []byte{0xff, 0xfe}) || b.Has(0, []byte{0xfe, 0xff}) {
+		decoded, _, ok := TryDecodeUTF16(b)
+		if !ok {
+			return nil
+		}
+
+		data = decoded
+	}
+
+	data = bytes.TrimSpace(data)
+	if len(data) == 0 || data[0] != '<' {
+		return nil
+	}
+
+	decoder := xml.NewDecoder(bytes.NewReader(data))
+
+	if b.Has(0, []byte{0xff, 0xfe}) || b.Has(0, []byte{0xfe, 0xff}) {
+		decoder.CharsetReader = decodedXMLCharset
+	}
+
+	for {
+		token, err := decoder.Token()
+		if err != nil {
+			return nil
+		}
+
+		if text, ok := token.(xml.CharData); ok && len(bytes.TrimSpace(text)) != 0 {
+			return nil
+		}
+
+		if root, ok := token.(xml.StartElement); ok {
+			return xmlRootMetadata(root)
+		}
+	}
+}
+
+func decodedXMLCharset(charset string, input io.Reader) (io.Reader, error) {
+	switch strings.ToLower(charset) {
+	case "utf-16", "utf-16le", "utf-16be":
+		return input, nil
+	default:
+		return nil, errors.New("unsupported XML encoding")
+	}
+}
+
+func xmlRootMetadata(root xml.StartElement) *Metadata {
+	name := root.Name.Local
+	namespace := root.Name.Space
+
+	switch {
+	case name == "svg" && namespace == "http://www.w3.org/2000/svg":
+		return &Metadata{Kind: KindSVGImage}
+	case name == "plist" && namespace == "":
+		return &Metadata{Kind: KindAppleXMLPropertyList}
+	case name == "kml" && (namespace == "http://www.opengis.net/kml/2.2" || namespace == "http://earth.google.com/kml/2.1"):
+		return &Metadata{Kind: KindKeyholeMarkupLanguage}
+	case name == "gpx" && (namespace == "http://www.topografix.com/GPX/1/1" || namespace == "http://www.topografix.com/GPX/1/0"):
+		return &Metadata{Kind: KindGPSExchangeFormat}
+	case name == "rss" && namespace == "":
+		return &Metadata{Kind: KindRSSFeed}
+	case name == "feed" && namespace == "http://www.w3.org/2005/Atom":
+		return &Metadata{Kind: KindAtomFeed}
+	case (name == "stylesheet" || name == "transform") && namespace == "http://www.w3.org/1999/XSL/Transform":
+		return &Metadata{Kind: KindXMLDocument, Type: TypeXSLTStylesheet}
+	case name == "Envelope" && (namespace == "http://schemas.xmlsoap.org/soap/envelope/" || namespace == "http://www.w3.org/2003/05/soap-envelope"):
+		return &Metadata{Kind: KindSOAPMessage}
+	case name == "COLLADA" && namespace == "http://www.collada.org/2005/11/COLLADASchema":
+		return &Metadata{Kind: KindColladaModel}
+	case name == "X3D" && (namespace == "" || namespace == "http://www.web3d.org/specifications/x3d-namespace"):
+		return &Metadata{Kind: KindX3DModel}
+	case namespace == "http://www.opengis.net/gml" || namespace == "http://www.opengis.net/gml/3.2":
+		return &Metadata{Kind: KindGeographyMarkupLanguage}
+	case name == "timedtext" && namespace == "":
+		for _, attribute := range root.Attr {
+			if attribute.Name.Local == "format" && attribute.Value == "3" {
+				return &Metadata{Kind: KindYouTubeTimedText}
+			}
+		}
+	case name == "assets" && namespace == "":
+		return &Metadata{Kind: KindGameMakerStudioProject, Type: TypeGameMakerStudio, Confidence: ConfidenceMedium}
+	}
+
+	return &Metadata{Kind: KindXMLDocument, Confidence: ConfidenceMedium}
 }
 
 const (
@@ -3100,32 +4161,10 @@ func DetectZIPContainer(b Buffer) *Metadata {
 
 	refined := detectZIPReaderAt(bytes.NewReader(b), int64(b.Len()))
 	if refined != nil {
-		return preferZIPMetadata(meta, refined)
+		return refined
 	}
 
 	return meta
-}
-
-func preferZIPMetadata(current, refined *Metadata) *Metadata {
-	switch refined.Type {
-	case TypeMicrosoftWordDocument:
-		switch current.Type {
-		case TypeMicrosoftWordMacroEnabledDocument, TypeMicrosoftWordTemplate, TypeMicrosoftWordMacroEnabledTemplate:
-			return current
-		}
-	case TypeMicrosoftExcelWorkbook:
-		switch current.Type {
-		case TypeMicrosoftExcelMacroEnabledWorkbook, TypeMicrosoftExcelTemplate, TypeMicrosoftExcelMacroEnabledTemplate, TypeMicrosoftExcelAddIn:
-			return current
-		}
-	case TypeMicrosoftPowerPointPresentation:
-		switch current.Type {
-		case TypeMicrosoftPowerPointMacroEnabledPresentation, TypeMicrosoftPowerPointTemplate, TypeMicrosoftPowerPointMacroEnabledTemplate, TypeMicrosoftPowerPointSlideshow, TypeMicrosoftPowerPointMacroEnabledSlideshow, TypeMicrosoftPowerPointAddIn:
-			return current
-		}
-	}
-
-	return refined
 }
 
 func detectZIPEntries(b Buffer) *Metadata {
@@ -3137,12 +4176,6 @@ func detectZIPEntries(b Buffer) *Metadata {
 		hasSketchMeta       bool
 		hasSketchUser       bool
 		hasSketchDoc        bool
-		hasWord             bool
-		hasExcel            bool
-		hasPowerPoint       bool
-		hasWordVBA          bool
-		hasExcelVBA         bool
-		hasPowerPointVBA    bool
 		hasManifestMF       bool
 		hasWebXML           bool
 		hasAppXML           bool
@@ -3157,7 +4190,6 @@ func detectZIPEntries(b Buffer) *Metadata {
 		hasProcreateDoc     bool
 		hasCeltxScript      bool
 		hasStudioOneSong    bool
-		hasBitwigProject    bool
 		hasPSVitaEboot      bool
 		hasOsuBeatmap       bool
 		hasOsuSkin          bool
@@ -3184,6 +4216,7 @@ func detectZIPEntries(b Buffer) *Metadata {
 
 		if !ok || !extraOK || !sizeOK || !flagsOK || nameLen == 0 || dataStart < i || dataStart > b.Len() {
 			i += 4
+
 			continue
 		}
 
@@ -3278,7 +4311,7 @@ func detectZIPEntries(b Buffer) *Metadata {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeFirefoxExtension}
 		} else if hasPrefixASCII(name, "animations/") {
 			hasLottieAnimations = true
-		} else if hasPrefixASCII(name, "payload/") {
+		} else if hasPrefixASCII(name, "payload/") && hasSuffixASCII(name, ".app/info.plist") && bytes.Count(name, []byte{'/'}) == 2 {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeIOSApplicationArchive}
 		} else if matchASCII(name, "bundleconfig.pb") {
 			return &Metadata{Kind: KindZIPArchive, Type: TypeAndroidAppBundle}
@@ -3300,8 +4333,6 @@ func detectZIPEntries(b Buffer) *Metadata {
 			hasCeltxScript = true
 		} else if matchASCII(name, "song.xml") || matchASCII(name, "project.xml") {
 			hasStudioOneSong = true
-		} else if matchASCII(name, "project.json") {
-			hasBitwigProject = true
 		} else if matchASCII(name, "eboot.bin") || matchASCII(name, "sce_sys/param.sfo") {
 			hasPSVitaEboot = true
 		} else if hasSuffixASCII(name, ".osu") {
@@ -3310,22 +4341,6 @@ func detectZIPEntries(b Buffer) *Metadata {
 			hasOsuSkin = true
 		} else if matchASCII(name, "metadata/buildversionhistory.plist") || hasPrefixASCII(name, "index/document.iwa") {
 			return &Metadata{Kind: KindAppleiWorkDocument}
-		}
-
-		if hasPrefixASCII(name, "word/") {
-			hasWord = true
-		} else if hasPrefixASCII(name, "xl/") {
-			hasExcel = true
-		} else if hasPrefixASCII(name, "ppt/") {
-			hasPowerPoint = true
-		}
-
-		if matchASCII(name, "word/vbaproject.bin") {
-			hasWordVBA = true
-		} else if matchASCII(name, "xl/vbaproject.bin") {
-			hasExcelVBA = true
-		} else if matchASCII(name, "ppt/vbaproject.bin") {
-			hasPowerPointVBA = true
 		}
 
 		if flags&0x08 != 0 || uint64(dataStart)+uint64(compressedSize) > uint64(b.Len()) {
@@ -3337,86 +4352,6 @@ func detectZIPEntries(b Buffer) *Metadata {
 
 	limitSearch := min(b.Len(), 32768)
 	searchArea := b[:limitSearch]
-
-	if hasWordVBA {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocument}
-	}
-
-	if hasExcelVBA {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledWorkbook}
-	}
-
-	if hasPowerPointVBA {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledPresentation}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.document.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledDocument}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.template.macroEnabledTemplate.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordMacroEnabledTemplate}
-	}
-
-	if hasWord {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftWordDocument}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.sheet.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledWorkbook}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.template.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelMacroEnabledTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.addin.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelAddIn}
-	}
-
-	if hasExcel {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftExcelWorkbook}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledPresentation}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.presentationml.template.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.template.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointSlideshow}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.slideshow.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointMacroEnabledSlideshow}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.addin.macroEnabled.main+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointAddIn}
-	}
-
-	if hasPowerPoint {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeMicrosoftPowerPointPresentation}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-xpsdocument.document+xml")) {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeXMLPaperSpecification}
-	}
 
 	if hasManifest {
 		if hasDex {
@@ -3488,10 +4423,6 @@ func detectZIPEntries(b Buffer) *Metadata {
 		return &Metadata{Kind: KindZIPArchive, Type: TypeStudioOne}
 	}
 
-	if hasBitwigProject {
-		return &Metadata{Kind: KindZIPArchive, Type: TypeBitwig}
-	}
-
 	if hasPSVitaEboot {
 		return &Metadata{Kind: KindZIPArchive, Type: TypePSVita}
 	}
@@ -3545,6 +4476,7 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *Metadata {
 	}
 
 	tailBuffer := Buffer(tail)
+
 	disk, _ := tailBuffer.U16LE(eocd + 4)
 	centralDisk, _ := tailBuffer.U16LE(eocd + 6)
 	entriesOnDisk, _ := tailBuffer.U16LE(eocd + 8)
@@ -3630,8 +4562,10 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *Metadata {
 	}
 
 	meta := detectZIPEntries(Buffer(entryData))
-	if meta.Kind == KindZIPArchive && meta.Type == TypeNone {
-		return nil
+
+	refined := detectOOXML(r, size, central)
+	if refined != nil {
+		return refined
 	}
 
 	return meta
@@ -3639,7 +4573,7 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *Metadata {
 
 func readAtExactly(r io.ReaderAt, data []byte, offset int64) bool {
 	n, err := r.ReadAt(data, offset)
-	return n == len(data) && (err == nil || err == io.EOF)
+	return n == len(data) && (err == nil || errors.Is(err, io.EOF))
 }
 
 func matchASCII(b []byte, lower string) bool {

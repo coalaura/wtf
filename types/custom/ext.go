@@ -7,7 +7,6 @@ const (
 	magicOffset      = superblockOffset + 56
 	compatOffset     = superblockOffset + 92
 	incompatOffset   = superblockOffset + 96
-	roCompatOffset   = superblockOffset + 100
 )
 
 func DetectExt(b types.Buffer) *types.Metadata {
@@ -17,6 +16,24 @@ func DetectExt(b types.Buffer) *types.Metadata {
 
 	magic, ok := b.U16LE(magicOffset)
 	if !ok || magic != 0xef53 {
+		return nil
+	}
+
+	inodes, _ := b.U32LE(superblockOffset)
+	blocks, _ := b.U32LE(superblockOffset + 4)
+	firstBlock, _ := b.U32LE(superblockOffset + 20)
+
+	blockShift, _ := b.U32LE(superblockOffset + 24)
+	blocksPerGroup, _ := b.U32LE(superblockOffset + 32)
+	inodesPerGroup, _ := b.U32LE(superblockOffset + 40)
+	revision, _ := b.U32LE(superblockOffset + 76)
+
+	if inodes == 0 || blocks == 0 || blockShift > 6 || revision > 1 || blocksPerGroup == 0 || inodesPerGroup == 0 {
+		return nil
+	}
+
+	blockSize := uint32(1024) << blockShift
+	if blocksPerGroup > blockSize*8 || inodesPerGroup > blockSize*8 || blocks <= firstBlock || blockShift == 0 && firstBlock != 1 || blockShift != 0 && firstBlock != 0 {
 		return nil
 	}
 
@@ -30,16 +47,11 @@ func DetectExt(b types.Buffer) *types.Metadata {
 		return nil
 	}
 
-	roCompat, ok := b.U32LE(roCompatOffset)
-	if !ok {
-		return nil
-	}
-
 	typ := types.TypeExt2
 
 	if incompat&0x40 != 0 {
 		typ = types.TypeExt4
-	} else if compat&0x4 != 0 || roCompat&0x4 != 0 {
+	} else if compat&0x4 != 0 {
 		typ = types.TypeExt3
 	}
 

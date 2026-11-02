@@ -2,67 +2,70 @@ package custom
 
 import "github.com/coalaura/wtf/types"
 
-func DetectPKCS12(b types.Buffer) *types.Metadata {
-	if b.Len() < 32 {
+func DetectPKCS12(buffer types.Buffer) *types.Metadata {
+	return detectPKCS12Sized(buffer, int64(buffer.Len()))
+}
+
+func detectPKCS12Sized(buffer types.Buffer, size int64) *types.Metadata {
+	offset, end, ok := asn1Header(buffer, 0, 0x30, size)
+	if !ok || end != size {
 		return nil
 	}
 
-	offset, length, ok := asn1Value(b, 0, 0x30)
+	version, versionEnd, ok := asn1Header(buffer, offset, 2, end)
+	if !ok || versionEnd != int64(version)+1 || !buffer.Has(version, []byte{3}) {
+		return nil
+	}
+
+	content, contentEnd, ok := asn1Header(buffer, version+1, 0x30, end)
 	if !ok {
 		return nil
 	}
 
-	end := offset + length
-
-	versionOffset, versionLength, ok := asn1Value(b, offset, 0x02)
-	if !ok || versionLength != 1 || versionOffset+versionLength > end || b[versionOffset] != 3 {
+	oid, oidEnd, ok := asn1Header(buffer, content, 6, contentEnd)
+	if !ok || oidEnd != int64(oid)+9 || !buffer.Has(oid, []byte{0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 1, 7, 1}) {
 		return nil
 	}
 
-	offset = versionOffset + versionLength
-
-	contentOffset, contentLength, ok := asn1Value(b, offset, 0x30)
-	if !ok || contentOffset+contentLength > end {
-		return nil
-	}
-
-	contentEnd := contentOffset + contentLength
-
-	oidOffset, oidLength, ok := asn1Value(b, contentOffset, 0x06)
-	if !ok || oidLength != 9 || oidOffset+oidLength > contentEnd || !b.Has(oidOffset, []byte{0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x01}) {
+	_, _, ok = asn1Header(buffer, oid+9, 0xa0, contentEnd)
+	if !ok {
 		return nil
 	}
 
 	return &types.Metadata{Kind: types.KindPKCS12}
 }
 
-func asn1Value(b types.Buffer, offset int, tag byte) (int, int, bool) {
-	if offset < 0 || offset+2 > b.Len() || b[offset] != tag {
+func asn1Header(buffer types.Buffer, offset int, tag byte, limit int64) (int, int64, bool) {
+	if offset < 0 || offset > buffer.Len()-2 || buffer[offset] != tag {
 		return 0, 0, false
 	}
 
-	length := int(b[offset+1])
-	headerSize := 2
+	length := int64(buffer[offset+1])
+	header := 2
 
 	if length&0x80 != 0 {
-		lengthBytes := length & 0x7f
-		if lengthBytes == 0 || lengthBytes > 4 || offset+2+lengthBytes > b.Len() {
+		count := int(length & 0x7f)
+		if count == 0 || count > 4 || count > buffer.Len()-offset-2 || buffer[offset+2] == 0 {
 			return 0, 0, false
 		}
 
 		length = 0
 
-		for i := range lengthBytes {
-			length = length<<8 | int(b[offset+2+i])
+		for index := range count {
+			length = length<<8 | int64(buffer[offset+2+index])
 		}
 
-		headerSize += lengthBytes
+		if length < 128 {
+			return 0, 0, false
+		}
+
+		header += count
 	}
 
-	valueOffset := offset + headerSize
-	if length < 0 || valueOffset > b.Len() || length > b.Len()-valueOffset {
+	start := offset + header
+	if int64(start) > limit || length > limit-int64(start) {
 		return 0, 0, false
 	}
 
-	return valueOffset, length, true
+	return start, int64(start) + length, true
 }

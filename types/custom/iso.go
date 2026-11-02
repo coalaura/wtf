@@ -1,12 +1,17 @@
 package custom
 
 import (
+	"io"
 	"slices"
 
 	"github.com/coalaura/wtf/types"
 )
 
 func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
+	if b.Has(0, []byte{0, 0, 0, 12, 'j', 'P', ' ', ' ', 13, 10, 135, 10}) {
+		b = b[12:]
+	}
+
 	if b.Len() < 16 {
 		return nil
 	}
@@ -145,12 +150,130 @@ func DetectISOBaseMedia(b types.Buffer) *types.Metadata {
 	}
 
 	if hasISOBrand(b, brandOffset, compatibleOffset, boxLimit, "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "dash") {
-		return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMP4Video}
+		audio, video := isoTrackKinds(b, 0)
+		if video {
+			return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMP4Video}
+		}
+
+		if audio {
+			return &types.Metadata{Kind: types.KindISOBaseMedia, Type: types.TypeMPEG4Audio}
+		}
 	}
 
 	return &types.Metadata{
 		Kind: types.KindISOBaseMedia,
 	}
+}
+
+func DetectISOReaderAt(b types.Buffer, reader io.ReaderAt, size int64) *types.Metadata {
+	meta := DetectISOBaseMedia(b)
+	if meta == nil || meta.Type != types.TypeNone {
+		return meta
+	}
+
+	var (
+		header [16]byte
+		offset int64
+	)
+
+	for range 256 {
+		if size-offset < 8 || !readAtExactly(reader, header[:8], offset) {
+			break
+		}
+
+		length32, _ := types.Buffer(header[:]).U32BE(0)
+		length := uint64(length32)
+		headerSize := 8
+
+		if length == 1 {
+			if size-offset < 16 || !readAtExactly(reader, header[8:], offset+8) {
+				break
+			}
+
+			high, _ := types.Buffer(header[:]).U32BE(8)
+			low, _ := types.Buffer(header[:]).U32BE(12)
+			length = uint64(high)<<32 | uint64(low)
+			headerSize = 16
+		}
+
+		if length == 0 {
+			length = uint64(size - offset)
+		}
+
+		if length < uint64(headerSize) || length > uint64(size-offset) {
+			break
+		}
+
+		if string(header[4:8]) == "moov" && length <= maxScanSize {
+			box := make(types.Buffer, int(length))
+			if !readAtExactly(reader, box, offset) {
+				break
+			}
+
+			audio, video := isoTrackKinds(box, 0)
+			if video {
+				meta.Type = types.TypeMP4Video
+			} else if audio {
+				meta.Type = types.TypeMPEG4Audio
+			}
+
+			break
+		}
+
+		offset += int64(length)
+	}
+
+	return meta
+}
+
+func isoTrackKinds(b types.Buffer, depth int) (bool, bool) {
+	if depth > 4 {
+		return false, false
+	}
+
+	var (
+		audio bool
+		video bool
+	)
+
+	for offset := 0; offset+8 <= b.Len(); {
+		length32, _ := b.U32BE(offset)
+		length := uint64(length32)
+		header := 8
+
+		if length == 1 {
+			high, _ := b.U32BE(offset + 8)
+			low, _ := b.U32BE(offset + 12)
+			length = uint64(high)<<32 | uint64(low)
+			header = 16
+		}
+
+		if length == 0 {
+			length = uint64(b.Len() - offset)
+		}
+
+		if length < uint64(header) || length > uint64(b.Len()-offset) {
+			break
+		}
+
+		payload := b[offset+header : offset+int(length)]
+
+		switch string(b[offset+4 : offset+8]) {
+		case "moov", "trak", "mdia":
+			childAudio, childVideo := isoTrackKinds(payload, depth+1)
+			audio = audio || childAudio
+			video = video || childVideo
+		case "hdlr":
+			if depth == 3 && payload.Len() >= 12 {
+				audio = audio || payload.Has(8, []byte("soun"))
+				video = video || payload.Has(8, []byte("vide"))
+			}
+		}
+
+		offset += int(length)
+	}
+
+	return audio, video
 }
 
 func hasISOBrand(b types.Buffer, majorOffset int, compatOffset int, boxEnd int, brands ...string) bool {

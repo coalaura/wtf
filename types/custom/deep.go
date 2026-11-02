@@ -14,22 +14,13 @@ func DetectDeepAnalysis(b types.Buffer) *types.Metadata {
 		return nil
 	}
 
-	// Don't analyze small files for encryption
+	// Small samples do not provide meaningful entropy estimates.
 	if b.Len() < 512 {
 		return nil
 	}
 
-	// Check for common binary patterns that might be confused with encryption
 	if isKnownBinaryPattern(b) {
 		return nil
-	}
-
-	if result.IsEncrypted {
-		return &types.Metadata{
-			Kind:       types.KindHighEntropyData,
-			Type:       types.TypeEncrypted,
-			Confidence: types.ConfidenceLow,
-		}
 	}
 
 	if result.IsHighEntropy {
@@ -66,6 +57,7 @@ func isKnownBinaryPattern(b types.Buffer) bool {
 		for i := 1; i < 32 && i < b.Len(); i++ {
 			if b[i] != first {
 				allSame = false
+
 				break
 			}
 		}

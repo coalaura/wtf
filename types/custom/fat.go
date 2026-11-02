@@ -7,7 +7,7 @@ func DetectFAT(b types.Buffer) *types.Metadata {
 		return nil
 	}
 
-	if !((b[0] == 0xeb && b[2] == 0x90) || b[0] == 0xe9) {
+	if (b[0] != 0xeb || b[2] != 0x90) && b[0] != 0xe9 {
 		return nil
 	}
 

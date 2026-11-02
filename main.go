@@ -18,6 +18,11 @@ var (
 	log     = plain.New()
 )
 
+type durationUnit struct {
+	value  time.Duration
+	suffix string
+}
+
 const MaxReadSize = 128 * 1024
 
 const bashCompletion = `_wtf() {
@@ -153,7 +158,7 @@ func processFile(path string, porcelain bool, timing bool, deepAnalysis bool) {
 	buf := make([]byte, readSize)
 
 	n, err := io.ReadFull(file, buf)
-	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
+	if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
 		log.Errorln(err)
 
 		os.Exit(1)
@@ -283,12 +288,7 @@ func formatTime(d time.Duration) string {
 		return "0s"
 	}
 
-	type unit struct {
-		value  time.Duration
-		suffix string
-	}
-
-	units := []unit{
+	units := []durationUnit{
 		{time.Hour, "h"},
 		{time.Minute, "m"},
 		{time.Second, "s"},
@@ -304,7 +304,7 @@ func formatTime(d time.Duration) string {
 		}
 
 		count := d / unit.value
-		d -= count * unit.value
+		d %= unit.value
 
 		parts = append(parts, fmt.Sprintf("%d%s", count, unit.suffix))
 	}

@@ -16,6 +16,7 @@ func DetectOgg(b types.Buffer) *types.Metadata {
 		}
 
 		segmentCount := int(b[offset+26])
+
 		headerEnd := offset + 27 + segmentCount
 		if headerEnd > limit {
 			break
@@ -37,11 +38,13 @@ func DetectOgg(b types.Buffer) *types.Metadata {
 
 		for _, size := range b[offset+27 : headerEnd] {
 			packetOffset += int(size)
+
 			if size == 255 {
 				continue
 			}
 
-			if meta := detectOggPacket(b[packetStart:packetOffset]); meta != nil {
+			meta := detectOggPacket(b[packetStart:packetOffset])
+			if meta != nil {
 				return meta
 			}
 

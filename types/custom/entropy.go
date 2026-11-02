@@ -8,9 +8,8 @@ import (
 )
 
 const (
-	entropyThresholdEncrypted = 7.9
-	entropyThresholdHigh      = 7.5
-	entropyThresholdMedium    = 6.0
+	entropyThresholdHigh   = 7.5
+	entropyThresholdMedium = 6.0
 )
 
 type ByteFrequency [256]int
@@ -75,7 +74,6 @@ func CalculateEntropy(b types.Buffer) *EntropyResult {
 
 	return &EntropyResult{
 		ShannonEntropy: entropy,
-		IsEncrypted:    entropy >= entropyThresholdEncrypted && zeros == 0,
 		IsHighEntropy:  entropy >= entropyThresholdHigh,
 		ByteFreq:       freq,
 		ZeroBytes:      zeros,
@@ -93,14 +91,6 @@ func DetectHighEntropy(b types.Buffer) *types.Metadata {
 	// Only flag as high entropy if we have enough data to be meaningful
 	if b.Len() < 256 {
 		return nil
-	}
-
-	if result.IsEncrypted {
-		return &types.Metadata{
-			Kind:       types.KindHighEntropyData,
-			Type:       types.TypeEncrypted,
-			Confidence: types.ConfidenceMedium,
-		}
 	}
 
 	if result.IsHighEntropy {

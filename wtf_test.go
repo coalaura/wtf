@@ -1,6 +1,11 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
+	"encoding/binary"
+	"errors"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -18,6 +23,14 @@ type testCase struct {
 	typ  types.TypeID
 }
 
+type collisionCase struct {
+	name      string
+	data      []byte
+	kind      types.KindID
+	typ       types.TypeID
+	forbidden types.KindID
+}
+
 func TestConsistency(t *testing.T) {
 	typeNames := getIdentifiers(t, "types/ids_type.go", "Type")
 	kindNames := getIdentifiers(t, "types/ids_kind.go", "Kind")
@@ -25,6 +38,7 @@ func TestConsistency(t *testing.T) {
 	for i := types.TypeID(1); i < types.MaxTypes; i++ {
 		if i.String() == "" {
 			name := "Unknown Identifier"
+
 			if int(i) < len(typeNames) {
 				name = typeNames[i]
 			}
@@ -36,6 +50,7 @@ func TestConsistency(t *testing.T) {
 	for i := types.KindID(1); i < types.MaxKinds; i++ {
 		if i.String() == "Unknown" {
 			name := "Unknown Identifier"
+
 			if int(i) < len(kindNames) {
 				name = kindNames[i]
 			}
@@ -61,7 +76,7 @@ func TestDetectFixtures(t *testing.T) {
 		{file: "bigtiff.tif", kind: types.KindTIFFImage, typ: types.TypeBigTIFF},
 		{file: "bundle.aab", kind: types.KindZIPArchive, typ: types.TypeAndroidAppBundle},
 		{file: "comic.cbz", kind: types.KindZIPArchive, typ: types.TypeComicBook},
-		{file: "cr2.cr2", kind: types.KindCanonRAWImage, typ: types.TypeHE},
+		{file: "cr2.cr2", kind: types.KindCanonRAWImage, typ: types.TypeCanonRAW2},
 		{file: "cursor.cur", kind: types.KindWindowsCursorImage, typ: types.TypeNone},
 		{file: "data.json", kind: types.KindJSONDocument, typ: types.TypeNone},
 		{file: "dicom.dcm", kind: types.KindDICOMMedicalImage, typ: types.TypeNone},
@@ -152,8 +167,127 @@ func TestDetectFixtures(t *testing.T) {
 			if meta.Type != tc.typ {
 				t.Fatalf("type mismatch: got %v (%q), want %v (%q)", meta.Type, meta.Type.String(), tc.typ, tc.typ.String())
 			}
+
+			streamed, err := types.DetectReaderAt(tc.file, data[:min(len(data), 2048)], bytes.NewReader(data), int64(len(data)))
+			if err != nil || streamed == nil || *streamed != *meta {
+				t.Fatalf("ReaderAt mismatch: got %+v, %v; want %+v", streamed, err, meta)
+			}
 		})
 	}
+}
+
+func TestTarSizeOverflow(t *testing.T) {
+	data := make([]byte, 512)
+	copy(data, "member")
+	copy(data[257:], "ustar\x00")
+	data[124] = 0x80
+	binary.BigEndian.PutUint64(data[128:], ^uint64(0)-511)
+	checksum := 8 * int(' ')
+
+	for _, value := range data {
+		checksum += int(value)
+	}
+
+	copy(data[148:156], fmt.Sprintf("%06o\x00 ", checksum))
+
+	meta, err := types.Detect("overflow.tar", data)
+	if err != nil || meta.Kind != types.KindTARArchive {
+		t.Fatalf("detect: %v, %v", meta, err)
+	}
+}
+
+func TestTIFFCountOverflow(t *testing.T) {
+	data := make([]byte, 32)
+	copy(data, "II\x2a\x00\x08\x00\x00\x00")
+	binary.LittleEndian.PutUint16(data[8:], 1)
+	binary.LittleEndian.PutUint16(data[10:], 0x010f)
+	binary.LittleEndian.PutUint16(data[12:], 2)
+	binary.LittleEndian.PutUint32(data[14:], 0xffffffff)
+	binary.LittleEndian.PutUint32(data[18:], 16)
+
+	meta, err := types.Detect("overflow.tif", data)
+	if err != nil || meta.Kind != types.KindTIFFImage {
+		t.Fatalf("detect: %v, %v", meta, err)
+	}
+}
+
+func TestDetectCollisions(t *testing.T) {
+	payload := make([]byte, 2048)
+	copy(payload[1080-30-len("payload"):], []byte{0x53, 0xef})
+	zipPayload := collisionZIP(t, map[string][]byte{"payload": payload}, zip.Store)
+	quotedMIME := collisionZIP(t, map[string][]byte{"notes.txt": []byte("application/vnd.ms-word.document.macroEnabled.main+xml")}, zip.Store)
+	project := collisionZIP(t, map[string][]byte{"project.json": []byte("{}"), "payload/data.txt": []byte("data")}, zip.Deflate)
+	template := collisionZIP(t, map[string][]byte{
+		"[Content_Types].xml": []byte(`<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml"/></Types>`),
+		"_rels/.rels":         []byte(`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`),
+		"word/document.xml":   []byte(`<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>`),
+	}, zip.Deflate)
+	cases := []collisionCase{
+		{name: "zip-ext", data: zipPayload, kind: types.KindZIPArchive},
+		{name: "quoted-mime", data: quotedMIME, kind: types.KindZIPArchive},
+		{name: "generic-project", data: project, kind: types.KindZIPArchive},
+		{name: "deflated-template", data: template, kind: types.KindZIPArchive, typ: types.TypeMicrosoftWordTemplate},
+		{name: "boolean-not-font", data: []byte("true"), kind: types.KindJSONDocument},
+		{name: "json-array", data: []byte(" \n[1, null, {}]\t"), kind: types.KindJSONDocument},
+		{name: "json-empty", data: []byte("{}"), kind: types.KindJSONDocument},
+		{name: "json-malformed", data: []byte(`{"type":"FeatureCollection","features":}`), forbidden: types.KindJSONDocument},
+		{name: "resources-key", data: []byte(`{"resources":[]}`), kind: types.KindJSONDocument},
+		{name: "xml-comment", data: []byte("\xef\xbb\xbf<?xml version=\"1.0\"?><!-- <svg --> <root/>"), kind: types.KindXMLDocument},
+		{name: "bitmap-prose", data: []byte("BM is an abbreviation"), forbidden: types.KindBMPImage},
+		{name: "netpbm-prose", data: []byte("P6 is a processor family"), forbidden: types.KindNetpbmImage},
+		{name: "c-header", data: []byte("#define VALUE 42\n"), forbidden: types.KindXBitMapImage},
+		{name: "tagged-flac", data: []byte("ID3\x04\x00\x00\x00\x00\x00\x00fLaC"), kind: types.KindFLACAudio},
+	}
+
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			full, fullErr := types.Detect(test.name, test.data)
+			streamed, streamErr := types.DetectReaderAt(test.name, test.data[:min(32, len(test.data))], bytes.NewReader(test.data), int64(len(test.data)))
+
+			if !errors.Is(fullErr, streamErr) || (full == nil) != (streamed == nil) || full != nil && *full != *streamed {
+				t.Fatalf("API mismatch: %v, %v / %v, %v", full, fullErr, streamed, streamErr)
+			}
+
+			if test.forbidden != types.KindUnknown {
+				if full != nil && full.Kind == test.forbidden {
+					t.Fatalf("false positive: %+v", full)
+				}
+
+				return
+			}
+
+			if fullErr != nil || full == nil || full.Kind != test.kind || full.Type != test.typ {
+				t.Fatalf("got %+v, %v; want %v / %v", full, fullErr, test.kind, test.typ)
+			}
+		})
+	}
+}
+
+func collisionZIP(t *testing.T, files map[string][]byte, method uint16) []byte {
+	t.Helper()
+
+	var output bytes.Buffer
+
+	writer := zip.NewWriter(&output)
+
+	for name, data := range files {
+		entry, err := writer.CreateHeader(&zip.FileHeader{Name: name, Method: method})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, err = entry.Write(data)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	err := writer.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return output.Bytes()
 }
 
 func getIdentifiers(t *testing.T, filename, prefix string) []string {

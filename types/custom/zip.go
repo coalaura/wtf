@@ -2,6 +2,7 @@ package custom
 
 import (
 	"bytes"
+	"errors"
 	"io"
 
 	"github.com/coalaura/wtf/types"
@@ -24,32 +25,10 @@ func DetectZIPContainer(b types.Buffer) *types.Metadata {
 
 	refined := detectZIPReaderAt(bytes.NewReader(b), int64(b.Len()))
 	if refined != nil {
-		return preferZIPMetadata(meta, refined)
+		return refined
 	}
 
 	return meta
-}
-
-func preferZIPMetadata(current, refined *types.Metadata) *types.Metadata {
-	switch refined.Type {
-	case types.TypeMicrosoftWordDocument:
-		switch current.Type {
-		case types.TypeMicrosoftWordMacroEnabledDocument, types.TypeMicrosoftWordTemplate, types.TypeMicrosoftWordMacroEnabledTemplate:
-			return current
-		}
-	case types.TypeMicrosoftExcelWorkbook:
-		switch current.Type {
-		case types.TypeMicrosoftExcelMacroEnabledWorkbook, types.TypeMicrosoftExcelTemplate, types.TypeMicrosoftExcelMacroEnabledTemplate, types.TypeMicrosoftExcelAddIn:
-			return current
-		}
-	case types.TypeMicrosoftPowerPointPresentation:
-		switch current.Type {
-		case types.TypeMicrosoftPowerPointMacroEnabledPresentation, types.TypeMicrosoftPowerPointTemplate, types.TypeMicrosoftPowerPointMacroEnabledTemplate, types.TypeMicrosoftPowerPointSlideshow, types.TypeMicrosoftPowerPointMacroEnabledSlideshow, types.TypeMicrosoftPowerPointAddIn:
-			return current
-		}
-	}
-
-	return refined
 }
 
 func detectZIPEntries(b types.Buffer) *types.Metadata {
@@ -61,12 +40,6 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 		hasSketchMeta       bool
 		hasSketchUser       bool
 		hasSketchDoc        bool
-		hasWord             bool
-		hasExcel            bool
-		hasPowerPoint       bool
-		hasWordVBA          bool
-		hasExcelVBA         bool
-		hasPowerPointVBA    bool
 		hasManifestMF       bool
 		hasWebXML           bool
 		hasAppXML           bool
@@ -81,7 +54,6 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 		hasProcreateDoc     bool
 		hasCeltxScript      bool
 		hasStudioOneSong    bool
-		hasBitwigProject    bool
 		hasPSVitaEboot      bool
 		hasOsuBeatmap       bool
 		hasOsuSkin          bool
@@ -108,6 +80,7 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 
 		if !ok || !extraOK || !sizeOK || !flagsOK || nameLen == 0 || dataStart < i || dataStart > b.Len() {
 			i += 4
+
 			continue
 		}
 
@@ -202,7 +175,7 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeFirefoxExtension}
 		} else if hasPrefixASCII(name, "animations/") {
 			hasLottieAnimations = true
-		} else if hasPrefixASCII(name, "payload/") {
+		} else if hasPrefixASCII(name, "payload/") && hasSuffixASCII(name, ".app/info.plist") && bytes.Count(name, []byte{'/'}) == 2 {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeIOSApplicationArchive}
 		} else if matchASCII(name, "bundleconfig.pb") {
 			return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeAndroidAppBundle}
@@ -224,8 +197,6 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 			hasCeltxScript = true
 		} else if matchASCII(name, "song.xml") || matchASCII(name, "project.xml") {
 			hasStudioOneSong = true
-		} else if matchASCII(name, "project.json") {
-			hasBitwigProject = true
 		} else if matchASCII(name, "eboot.bin") || matchASCII(name, "sce_sys/param.sfo") {
 			hasPSVitaEboot = true
 		} else if hasSuffixASCII(name, ".osu") {
@@ -234,22 +205,6 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 			hasOsuSkin = true
 		} else if matchASCII(name, "metadata/buildversionhistory.plist") || hasPrefixASCII(name, "index/document.iwa") {
 			return &types.Metadata{Kind: types.KindAppleiWorkDocument}
-		}
-
-		if hasPrefixASCII(name, "word/") {
-			hasWord = true
-		} else if hasPrefixASCII(name, "xl/") {
-			hasExcel = true
-		} else if hasPrefixASCII(name, "ppt/") {
-			hasPowerPoint = true
-		}
-
-		if matchASCII(name, "word/vbaproject.bin") {
-			hasWordVBA = true
-		} else if matchASCII(name, "xl/vbaproject.bin") {
-			hasExcelVBA = true
-		} else if matchASCII(name, "ppt/vbaproject.bin") {
-			hasPowerPointVBA = true
 		}
 
 		if flags&0x08 != 0 || uint64(dataStart)+uint64(compressedSize) > uint64(b.Len()) {
@@ -261,91 +216,6 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 
 	limitSearch := min(b.Len(), 32768)
 	searchArea := b[:limitSearch]
-
-	// Macro-enabled detection via vbaProject.bin
-	if hasWordVBA {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftWordMacroEnabledDocument}
-	}
-
-	if hasExcelVBA {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftExcelMacroEnabledWorkbook}
-	}
-
-	if hasPowerPointVBA {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointMacroEnabledPresentation}
-	}
-
-	// Word
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.document.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftWordMacroEnabledDocument}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftWordTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-word.template.macroEnabledTemplate.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftWordMacroEnabledTemplate}
-	}
-
-	if hasWord {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftWordDocument}
-	}
-
-	// Excel
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.sheet.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftExcelMacroEnabledWorkbook}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftExcelTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.template.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftExcelMacroEnabledTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-excel.addin.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftExcelAddIn}
-	}
-
-	if hasExcel {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftExcelWorkbook}
-	}
-
-	// PowerPoint
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointMacroEnabledPresentation}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.presentationml.template.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.template.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointMacroEnabledTemplate}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointSlideshow}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.slideshow.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointMacroEnabledSlideshow}
-	}
-
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-powerpoint.addin.macroEnabled.main+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointAddIn}
-	}
-
-	if hasPowerPoint {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeMicrosoftPowerPointPresentation}
-	}
-
-	// XPS
-	if bytes.Contains(searchArea, []byte("application/vnd.ms-xpsdocument.document+xml")) {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeXMLPaperSpecification}
-	}
 
 	if hasManifest {
 		if hasDex {
@@ -417,10 +287,6 @@ func detectZIPEntries(b types.Buffer) *types.Metadata {
 		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeStudioOne}
 	}
 
-	if hasBitwigProject {
-		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypeBitwig}
-	}
-
 	if hasPSVitaEboot {
 		return &types.Metadata{Kind: types.KindZIPArchive, Type: types.TypePSVita}
 	}
@@ -474,6 +340,7 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *types.Metadata {
 	}
 
 	tailBuffer := types.Buffer(tail)
+
 	disk, _ := tailBuffer.U16LE(eocd + 4)
 	centralDisk, _ := tailBuffer.U16LE(eocd + 6)
 	entriesOnDisk, _ := tailBuffer.U16LE(eocd + 8)
@@ -559,8 +426,10 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *types.Metadata {
 	}
 
 	meta := detectZIPEntries(types.Buffer(entryData))
-	if meta.Kind == types.KindZIPArchive && meta.Type == types.TypeNone {
-		return nil
+
+	refined := detectOOXML(r, size, central)
+	if refined != nil {
+		return refined
 	}
 
 	return meta
@@ -568,7 +437,7 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *types.Metadata {
 
 func readAtExactly(r io.ReaderAt, data []byte, offset int64) bool {
 	n, err := r.ReadAt(data, offset)
-	return n == len(data) && (err == nil || err == io.EOF)
+	return n == len(data) && (err == nil || errors.Is(err, io.EOF))
 }
 
 // matchASCII compares a byte slice to a lowercase string without allocating.

@@ -44,6 +44,7 @@ func DetectText(b types.Buffer) *types.Metadata {
 			} else {
 				content = b
 			}
+
 			encoding = detectedEncoding
 		default:
 			content = b
@@ -172,16 +173,6 @@ func detectTextSubtype(data []byte) types.TypeID {
 
 		if bytes.Contains(shebang, []byte("fsharpi")) || bytes.Contains(shebang, []byte("fsharp")) {
 			return types.TypeFSharpSource
-		}
-	}
-
-	// TopoJSON / GeoJSON
-	if bytes.HasPrefix(trimmed, []byte(`{"type":`)) || bytes.HasPrefix(trimmed, []byte(`{"type": `)) {
-		if bytes.Contains(trimmed, []byte(`"Topology"`)) || bytes.Contains(trimmed, []byte(`"transform"`)) {
-			return types.TypeTopoJSON
-		}
-		if bytes.Contains(trimmed, []byte(`"FeatureCollection"`)) || bytes.Contains(trimmed, []byte(`"Feature"`)) {
-			return types.TypeGeoJSON
 		}
 	}
 

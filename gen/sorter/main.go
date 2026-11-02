@@ -15,211 +15,6 @@ import (
 	"strings"
 )
 
-var ignoredTypes = map[string]bool{
-	// Structural / Generic
-	"TypeNone":      true,
-	"TypeEmpty":     true,
-	"TypeContainer": true,
-	"TypeWrapper":   true,
-	"TypeLegacy":    true,
-	"TypeSpecial":   true,
-
-	// Endianness / Bitness
-	"Type32Bit":                  true,
-	"Type32BitBigEndian":         true,
-	"Type32BitLittleEndian":      true,
-	"Type64Bit":                  true,
-	"Type64BitBigEndian":         true,
-	"Type64BitLittleEndian":      true,
-	"TypeBigEndian":              true,
-	"TypeLittleEndian":           true,
-	"TypeBinaryBigEndian":        true,
-	"TypeBinaryLittleEndian":     true,
-	"TypeNanosecondBigEndian":    true,
-	"TypeNanosecondLittleEndian": true,
-	"TypeByteSwapped":            true,
-
-	// Versions
-	"TypeVersion035": true,
-	"TypeVersion036": true,
-	"TypeVersion037": true,
-	"TypeVersion038": true,
-	"TypeVersion039": true,
-	"TypeVersion040": true,
-	"TypeVersion041": true,
-	"TypeVersion1":   true,
-	"TypeVersion2":   true,
-	"TypeVersion3":   true,
-	"TypeVersion4":   true,
-	"TypeVersion5":   true,
-	"TypeVersion7":   true,
-	"TypeVersion8":   true,
-	"TypeGIF87a":     true,
-	"TypeGIF89a":     true,
-
-	// Compression / Chunk States
-	"TypeCodestream":     true,
-	"TypeLZ4Legacy":      true,
-	"TypeLZMACompressed": true,
-	"TypeZlibCompressed": true,
-	"TypeUncompressed":   true,
-	"TypeSkinnableFrame": true,
-	"TypeCAT":            true,
-	"TypeLIST":           true,
-
-	// Filesystem Entries
-	"TypeBlockDevice":     true,
-	"TypeCharacterDevice": true,
-	"TypeDirectory":       true,
-	"TypeNamedPipe":       true,
-	"TypeSocket":          true,
-	"TypeSymbolicLink":    true,
-
-	// Specific Internal Markers / Architectures
-	"TypeB4":              true,
-	"TypeCE":              true,
-	"TypeCOWD":            true,
-	"TypeKDM":             true,
-	"TypeIMMM":            true,
-	"TypePE32ARM":         true,
-	"TypePE32ARM64":       true,
-	"TypePE32ARMv7":       true,
-	"TypePE32Itanium":     true,
-	"TypePE32PlusARM64":   true,
-	"TypePE32PlusUnknown": true,
-	"TypePE32PlusX8664":   true,
-	"TypePE32Unknown":     true,
-	"TypePE32X86":         true,
-	"TypePE32X8664":       true,
-	"TypeFAT12":           true,
-	"TypeFAT16":           true,
-	"TypeFAT32":           true,
-
-	// Text / Encodings
-	"TypeASCII":           true,
-	"TypeUTF8":            true,
-	"TypeUTF16":           true,
-	"TypeUTF16LE":         true,
-	"TypeUTF16BE":         true,
-	"TypeUTF32LE":         true,
-	"TypeUTF32BE":         true,
-	"TypeLatin1":          true,
-	"TypeWindows1252":     true,
-	"TypeNewASCII":        true,
-	"TypeNewASCIIWithCRC": true,
-	"TypeOldASCII":        true,
-
-	// Source Code / Scripts
-	"TypeBashScript":                 true,
-	"TypeBatchScript":                true,
-	"TypeCMakeScript":                true,
-	"TypeCPPSource":                  true,
-	"TypeCSharpSource":               true,
-	"TypeCSource":                    true,
-	"TypeCSS":                        true,
-	"TypeDartSource":                 true,
-	"TypeDockerfile":                 true,
-	"TypeDockerComposeConfiguration": true,
-	"TypeGoSource":                   true,
-	"TypeGraphQL":                    true,
-	"TypeGraphQLSchema":              true,
-	"TypeINIConfiguration":           true,
-	"TypeJavaSource":                 true,
-	"TypeJavaScriptSource":           true,
-	"TypeJSONCSource":                true,
-	"TypeJSON5Source":                true,
-	"TypeKotlinSource":               true,
-	"TypeLuaScript":                  true,
-	"TypeMakefile":                   true,
-	"TypeMarkdownDocument":           true,
-	"TypeObjectiveCSource":           true,
-	"TypePHPScript":                  true,
-	"TypePerlScript":                 true,
-	"TypePowerShellScript":           true,
-	"TypePropertiesFile":             true,
-	"TypePythonScript":               true,
-	"TypeRScript":                    true,
-	"TypeRubyScript":                 true,
-	"TypeRustSource":                 true,
-	"TypeScalaSource":                true,
-	"TypeSQLScript":                  true,
-	"TypeSwiftSource":                true,
-	"TypeTOMLConfiguration":          true,
-	"TypeTerraformConfiguration":     true,
-	"TypeTerraformModule":            true,
-	"TypeTypeScriptSource":           true,
-	"TypeYAMLConfiguration":          true,
-	"TypeElixirScript":               true,
-	"TypeHaskellSource":              true,
-	"TypeVimScript":                  true,
-	"TypeFishScript":                 true,
-	"TypeZshScript":                  true,
-	"TypeNixExpression":              true,
-	"TypeGuileScript":                true,
-	"TypeEmacsLispScript":            true,
-	"TypeClojureScript":              true,
-	"TypeFSharpSource":               true,
-	"TypeShellcheckDirective":        true,
-	"TypeZigSource":                  true,
-	"TypeSoliditySource":             true,
-	"TypeNimSource":                  true,
-
-	// Templates / Components
-	"TypeVueComponent":       true,
-	"TypeReactComponent":     true,
-	"TypeAngularComponent":   true,
-	"TypeSvelteComponent":    true,
-	"TypeDjangoTemplate":     true,
-	"TypeJinjaTemplate":      true,
-	"TypeGoTemplate":         true,
-	"TypeHandlebarsTemplate": true,
-
-	// Interface Definitions
-	"TypeProtocolBuffer":       true,
-	"TypeThriftInterface":      true,
-	"TypeOpenAPISpecification": true,
-
-	// Hardware Description Languages
-	"TypeVHDLSource":          true,
-	"TypeVerilogSource":       true,
-	"TypeSystemVerilogSource": true,
-
-	// Proof Assistants / Theorem Provers
-	"TypeCoqSource":   true,
-	"TypeLeanSource":  true,
-	"TypeIdrisSource": true,
-	"TypeAgdaSource":  true,
-
-	// Documentation Formats
-	"TypeLaTeXDocument":    true,
-	"TypeTeXDocument":      true,
-	"TypeReStructuredText": true,
-	"TypeAsciiDoc":         true,
-	"TypeOrgMode":          true,
-
-	// Data Formats
-	"TypeCSVData":       true,
-	"TypeTSVData":       true,
-	"TypeLogData":       true,
-	"TypeHTTPLog":       true,
-	"TypeApacheLog":     true,
-	"TypeNginxLog":      true,
-	"TypeDiffPatch":     true,
-	"TypeGitDiff":       true,
-	"TypeCommitMessage": true,
-	"TypeGeoJSON":       true,
-	"TypeTopoJSON":      true,
-
-	// Configuration Files
-	"TypeSSHConfig": true,
-	"TypeGitConfig": true,
-
-	// High Entropy / Binary
-	"TypeHighEntropy": true,
-	"TypeEncrypted":   true,
-	"TypeBinary":      true,
-}
-
 var removeEntries = []string{
 	"KindCALSImage",
 	"KindDolphinRVZ",
@@ -328,20 +123,19 @@ func updateReadme(count int) {
 		os.Exit(1)
 	}
 
-	rounded := (count / 10) * 10
-
-	re := regexp.MustCompile(`over \*\*\d+\+ file formats\*\*`)
-	newText := fmt.Sprintf("over **%d+ file formats**", rounded)
+	re := regexp.MustCompile(`\*\*\d+ detection entries\*\*`)
+	newText := fmt.Sprintf("**%d detection entries**", count)
 
 	updated := re.ReplaceAll(content, []byte(newText))
 
 	if !bytes.Equal(content, updated) {
-		if err := os.WriteFile(path, updated, 0644); err != nil {
+		err = os.WriteFile(path, updated, 0644)
+		if err != nil {
 			fmt.Printf("failed to write README.md: %v\n", err)
 
 			os.Exit(1)
 		} else {
-			fmt.Printf("Updated README.md format count to %d+\n", rounded)
+			fmt.Printf("Updated README.md detection entry count to %d\n", count)
 		}
 	}
 }
@@ -534,7 +328,8 @@ func sortIDs(kindPath, typePath string) int {
 		os.Exit(1)
 	}
 
-	if err := os.WriteFile(kindPath, formattedKind, 0644); err != nil {
+	err = os.WriteFile(kindPath, formattedKind, 0644)
+	if err != nil {
 		fmt.Printf("write error for %s: %v\n", kindPath, err)
 
 		os.Exit(1)
@@ -561,6 +356,7 @@ func sortIDs(kindPath, typePath string) int {
 		if t == "MaxTypes" {
 			continue
 		}
+
 		fmt.Fprintf(&typeBuf, "\t%s: %s,\n", t, typesMap[t])
 	}
 
@@ -581,30 +377,45 @@ func sortIDs(kindPath, typePath string) int {
 		os.Exit(1)
 	}
 
-	if err := os.WriteFile(typePath, formattedType, 0644); err != nil {
+	err = os.WriteFile(typePath, formattedType, 0644)
+	if err != nil {
 		fmt.Printf("write error for %s: %v\n", typePath, err)
 
 		os.Exit(1)
 	}
 
-	var validTypes int
-
-	for _, t := range typesList {
-		if t == "MaxTypes" {
-			continue
-		}
-
-		if !ignoredTypes[t] {
-			validTypes++
-		}
+	formatFile, err := parser.ParseFile(token.NewFileSet(), "./gen_formats.go", nil, 0)
+	if err != nil {
+		panic(err)
 	}
 
+	var listedSubtypes int
+
+	ast.Inspect(formatFile, func(node ast.Node) bool {
+		literal, ok := node.(*ast.CompositeLit)
+		if !ok {
+			return true
+		}
+
+		if _, ok := literal.Type.(*ast.MapType); ok {
+			for _, element := range literal.Elts {
+				pair := element.(*ast.KeyValueExpr)
+				listedSubtypes += len(pair.Value.(*ast.CompositeLit).Elts)
+			}
+
+			return false
+		}
+
+		return true
+	})
+
 	kindCount := len(kinds) - 1 // subtract KindUnknown
+
 	if hasMaxKinds {
 		kindCount-- // subtract MaxKinds
 	}
 
-	return kindCount + validTypes
+	return kindCount + listedSubtypes
 }
 
 func sortRegistrations(dir string) {
@@ -768,7 +579,8 @@ func processFormatFile(path string) {
 		os.Exit(1)
 	}
 
-	if err := os.WriteFile(path, finalSrc, 0644); err != nil {
+	err = os.WriteFile(path, finalSrc, 0644)
+	if err != nil {
 		fmt.Printf("failed to write %s: %v\n", path, err)
 
 		os.Exit(1)

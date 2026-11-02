@@ -46,10 +46,10 @@ const (
 	TypeBinary
 	TypeBinaryBigEndian
 	TypeBinaryLittleEndian
-	TypeBitwig
 	TypeBlackmagicRAWVideo
 	TypeBlockDevice
 	TypeByteSwapped
+	TypeCanonRAW2
 	TypeCanonRAW3Image
 	TypeCatalog
 	TypeCDAAudio
@@ -88,7 +88,6 @@ const (
 	TypeElixirScript
 	TypeEmacsLispScript
 	TypeEmpty
-	TypeEncrypted
 	TypeEnhancedMetafile
 	TypeEPUBDocument
 	TypeExt2
@@ -277,7 +276,6 @@ const (
 	TypeSocket
 	TypeSoliditySource
 	TypeSonyRAW
-	TypeSonyRAWSR2
 	TypeSoundFont2
 	TypeSpecial
 	TypeSpeexAudio
@@ -398,10 +396,10 @@ var typeNames = [...]string{
 	TypeBinary:                             "Binary",
 	TypeBinaryBigEndian:                    "Binary Big-Endian",
 	TypeBinaryLittleEndian:                 "Binary Little-Endian",
-	TypeBitwig:                             "Bitwig Studio Project",
 	TypeBlackmagicRAWVideo:                 "Blackmagic RAW Video",
 	TypeBlockDevice:                        "Block Device",
 	TypeByteSwapped:                        "Byte-Swapped",
+	TypeCanonRAW2:                          "CR2",
 	TypeCanonRAW3Image:                     "Canon RAW 3 Image",
 	TypeCatalog:                            "Catalog",
 	TypeCDAAudio:                           "CD Audio",
@@ -440,7 +438,6 @@ var typeNames = [...]string{
 	TypeElixirScript:                       "Elixir Script",
 	TypeEmacsLispScript:                    "Emacs Lisp Script",
 	TypeEmpty:                              "Empty",
-	TypeEncrypted:                          "Encrypted",
 	TypeEnhancedMetafile:                   "Enhanced Metafile",
 	TypeEPUBDocument:                       "EPUB Document",
 	TypeExt2:                               "ext2",
@@ -475,7 +472,7 @@ var typeNames = [...]string{
 	TypeHandlebarsTemplate:                 "Handlebars Template",
 	TypeHaskellSource:                      "Haskell Source",
 	TypeHDPhoto:                            "HD Photo",
-	TypeHE:                                 "HE",
+	TypeHE:                                 "CRW",
 	TypeHEIFImage:                          "HEIF Image",
 	TypeHighEntropy:                        "High Entropy",
 	TypeHTTPLog:                            "HTTP Log",
@@ -624,12 +621,11 @@ var typeNames = [...]string{
 	TypeRustSource:                                  "Rust Source",
 	TypeScalaSource:                                 "Scala Source",
 	TypeShellcheckDirective:                         "Shellcheck Directive",
-	TypeSkinnableFrame:                              "Skinnable Frame",
+	TypeSkinnableFrame:                              "Skippable Frame",
 	TypeSlackwarePackage:                            "Slackware Package",
 	TypeSocket:                                      "Socket",
 	TypeSoliditySource:                              "Solidity Source",
 	TypeSonyRAW:                                     "Sony RAW",
-	TypeSonyRAWSR2:                                  "Sony SR2 RAW",
 	TypeSoundFont2:                                  "SoundFont 2",
 	TypeSpecial:                                     "Special",
 	TypeSpeexAudio:                                  "Speex Audio",

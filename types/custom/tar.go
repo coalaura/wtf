@@ -7,13 +7,18 @@ import (
 )
 
 func DetectTar(b types.Buffer) *types.Metadata {
-	var isTar bool
+	var (
+		isTar        bool
+		hasOCILayout bool
+		hasOCIIndex  bool
+		hasOCIBlobs  bool
+	)
 
 	limit := min(b.Len(), maxScanSize)
 
 	for offset := 0; offset+512 <= limit; {
 		header := b[offset : offset+512]
-		if string(header[257:262]) != "ustar" || !validTarChecksum(header) {
+		if header[0] == 0 || !validTarChecksum(header) {
 			break
 		}
 
@@ -24,7 +29,12 @@ func DetectTar(b types.Buffer) *types.Metadata {
 			nameEnd = 100
 		}
 
-		prefixEnd := bytes.IndexByte(header[345:500], 0)
+		prefixEnd := 0
+
+		if string(header[257:262]) == "ustar" {
+			prefixEnd = bytes.IndexByte(header[345:500], 0)
+		}
+
 		if prefixEnd == -1 {
 			prefixEnd = 155
 		}
@@ -36,8 +46,12 @@ func DetectTar(b types.Buffer) *types.Metadata {
 			switch {
 			case tarPathEqual(prefix, name, "package/package.json"), tarPathEqual(prefix, name, "package.json"):
 				return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeNpmPackage}
-			case tarPathEqual(prefix, name, "oci-layout"), tarPathEqual(prefix, name, "index.json"), tarPathEqual(prefix, name, "manifest.json"):
-				return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeOCIImageLayout}
+			case tarPathEqual(prefix, name, "oci-layout"):
+				hasOCILayout = true
+			case tarPathEqual(prefix, name, "index.json"):
+				hasOCIIndex = true
+			case bytes.HasPrefix(name, []byte("blobs/sha256/")) || bytes.HasPrefix(prefix, []byte("blobs/sha256")):
+				hasOCIBlobs = true
 			case tarPathEqual(prefix, name, "PKG-INFO"), tarPathEqual(prefix, name, "setup.py"), tarPathEqual(prefix, name, "pyproject.toml"):
 				return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypePythonSourceDistribution}
 			case tarPathEqual(prefix, name, "info/index.json"):
@@ -60,15 +74,29 @@ func DetectTar(b types.Buffer) *types.Metadata {
 			break
 		}
 
-		next := uint64(offset+512) + ((size + 511) / 512 * 512)
-		if next > uint64(limit) {
+		remaining := uint64(limit - offset - 512)
+		if size > remaining {
 			break
 		}
 
-		offset = int(next)
+		padded := (size + 511) / 512 * 512
+		if padded > remaining {
+			break
+		}
+
+		next := offset + 512 + int(padded)
+		if next <= offset {
+			break
+		}
+
+		offset = next
 	}
 
 	if isTar {
+		if hasOCILayout && hasOCIIndex && hasOCIBlobs {
+			return &types.Metadata{Kind: types.KindTARArchive, Type: types.TypeOCIImageLayout}
+		}
+
 		return &types.Metadata{Kind: types.KindTARArchive}
 	}
 
@@ -81,8 +109,10 @@ func validTarChecksum(header []byte) bool {
 		return false
 	}
 
-	var unsignedSum uint64
-	var signedSum int64
+	var (
+		unsignedSum uint64
+		signedSum   int64
+	)
 
 	for i, value := range header {
 		if i >= 148 && i < 156 {

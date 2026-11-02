@@ -613,7 +613,6 @@ const (
 	KindQuickBooksBackup
 	KindQuickenData
 	KindQuickenQuickFinder
-	KindQuickReportDocument
 	KindRadianceHDRImage
 	KindRagePackageFormatArchive
 	KindRagTimeDocument
@@ -827,7 +826,6 @@ const (
 	KindWindowsThumbnailCache
 	KindWindowsTypeLibrary
 	KindWindowsUserStateMigration
-	KindWinNTNetmonCapture
 	KindWinNTRegistryUndo
 	KindWinPharaohCapture
 	KindWinPharaohFilter
@@ -874,6 +872,7 @@ const (
 	KindZSNESSavestate
 	KindZstandardArchive
 	KindZstandardDictionary
+	KindZstandardLZ4Stream
 	KindZXTape
 	MaxKinds
 )
@@ -1488,7 +1487,6 @@ var kindNames = [...]string{
 	KindQuickBooksBackup:                    "QuickBooks Backup",
 	KindQuickenData:                         "Quicken Data",
 	KindQuickenQuickFinder:                  "Quicken QuickFinder",
-	KindQuickReportDocument:                 "QuickReport Document",
 	KindRadianceHDRImage:                    "Radiance HDR Image",
 	KindRagePackageFormatArchive:            "RAGE Package Format Archive",
 	KindRagTimeDocument:                     "RagTime Document",
@@ -1702,7 +1700,6 @@ var kindNames = [...]string{
 	KindWindowsThumbnailCache:               "Windows Thumbnail Cache",
 	KindWindowsTypeLibrary:                  "Windows Type Library",
 	KindWindowsUserStateMigration:           "Windows User State Migration",
-	KindWinNTNetmonCapture:                  "WinNT Netmon Capture",
 	KindWinNTRegistryUndo:                   "WinNT Registry Undo",
 	KindWinPharaohCapture:                   "WinPharaoh Capture",
 	KindWinPharaohFilter:                    "WinPharaoh Filter",
@@ -1749,6 +1746,7 @@ var kindNames = [...]string{
 	KindZSNESSavestate:                      "ZSNES Savestate",
 	KindZstandardArchive:                    "Zstandard Archive",
 	KindZstandardDictionary:                 "Zstandard Dictionary",
+	KindZstandardLZ4Stream:                  "Zstandard/LZ4 Stream",
 	KindZXTape:                              "ZX Spectrum Tape",
 }
 

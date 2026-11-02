@@ -40,7 +40,6 @@ func init() {
 	types.RegisterSignature(types.KindVideoCDImage, types.TypeNone, 0, []byte("ENTRYVCD"))
 	types.RegisterSignature(types.KindWebexARFVideo, types.TypeNone, 0, []byte{0x01, 0x00, 0x02, 0x00})
 	types.RegisterSignature(types.KindWTVVideo, types.TypeNone, 0, []byte{0xb7, 0xd8, 0x00, 0x20, 0x37, 0x49, 0xda, 0x11, 0xa6, 0x4e, 0x00, 0x07, 0xe9, 0x5e, 0xad, 0x8d})
-	types.RegisterSignature(types.KindYouTubeTimedText, types.TypeNone, 0, []byte("\xef\xbb\xbf<?xml version"))
 	types.RegisterSignature(types.KindYUV4MPEG2Video, types.TypeNone, 0, []byte("YUV4MPEG2 "))
 
 	types.RegisterMaskedSignature(types.KindIFFContainer, types.TypeWestwoodVQA, 0, []byte("FORM\x00\x00\x00\x00WVQA"), []byte{0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})

@@ -4,6 +4,12 @@ import "github.com/coalaura/wtf/types"
 
 func DetectH26x(b types.Buffer) *types.Metadata {
 	startCodeOffset := findAnnexBStartCode(b)
+
+	for startCodeOffset >= 0 && startCodeOffset+2 < b.Len() && b[startCodeOffset] == 9 && b[startCodeOffset+1]&0x1f == 0x10 {
+		b = b[startCodeOffset+2:]
+		startCodeOffset = findAnnexBStartCode(b)
+	}
+
 	if startCodeOffset == -1 {
 		return nil
 	}
@@ -14,7 +20,6 @@ func DetectH26x(b types.Buffer) *types.Metadata {
 	}
 
 	nalHeader := b[nalOffset]
-
 	if nalHeader&0x80 != 0 {
 		return nil
 	}

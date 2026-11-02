@@ -13,8 +13,10 @@ func DetectELF(b types.Buffer) *types.Metadata {
 		}
 	}
 
-	class := byte(0)
-	data := byte(0)
+	var (
+		class byte
+		data  byte
+	)
 
 	if b.Len() > 4 {
 		class = b[4]
