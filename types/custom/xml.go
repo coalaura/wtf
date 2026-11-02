@@ -28,6 +28,7 @@ func DetectXMLSubtypes(b types.Buffer) *types.Metadata {
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(data))
+	decoder.CharsetReader = xmlCharset
 
 	if b.Has(0, []byte{0xff, 0xfe}) || b.Has(0, []byte{0xfe, 0xff}) {
 		decoder.CharsetReader = decodedXMLCharset
@@ -56,6 +57,27 @@ func decodedXMLCharset(charset string, input io.Reader) (io.Reader, error) {
 	default:
 		return nil, errors.New("unsupported XML encoding")
 	}
+}
+
+func xmlCharset(charset string, input io.Reader) (io.Reader, error) {
+	if !strings.EqualFold(charset, "iso-8859-1") {
+		return nil, errors.New("unsupported XML encoding")
+	}
+
+	data, err := io.ReadAll(input)
+	if err != nil {
+		return nil, err
+	}
+
+	var decoded strings.Builder
+
+	decoded.Grow(len(data) * 2)
+
+	for _, character := range data {
+		decoded.WriteRune(rune(character))
+	}
+
+	return strings.NewReader(decoded.String()), nil
 }
 
 func xmlRootMetadata(root xml.StartElement) *types.Metadata {

@@ -13,7 +13,6 @@ func init() {
 	types.Register(types.DetectFunc(custom.DetectELF))
 	types.Register(types.DetectFunc(custom.DetectFAT))
 	types.Register(types.DetectFunc(custom.DetectFLIC))
-	types.Register(types.DetectFunc(custom.DetectHDF5))
 	types.Register(types.DetectFunc(custom.DetectISOBaseMedia))
 	types.Register(types.DetectFunc(custom.DetectJPEG))
 	types.Register(types.DetectFunc(custom.DetectMachO))
@@ -31,7 +30,6 @@ func init() {
 	types.Register(types.DetectFunc(custom.DetectTIFFSubtypes))
 	types.Register(types.DetectFunc(custom.DetectTorrent))
 	types.Register(types.DetectFunc(custom.DetectTrueType))
-	types.Register(types.DetectFunc(custom.DetectXBM))
 	types.Register(types.DetectFunc(custom.DetectZIPContainer))
 
 	types.RegisterWeak(types.DetectFunc(custom.DetectAV1))
@@ -43,6 +41,7 @@ func init() {
 	types.RegisterWeak(types.DetectFunc(custom.DetectMPEGTransport))
 	types.RegisterWeak(types.DetectFunc(custom.DetectPCX))
 	types.RegisterWeak(types.DetectFunc(custom.DetectSpine))
+	types.RegisterWeak(types.DetectFunc(custom.DetectXBM))
 	types.RegisterWeak(types.DetectFunc(custom.DetectXMLSubtypes))
 	types.RegisterWeak(types.DetectFunc(custom.DetectZlib))
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/tar"
 	"archive/zip"
 	"bytes"
 	"encoding/binary"
@@ -9,6 +10,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"hash/crc32"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,6 +32,41 @@ type collisionCase struct {
 	kind      types.KindID
 	typ       types.TypeID
 	forbidden types.KindID
+}
+
+type countingReaderAt struct {
+	reader io.ReaderAt
+	bytes  int
+	calls  int
+}
+
+func (reader *countingReaderAt) ReadAt(data []byte, offset int64) (int, error) {
+	reader.bytes += len(data)
+	reader.calls++
+
+	return reader.reader.ReadAt(data, offset)
+}
+
+func BenchmarkDetectFixtures(b *testing.B) {
+	fixtures := []string{"png.png", "pdf.pdf"}
+
+	for _, name := range fixtures {
+		b.Run(name, func(b *testing.B) {
+			data, err := os.ReadFile(filepath.Join("test", name))
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			b.ReportAllocs()
+
+			for b.Loop() {
+				_, err = types.Detect(name, data)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
 }
 
 func TestConsistency(t *testing.T) {
@@ -212,12 +250,17 @@ func TestTIFFCountOverflow(t *testing.T) {
 }
 
 func TestDetectCollisions(t *testing.T) {
+	xbm := []byte("#define icon_width 8\n#define icon_height 1\nstatic unsigned char icon_bits[] = { 0xff };\n")
 	payload := make([]byte, 2048)
 	copy(payload[1080-30-len("payload"):], []byte{0x53, 0xef})
 
 	zipPayload := collisionZIP(t, map[string][]byte{"payload": payload}, zip.Store)
 	quotedMIME := collisionZIP(t, map[string][]byte{"notes.txt": []byte("application/vnd.ms-word.document.macroEnabled.main+xml")}, zip.Store)
 	project := collisionZIP(t, map[string][]byte{"project.json": []byte("{}"), "payload/data.txt": []byte("data")}, zip.Deflate)
+	footerZIP := collisionZIP(t, map[string][]byte{"payload": []byte("data")}, zip.Store)
+	binary.LittleEndian.PutUint16(footerZIP[len(footerZIP)-2:], 8)
+	footerZIP = append(footerZIP, 0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb)
+	hdfText := append(bytes.Repeat([]byte{'x'}, 463), []byte("\x89HDF\r\n\x1a\n")...)
 
 	template := collisionZIP(t, map[string][]byte{
 		"[Content_Types].xml": []byte(`<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml"/></Types>`),
@@ -227,18 +270,28 @@ func TestDetectCollisions(t *testing.T) {
 
 	cases := []collisionCase{
 		{name: "zip-ext", data: zipPayload, kind: types.KindZIPArchive},
+		{name: "zip-leveldb", data: footerZIP, kind: types.KindZIPArchive},
+		{name: "png-hdf5", data: collisionPNG(t, hdfText), kind: types.KindPNGImage},
+		{name: "tar-metadata", data: collisionTAR(t, "metadata"), kind: types.KindTARArchive},
+		{name: "tar-deploy", data: collisionTAR(t, "deploy"), kind: types.KindTARArchive},
 		{name: "quoted-mime", data: quotedMIME, kind: types.KindZIPArchive},
 		{name: "generic-project", data: project, kind: types.KindZIPArchive},
 		{name: "deflated-template", data: template, kind: types.KindZIPArchive, typ: types.TypeMicrosoftWordTemplate},
 		{name: "boolean-not-font", data: []byte("true"), kind: types.KindJSONDocument},
 		{name: "json-array", data: []byte(" \n[1, null, {}]\t"), kind: types.KindJSONDocument},
 		{name: "json-empty", data: []byte("{}"), kind: types.KindJSONDocument},
+		{name: "geojson-false", data: []byte(`{"type":"FeatureCollection","features":false}`), kind: types.KindJSONDocument},
+		{name: "geojson-features", data: []byte(`{"type":"FeatureCollection","features":[]}`), kind: types.KindJSONDocument, typ: types.TypeGeoJSON},
+		{name: "geojson-geometries", data: []byte(`{"type":"GeometryCollection","geometries":[]}`), kind: types.KindJSONDocument, typ: types.TypeGeoJSON},
 		{name: "json-malformed", data: []byte(`{"type":"FeatureCollection","features":}`), forbidden: types.KindJSONDocument},
 		{name: "resources-key", data: []byte(`{"resources":[]}`), kind: types.KindJSONDocument},
 		{name: "xml-comment", data: []byte("\xef\xbb\xbf<?xml version=\"1.0\"?><!-- <svg --> <root/>"), kind: types.KindXMLDocument},
+		{name: "rss-latin1", data: []byte("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!-- caf\xe9 --><rss/>"), kind: types.KindRSSFeed},
 		{name: "bitmap-prose", data: []byte("BM is an abbreviation"), forbidden: types.KindBMPImage},
 		{name: "netpbm-prose", data: []byte("P6 is a processor family"), forbidden: types.KindNetpbmImage},
 		{name: "c-header", data: []byte("#define VALUE 42\n"), forbidden: types.KindXBitMapImage},
+		{name: "xbm", data: xbm, kind: types.KindXBitMapImage},
+		{name: "png-xbm", data: collisionPNG(t, xbm), kind: types.KindPNGImage},
 		{name: "tagged-flac", data: []byte("ID3\x04\x00\x00\x00\x00\x00\x00fLaC"), kind: types.KindFLACAudio},
 	}
 
@@ -264,6 +317,103 @@ func TestDetectCollisions(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestZIPReadBudget(t *testing.T) {
+	var (
+		previousBytes int
+		previousCalls int
+	)
+
+	counts := []int{4000, 40000}
+
+	for _, count := range counts {
+		record := make([]byte, 47)
+		copy(record, "PK\x01\x02")
+		binary.LittleEndian.PutUint16(record[28:], 1)
+		record[46] = 'x'
+
+		payload := bytes.Repeat(record, count)
+
+		data := collisionZIP(t, map[string][]byte{"payload": payload}, zip.Store)
+		end := len(data) - 22
+		binary.LittleEndian.PutUint16(data[end+20:], 23)
+
+		decoy := make([]byte, 23)
+		copy(decoy, "PK\x05\x06")
+		binary.LittleEndian.PutUint16(decoy[8:], uint16(count))
+		binary.LittleEndian.PutUint16(decoy[10:], uint16(count))
+		binary.LittleEndian.PutUint32(decoy[12:], uint32(len(payload)))
+		binary.LittleEndian.PutUint32(decoy[16:], 30+uint32(len("payload")))
+
+		data = append(data, decoy...)
+
+		reader := &countingReaderAt{reader: bytes.NewReader(data)}
+
+		meta, err := types.DetectReaderAt("decoy.zip", data[:128*1024], reader, int64(len(data)))
+		if err != nil || meta == nil || meta.Kind != types.KindZIPArchive || meta.Type != types.TypeNone {
+			t.Fatalf("detect: %+v, %v", meta, err)
+		}
+
+		full, err := types.Detect("decoy.zip", data)
+		if err != nil || full == nil || *full != *meta {
+			t.Fatalf("Detect mismatch: %+v, %v", full, err)
+		}
+
+		t.Logf("decoy payload %d bytes: %d bytes / %d ReadAt calls", len(payload), reader.bytes, reader.calls)
+
+		if previousBytes != 0 && (reader.bytes != previousBytes || reader.calls != previousCalls) {
+			t.Fatal("read budget grew with decoy payload")
+		}
+
+		if reader.bytes > 70*1024 {
+			t.Fatal("exceeded bounded metadata read budget")
+		}
+
+		previousBytes = reader.bytes
+		previousCalls = reader.calls
+	}
+}
+
+func collisionPNG(t *testing.T, text []byte) []byte {
+	t.Helper()
+
+	data, err := os.ReadFile(filepath.Join("test", "png.png"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	chunk := make([]byte, 12+len("Comment\x00")+len(text))
+	binary.BigEndian.PutUint32(chunk, uint32(len(chunk)-12))
+	copy(chunk[4:], "tEXtComment\x00")
+	copy(chunk[8+len("Comment\x00"):], text)
+	binary.BigEndian.PutUint32(chunk[len(chunk)-4:], crc32.ChecksumIEEE(chunk[4:len(chunk)-4]))
+
+	output := make([]byte, 0, len(data)+len(chunk))
+	output = append(output, data[:33]...)
+	output = append(output, chunk...)
+
+	return append(output, data[33:]...)
+}
+
+func collisionTAR(t *testing.T, name string) []byte {
+	t.Helper()
+
+	var output bytes.Buffer
+
+	writer := tar.NewWriter(&output)
+
+	err := writer.WriteHeader(&tar.Header{Name: name, Mode: 0600})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = writer.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return output.Bytes()
 }
 
 func collisionZIP(t *testing.T, files map[string][]byte, method uint16) []byte {

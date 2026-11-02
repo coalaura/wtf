@@ -12,6 +12,7 @@ type jsonIdentity struct {
 	ResourceVersion string          `json:"resourceVersion"`
 	Features        json.RawMessage `json:"features"`
 	Geometry        json.RawMessage `json:"geometry"`
+	Geometries      json.RawMessage `json:"geometries"`
 	Coordinates     json.RawMessage `json:"coordinates"`
 	Objects         json.RawMessage `json:"objects"`
 	Arcs            json.RawMessage `json:"arcs"`
@@ -29,7 +30,11 @@ func DetectJSON(b types.Buffer) *types.Metadata {
 	if err == nil {
 		switch identity.Type {
 		case "FeatureCollection":
-			if len(identity.Features) > 0 {
+			if len(identity.Features) > 0 && identity.Features[0] == '[' {
+				return &types.Metadata{Kind: types.KindJSONDocument, Type: types.TypeGeoJSON}
+			}
+		case "GeometryCollection":
+			if len(identity.Geometries) > 0 && identity.Geometries[0] == '[' {
 				return &types.Metadata{Kind: types.KindJSONDocument, Type: types.TypeGeoJSON}
 			}
 		case "Feature":

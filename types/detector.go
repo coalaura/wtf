@@ -30,21 +30,6 @@ func DetectReaderAt(name string, data []byte, r io.ReaderAt, size int64) (*Metad
 
 	var meta *Metadata
 
-	if size >= 48 {
-		tail := make([]byte, min(size, 512))
-
-		if !readAtExactly(r, tail, size-int64(len(tail))) {
-			return nil, io.ErrUnexpectedEOF
-		}
-
-		meta = DetectFileTrailer(Buffer(tail))
-		if meta != nil {
-			meta.File = name
-
-			return meta, nil
-		}
-	}
-
 	prefixSize := int(min(size, int64(maxScanSize)))
 	if len(data) < prefixSize {
 		data = make([]byte, prefixSize)
@@ -56,11 +41,28 @@ func DetectReaderAt(name string, data []byte, r io.ReaderAt, size int64) (*Metad
 	buffer := Buffer(data[:prefixSize])
 	if buffer.Has(0, []byte("PK\x03\x04")) || buffer.Has(0, []byte("PK\x05\x06")) {
 		meta = detectZIPReaderAt(r, size)
-		if meta != nil && meta.Type == TypeNone {
+		if meta != nil && meta.Kind == KindZIPArchive && meta.Type == TypeNone {
 			meta = detectZIPEntries(buffer)
 		}
 	} else if buffer.Has(0, []byte{0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1}) {
 		meta = detectOLEReaderAt(r, size)
+	}
+
+	if meta == nil && size >= 48 {
+		tailSize := min(size, 512)
+
+		var tail []byte
+
+		if int64(len(data)) >= size {
+			tail = data[size-tailSize : size]
+		} else {
+			tail = make([]byte, tailSize)
+			if !readAtExactly(r, tail, size-tailSize) {
+				return nil, io.ErrUnexpectedEOF
+			}
+		}
+
+		meta = detectFileTrailerSized(Buffer(tail), r, size)
 	}
 
 	if meta == nil {
@@ -76,6 +78,10 @@ func DetectReaderAt(name string, data []byte, r io.ReaderAt, size int64) (*Metad
 	}
 
 	if meta == nil {
+		meta = detectStrong(buffer)
+	}
+
+	if meta == nil {
 		meta = DetectHDF5ReaderAt(buffer, r, size)
 	}
 
@@ -84,7 +90,7 @@ func DetectReaderAt(name string, data []byte, r io.ReaderAt, size int64) (*Metad
 		if tagged {
 			meta = RefineID3Metadata(detectOptimized(codec))
 		} else {
-			meta = detectOptimized(buffer)
+			meta = detectWeak(buffer)
 		}
 	}
 

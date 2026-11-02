@@ -1,9 +1,10 @@
 package custom
 
 import (
-	"archive/zip"
 	"bytes"
+	"compress/flate"
 	"encoding/xml"
+	"hash/crc32"
 	"io"
 	"path"
 	"strings"
@@ -32,19 +33,10 @@ type packageOverride struct {
 	ContentType string `xml:"ContentType,attr"`
 }
 
-// The caller validates and bounds the central directory before opening the ZIP.
-func detectOOXML(reader io.ReaderAt, size int64, central []byte) *types.Metadata {
-	if len(central) > maxCentralSize {
-		return nil
-	}
-
-	archive, err := zip.NewReader(reader, size)
-	if err != nil {
-		return nil
-	}
-
-	manifest := zipPart(archive, "[Content_Types].xml")
-	relations := zipPart(archive, "_rels/.rels")
+// Resolve parts only through the validated directory, never a second EOCD search.
+func detectOOXML(reader io.ReaderAt, centralOffset int64, central []byte) *types.Metadata {
+	manifest := zipPart(reader, centralOffset, central, "[Content_Types].xml")
+	relations := zipPart(reader, centralOffset, central, "_rels/.rels")
 
 	if manifest == nil || relations == nil {
 		return nil
@@ -52,7 +44,7 @@ func detectOOXML(reader io.ReaderAt, size int64, central []byte) *types.Metadata
 
 	var relationships packageRelationships
 
-	err = xml.Unmarshal(relations, &relationships)
+	err := xml.Unmarshal(relations, &relationships)
 	if err != nil {
 		return nil
 	}
@@ -71,7 +63,7 @@ func detectOOXML(reader io.ReaderAt, size int64, central []byte) *types.Metadata
 		mainPart = path.Clean("/" + relationship.Target)
 	}
 
-	if mainPart == "" || !hasZIPPart(archive, strings.TrimPrefix(mainPart, "/")) {
+	if mainPart == "" || findZIPPart(central, strings.TrimPrefix(mainPart, "/")) == nil {
 		return nil
 	}
 
@@ -138,49 +130,92 @@ func detectOOXML(reader io.ReaderAt, size int64, central []byte) *types.Metadata
 	return &types.Metadata{Kind: types.KindZIPArchive, Type: subtype}
 }
 
-func hasZIPPart(archive *zip.Reader, name string) bool {
-	count := 0
+func findZIPPart(central []byte, name string) types.Buffer {
+	var found types.Buffer
 
-	for _, file := range archive.File {
-		if file.Name == name {
-			count++
+	for offset := 0; offset < len(central); {
+		record := types.Buffer(central[offset:])
+		nameLength, _ := record.U16LE(28)
+		extraLength, _ := record.U16LE(30)
+		commentLength, _ := record.U16LE(32)
+
+		if string(record[centralHeaderSize:centralHeaderSize+int(nameLength)]) == name {
+			if found != nil {
+				return nil
+			}
+
+			found = record[:centralHeaderSize]
 		}
+
+		offset += centralHeaderSize + int(nameLength) + int(extraLength) + int(commentLength)
 	}
 
-	return count == 1
+	return found
 }
 
-func zipPart(archive *zip.Reader, name string) []byte {
-	if !hasZIPPart(archive, name) {
+func zipPart(reader io.ReaderAt, centralOffset int64, central []byte, name string) []byte {
+	record := findZIPPart(central, name)
+	if record == nil {
 		return nil
 	}
 
-	for _, file := range archive.File {
-		if file.Name != name {
-			continue
-		}
+	flags, _ := record.U16LE(8)
+	method, _ := record.U16LE(10)
+	checksum, _ := record.U32LE(16)
 
-		if file.CompressedSize64 > maxScanSize || file.UncompressedSize64 > maxScanSize || file.Flags&1 != 0 {
-			return nil
-		}
+	compressedSize, _ := record.U32LE(20)
+	uncompressedSize, _ := record.U32LE(24)
+	localOffset, _ := record.U32LE(42)
 
-		reader, err := file.Open()
+	if compressedSize > maxScanSize || uncompressedSize > maxScanSize || flags&0x41 != 0 || method != 0 && method != 8 || int64(localOffset)+localHeaderSize+int64(len(name)) > centralOffset {
+		return nil
+	}
+
+	local := make(types.Buffer, localHeaderSize+len(name))
+	if !readAtExactly(reader, local, int64(localOffset)) || !local.Has(0, []byte("PK\x03\x04")) {
+		return nil
+	}
+
+	localFlags, _ := local.U16LE(6)
+	localMethod, _ := local.U16LE(8)
+	localChecksum, _ := local.U32LE(14)
+	localCompressedSize, _ := local.U32LE(18)
+	localUncompressedSize, _ := local.U32LE(22)
+	nameLength, _ := local.U16LE(26)
+	extraLength, _ := local.U16LE(28)
+	dataOffset := int64(localOffset) + localHeaderSize + int64(nameLength) + int64(extraLength)
+
+	if localFlags != flags || localMethod != method || int(nameLength) != len(name) || string(local[localHeaderSize:]) != name || dataOffset+int64(compressedSize) > centralOffset {
+		return nil
+	}
+
+	if flags&8 == 0 && (localChecksum != checksum || localCompressedSize != compressedSize || localUncompressedSize != uncompressedSize) {
+		return nil
+	}
+
+	compressed := make([]byte, int(compressedSize))
+	if !readAtExactly(reader, compressed, dataOffset) {
+		return nil
+	}
+
+	output := compressed
+
+	if method == 8 {
+		inflater := flate.NewReader(bytes.NewReader(compressed))
+
+		var err error
+
+		output, err = io.ReadAll(io.LimitReader(inflater, int64(uncompressedSize)+1))
+		inflater.Close()
+
 		if err != nil {
 			return nil
 		}
-
-		var output bytes.Buffer
-
-		output.Grow(int(file.UncompressedSize64))
-		_, err = io.Copy(&output, io.LimitReader(reader, maxScanSize+1))
-		reader.Close()
-
-		if err != nil || output.Len() > maxScanSize {
-			return nil
-		}
-
-		return output.Bytes()
 	}
 
-	return nil
+	if len(output) != int(uncompressedSize) || crc32.ChecksumIEEE(output) != checksum {
+		return nil
+	}
+
+	return output
 }

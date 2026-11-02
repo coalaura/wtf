@@ -427,7 +427,7 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *types.Metadata {
 
 	meta := detectZIPEntries(types.Buffer(entryData))
 
-	refined := detectOOXML(r, size, central)
+	refined := detectOOXML(r, int64(centralOffset), central)
 	if refined != nil {
 		return refined
 	}

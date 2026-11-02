@@ -343,7 +343,8 @@ func checkUnusedIDs(idsKindPath string, idsTypePath string, internalDir string, 
 	}
 
 	for t := range definedTypes {
-		if t == "TypeNone" {
+		// Flatpak's retired TAR heuristic keeps its ID for source compatibility.
+		if t == "TypeNone" || t == "TypeFlatpak" {
 			continue
 		}
 
@@ -418,6 +419,8 @@ func generateOptimizedCode(gen *Generator, outPath string) {
 	buf.WriteString("package types\n\n")
 
 	buf.WriteString("func detectOptimized(b Buffer) *Metadata {\n")
+	buf.WriteString("\tmeta := detectStrong(b)\n\tif meta != nil {\n\t\treturn meta\n\t}\n\n\treturn detectWeak(b)\n}\n\n")
+	buf.WriteString("func detectStrong(b Buffer) *Metadata {\n")
 	buf.WriteString("\tif len(b) == 0 {\n\t\treturn nil\n\t}\n\n")
 
 	// 1. Strong Custom Detectors (Containers, complex formats)
@@ -429,6 +432,8 @@ func generateOptimizedCode(gen *Generator, outPath string) {
 
 	// 2. Strong Signatures Radix Tree
 	generateRadixForest(gen.StrongSigs, &buf)
+	buf.WriteString("\treturn nil\n}\n\nfunc detectWeak(b Buffer) *Metadata {\n")
+	buf.WriteString("\tif len(b) == 0 {\n\t\treturn nil\n\t}\n\n")
 
 	// 3. Weak Custom Detectors (JSON, XML, etc.)
 	sort.Strings(gen.Weak)

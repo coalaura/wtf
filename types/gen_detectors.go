@@ -2,12 +2,13 @@
 package types
 
 import (
-	"archive/zip"
 	"bytes"
+	"compress/flate"
 	"encoding/binary"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"hash/crc32"
 	"io"
 	"math"
 	"path"
@@ -166,9 +167,29 @@ func DetectDatabaseHeaders(b Buffer) *Metadata {
 }
 
 func DetectHDF5(b Buffer) *Metadata {
-	for offset := 0; offset+8 <= b.Len(); {
-		if b.Has(offset, []byte{0x89, 'H', 'D', 'F', 13, 10, 26, 10}) {
+	return DetectHDF5ReaderAt(b, bytes.NewReader(b), int64(b.Len()))
+}
+
+func DetectHDF5ReaderAt(b Buffer, reader io.ReaderAt, size int64) *Metadata {
+	var header [96]byte
+
+	for offset := int64(0); offset <= size-48; {
+		length := min(int64(len(header)), size-offset)
+
+		var superblock []byte
+
+		if offset+length <= int64(b.Len()) {
+			superblock = b[offset : offset+length]
+		} else if readAtExactly(reader, header[:length], offset) {
+			superblock = header[:length]
+		}
+
+		if validHDF5Superblock(superblock, uint64(offset), uint64(size)) {
 			return &Metadata{Kind: KindHDF5Data}
+		}
+
+		if offset > (size-48)/2 {
+			break
 		}
 
 		if offset == 0 {
@@ -181,31 +202,70 @@ func DetectHDF5(b Buffer) *Metadata {
 	return nil
 }
 
-func DetectHDF5ReaderAt(b Buffer, reader io.ReaderAt, size int64) *Metadata {
-	meta := DetectHDF5(b)
-	if meta != nil {
-		return meta
+func validHDF5Superblock(header []byte, offset uint64, size uint64) bool {
+	if len(header) < 48 || string(header[:8]) != "\x89HDF\r\n\x1a\n" {
+		return false
 	}
 
-	var signature [8]byte
+	version := header[8]
+	addressStart := 12
+	width := int(header[9])
+	lengthWidth := int(header[10])
+	rootStart := 0
 
-	for offset := int64(512); offset <= size-8; {
-		if offset >= int64(b.Len()) && readAtExactly(reader, signature[:], offset) && bytesEqualHDF5(signature[:]) {
-			return &Metadata{Kind: KindHDF5Data}
+	switch version {
+	case 0, 1:
+		width = int(header[13])
+		lengthWidth = int(header[14])
+		addressStart = 24
+
+		if header[9] != 0 || header[10] != 0 || header[11] != 0 || header[12] != 0 || header[15] != 0 || binary.LittleEndian.Uint16(header[16:]) == 0 || binary.LittleEndian.Uint16(header[18:]) == 0 || binary.LittleEndian.Uint32(header[20:]) & ^uint32(3) != 0 {
+			return false
 		}
 
-		if offset > (size-8)/2 {
-			break
+		if version == 1 {
+			addressStart = 28
+
+			if binary.LittleEndian.Uint16(header[24:]) == 0 || header[26] != 0 || header[27] != 0 {
+				return false
+			}
 		}
 
-		offset *= 2
+		rootStart = addressStart + 4*width + lengthWidth
+	case 2, 3:
+		if header[11] & ^byte(5) != 0 {
+			return false
+		}
+
+		rootStart = addressStart + 3*width
+	default:
+		return false
 	}
 
-	return nil
+	if !validHDF5Width(width) || !validHDF5Width(lengthWidth) || rootStart+width > len(header) {
+		return false
+	}
+
+	base := hdf5Address(header[addressStart : addressStart+width])
+	endStart := addressStart + 2*width
+	end := hdf5Address(header[endStart : endStart+width])
+	root := hdf5Address(header[rootStart : rootStart+width])
+
+	return base == offset && end > offset+uint64(rootStart+width) && end <= size && root > 0 && root < end-base
 }
 
-func bytesEqualHDF5(signature []byte) bool {
-	return string(signature) == "\x89HDF\r\n\x1a\n"
+func validHDF5Width(width int) bool {
+	return width == 1 || width == 2 || width == 4 || width == 8
+}
+
+func hdf5Address(data []byte) uint64 {
+	var value uint64
+
+	for index, part := range data {
+		value |= uint64(part) << (index * 8)
+	}
+
+	return value
 }
 
 func berkeleyMagic(magic uint32) bool {
@@ -278,6 +338,10 @@ func isKnownBinaryPattern(b Buffer) bool {
 }
 
 func DetectAppleDiskImage(b Buffer) *Metadata {
+	return detectAppleDiskImageSized(b, bytes.NewReader(b), int64(b.Len()))
+}
+
+func detectAppleDiskImageSized(b Buffer, reader io.ReaderAt, size int64) *Metadata {
 	if b.Len() < 512 {
 		return nil
 	}
@@ -289,13 +353,37 @@ func DetectAppleDiskImage(b Buffer) *Metadata {
 	segmentNumber, segmentOK := b.U32BE(offset + 56)
 	segmentCount, countOK := b.U32BE(offset + 60)
 
-	if b.Has(offset, []byte("koly")) && versionOK && version == 4 && sizeOK && headerSize == 512 && segmentOK && segmentNumber > 0 && countOK && segmentCount > 0 && segmentNumber <= segmentCount {
-		return &Metadata{
-			Kind: KindAppleDiskImage,
-		}
+	if !b.Has(offset, []byte("koly")) || !versionOK || version != 4 || !sizeOK || headerSize != 512 || !segmentOK || !countOK || segmentNumber > segmentCount {
+		return nil
 	}
 
-	return nil
+	if segmentNumber > 0 && segmentCount > 0 {
+		return &Metadata{Kind: KindAppleDiskImage}
+	}
+
+	if segmentNumber != 0 || segmentCount != 0 || size < 512 {
+		return nil
+	}
+
+	dataOffset := binary.BigEndian.Uint64(b[offset+24:])
+	dataLength := binary.BigEndian.Uint64(b[offset+32:])
+	xmlOffset := binary.BigEndian.Uint64(b[offset+216:])
+	xmlLength := binary.BigEndian.Uint64(b[offset+224:])
+	sectorCount := binary.BigEndian.Uint64(b[offset+492:])
+	limit := uint64(size - 512)
+
+	if dataOffset > limit || dataLength == 0 || dataLength > limit-dataOffset || xmlOffset < dataOffset+dataLength || xmlOffset > limit || xmlLength < 32 || xmlLength > limit-xmlOffset || sectorCount == 0 {
+		return nil
+	}
+
+	var resource [512]byte
+
+	metadata := resource[:min(xmlLength, uint64(len(resource)))]
+	if !readAtExactly(reader, metadata, int64(xmlOffset)) || !bytes.HasPrefix(metadata, []byte("<?xml")) || !bytes.Contains(metadata, []byte("<plist")) {
+		return nil
+	}
+
+	return &Metadata{Kind: KindAppleDiskImage}
 }
 
 func DetectEBML(b Buffer) *Metadata {
@@ -1163,6 +1251,10 @@ func DetectTrueType(b Buffer) *Metadata {
 }
 
 func DetectXBM(b Buffer) *Metadata {
+	if !isLikelyASCIIText(b) || !bytes.Contains(b, []byte("#define")) {
+		return nil
+	}
+
 	var (
 		name   string
 		width  bool
@@ -1501,6 +1593,7 @@ type jsonIdentity struct {
 	ResourceVersion string          `json:"resourceVersion"`
 	Features        json.RawMessage `json:"features"`
 	Geometry        json.RawMessage `json:"geometry"`
+	Geometries      json.RawMessage `json:"geometries"`
 	Coordinates     json.RawMessage `json:"coordinates"`
 	Objects         json.RawMessage `json:"objects"`
 	Arcs            json.RawMessage `json:"arcs"`
@@ -1518,7 +1611,11 @@ func DetectJSON(b Buffer) *Metadata {
 	if err == nil {
 		switch identity.Type {
 		case "FeatureCollection":
-			if len(identity.Features) > 0 {
+			if len(identity.Features) > 0 && identity.Features[0] == '[' {
+				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
+			}
+		case "GeometryCollection":
+			if len(identity.Geometries) > 0 && identity.Geometries[0] == '[' {
 				return &Metadata{Kind: KindJSONDocument, Type: TypeGeoJSON}
 			}
 		case "Feature":
@@ -2348,18 +2445,9 @@ type packageOverride struct {
 	ContentType string `xml:"ContentType,attr"`
 }
 
-func detectOOXML(reader io.ReaderAt, size int64, central []byte) *Metadata {
-	if len(central) > maxCentralSize {
-		return nil
-	}
-
-	archive, err := zip.NewReader(reader, size)
-	if err != nil {
-		return nil
-	}
-
-	manifest := zipPart(archive, "[Content_Types].xml")
-	relations := zipPart(archive, "_rels/.rels")
+func detectOOXML(reader io.ReaderAt, centralOffset int64, central []byte) *Metadata {
+	manifest := zipPart(reader, centralOffset, central, "[Content_Types].xml")
+	relations := zipPart(reader, centralOffset, central, "_rels/.rels")
 
 	if manifest == nil || relations == nil {
 		return nil
@@ -2367,7 +2455,7 @@ func detectOOXML(reader io.ReaderAt, size int64, central []byte) *Metadata {
 
 	var relationships packageRelationships
 
-	err = xml.Unmarshal(relations, &relationships)
+	err := xml.Unmarshal(relations, &relationships)
 	if err != nil {
 		return nil
 	}
@@ -2386,7 +2474,7 @@ func detectOOXML(reader io.ReaderAt, size int64, central []byte) *Metadata {
 		mainPart = path.Clean("/" + relationship.Target)
 	}
 
-	if mainPart == "" || !hasZIPPart(archive, strings.TrimPrefix(mainPart, "/")) {
+	if mainPart == "" || findZIPPart(central, strings.TrimPrefix(mainPart, "/")) == nil {
 		return nil
 	}
 
@@ -2453,51 +2541,94 @@ func detectOOXML(reader io.ReaderAt, size int64, central []byte) *Metadata {
 	return &Metadata{Kind: KindZIPArchive, Type: subtype}
 }
 
-func hasZIPPart(archive *zip.Reader, name string) bool {
-	count := 0
+func findZIPPart(central []byte, name string) Buffer {
+	var found Buffer
 
-	for _, file := range archive.File {
-		if file.Name == name {
-			count++
+	for offset := 0; offset < len(central); {
+		record := Buffer(central[offset:])
+		nameLength, _ := record.U16LE(28)
+		extraLength, _ := record.U16LE(30)
+		commentLength, _ := record.U16LE(32)
+
+		if string(record[centralHeaderSize:centralHeaderSize+int(nameLength)]) == name {
+			if found != nil {
+				return nil
+			}
+
+			found = record[:centralHeaderSize]
 		}
+
+		offset += centralHeaderSize + int(nameLength) + int(extraLength) + int(commentLength)
 	}
 
-	return count == 1
+	return found
 }
 
-func zipPart(archive *zip.Reader, name string) []byte {
-	if !hasZIPPart(archive, name) {
+func zipPart(reader io.ReaderAt, centralOffset int64, central []byte, name string) []byte {
+	record := findZIPPart(central, name)
+	if record == nil {
 		return nil
 	}
 
-	for _, file := range archive.File {
-		if file.Name != name {
-			continue
-		}
+	flags, _ := record.U16LE(8)
+	method, _ := record.U16LE(10)
+	checksum, _ := record.U32LE(16)
 
-		if file.CompressedSize64 > maxScanSize || file.UncompressedSize64 > maxScanSize || file.Flags&1 != 0 {
-			return nil
-		}
+	compressedSize, _ := record.U32LE(20)
+	uncompressedSize, _ := record.U32LE(24)
+	localOffset, _ := record.U32LE(42)
 
-		reader, err := file.Open()
+	if compressedSize > maxScanSize || uncompressedSize > maxScanSize || flags&0x41 != 0 || method != 0 && method != 8 || int64(localOffset)+localHeaderSize+int64(len(name)) > centralOffset {
+		return nil
+	}
+
+	local := make(Buffer, localHeaderSize+len(name))
+	if !readAtExactly(reader, local, int64(localOffset)) || !local.Has(0, []byte("PK\x03\x04")) {
+		return nil
+	}
+
+	localFlags, _ := local.U16LE(6)
+	localMethod, _ := local.U16LE(8)
+	localChecksum, _ := local.U32LE(14)
+	localCompressedSize, _ := local.U32LE(18)
+	localUncompressedSize, _ := local.U32LE(22)
+	nameLength, _ := local.U16LE(26)
+	extraLength, _ := local.U16LE(28)
+	dataOffset := int64(localOffset) + localHeaderSize + int64(nameLength) + int64(extraLength)
+
+	if localFlags != flags || localMethod != method || int(nameLength) != len(name) || string(local[localHeaderSize:]) != name || dataOffset+int64(compressedSize) > centralOffset {
+		return nil
+	}
+
+	if flags&8 == 0 && (localChecksum != checksum || localCompressedSize != compressedSize || localUncompressedSize != uncompressedSize) {
+		return nil
+	}
+
+	compressed := make([]byte, int(compressedSize))
+	if !readAtExactly(reader, compressed, dataOffset) {
+		return nil
+	}
+
+	output := compressed
+
+	if method == 8 {
+		inflater := flate.NewReader(bytes.NewReader(compressed))
+
+		var err error
+
+		output, err = io.ReadAll(io.LimitReader(inflater, int64(uncompressedSize)+1))
+		inflater.Close()
+
 		if err != nil {
 			return nil
 		}
-
-		var output bytes.Buffer
-
-		output.Grow(int(file.UncompressedSize64))
-		_, err = io.Copy(&output, io.LimitReader(reader, maxScanSize+1))
-		reader.Close()
-
-		if err != nil || output.Len() > maxScanSize {
-			return nil
-		}
-
-		return output.Bytes()
 	}
 
-	return nil
+	if len(output) != int(uncompressedSize) || crc32.ChecksumIEEE(output) != checksum {
+		return nil
+	}
+
+	return output
 }
 
 func DetectPCX(b Buffer) *Metadata {
@@ -2952,8 +3083,6 @@ func DetectTar(b Buffer) *Metadata {
 				return &Metadata{Kind: KindTARArchive, Type: TypeSlackwarePackage}
 			case tarPathEqual(prefix, name, "ComicInfo.xml"), tarPathEqual(prefix, name, "comicinfo.xml"):
 				return &Metadata{Kind: KindTARArchive, Type: TypeComicBook}
-			case tarPathEqual(prefix, name, "metadata"), tarPathEqual(prefix, name, "deploy"):
-				return &Metadata{Kind: KindTARArchive, Type: TypeFlatpak}
 			}
 		}
 
@@ -4019,12 +4148,16 @@ func DetectTorrent(b Buffer) *Metadata {
 }
 
 func DetectFileTrailer(buffer Buffer) *Metadata {
-	meta := DetectAppleDiskImage(buffer)
+	return detectFileTrailerSized(buffer, bytes.NewReader(buffer), int64(buffer.Len()))
+}
+
+func detectFileTrailerSized(buffer Buffer, reader io.ReaderAt, size int64) *Metadata {
+	meta := detectAppleDiskImageSized(buffer, reader, size)
 	if meta != nil {
 		return meta
 	}
 
-	if buffer.Len() >= 48 && buffer.Has(buffer.Len()-8, []byte{0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb}) {
+	if validLevelDBFooter(buffer, size) {
 		return &Metadata{Kind: KindLevelDB}
 	}
 
@@ -4056,6 +4189,42 @@ func DetectFileTrailer(buffer Buffer) *Metadata {
 	return &Metadata{Kind: KindVHDDiskImage}
 }
 
+func validLevelDBFooter(buffer Buffer, size int64) bool {
+	if buffer.Len() < 48 || size < 48 || !buffer.Has(buffer.Len()-8, []byte{0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb}) {
+		return false
+	}
+
+	footer := buffer[buffer.Len()-48 : buffer.Len()-8]
+	limit := uint64(size - 48)
+
+	var previousEnd uint64
+
+	for range 2 {
+		offset, count := binary.Uvarint(footer)
+		if count <= 0 {
+			return false
+		}
+
+		footer = footer[count:]
+
+		length, count := binary.Uvarint(footer)
+		if count <= 0 || offset < previousEnd || offset > limit || limit-offset < 5 || length == 0 || length > limit-offset-5 {
+			return false
+		}
+
+		footer = footer[count:]
+		previousEnd = offset + length + 5
+	}
+
+	for _, value := range footer {
+		if value != 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
 func DetectXMLSubtypes(b Buffer) *Metadata {
 	data := bytes.TrimPrefix(b, []byte{0xef, 0xbb, 0xbf})
 
@@ -4074,6 +4243,7 @@ func DetectXMLSubtypes(b Buffer) *Metadata {
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(data))
+	decoder.CharsetReader = xmlCharset
 
 	if b.Has(0, []byte{0xff, 0xfe}) || b.Has(0, []byte{0xfe, 0xff}) {
 		decoder.CharsetReader = decodedXMLCharset
@@ -4102,6 +4272,27 @@ func decodedXMLCharset(charset string, input io.Reader) (io.Reader, error) {
 	default:
 		return nil, errors.New("unsupported XML encoding")
 	}
+}
+
+func xmlCharset(charset string, input io.Reader) (io.Reader, error) {
+	if !strings.EqualFold(charset, "iso-8859-1") {
+		return nil, errors.New("unsupported XML encoding")
+	}
+
+	data, err := io.ReadAll(input)
+	if err != nil {
+		return nil, err
+	}
+
+	var decoded strings.Builder
+
+	decoded.Grow(len(data) * 2)
+
+	for _, character := range data {
+		decoded.WriteRune(rune(character))
+	}
+
+	return strings.NewReader(decoded.String()), nil
 }
 
 func xmlRootMetadata(root xml.StartElement) *Metadata {
@@ -4563,7 +4754,7 @@ func detectZIPReaderAt(r io.ReaderAt, size int64) *Metadata {
 
 	meta := detectZIPEntries(Buffer(entryData))
 
-	refined := detectOOXML(r, size, central)
+	refined := detectOOXML(r, int64(centralOffset), central)
 	if refined != nil {
 		return refined
 	}

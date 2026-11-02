@@ -71,6 +71,7 @@ func init() {
 	types.RegisterSignature(types.KindMeasurementDataFormat, types.TypeNone, 0, []byte("UnFinMF"))
 	types.RegisterSignature(types.KindMerriamWebsterDictionary, types.TypeNone, 0, []byte("M-W Pock"))
 	types.RegisterSignature(types.KindMicrosoftAccessDatabase, types.TypeNone, 0, []byte{0x00, 0x01, 0x00, 0x00, 'S', 't', 'a', 'n', 'd', 'a', 'r', 'd', ' ', 'A', 'C', 'E', ' ', 'D', 'B'})
+	types.RegisterSignature(types.KindMicrosoftAccessDatabase, types.TypeNone, 0, []byte{0x00, 0x01, 0x00, 0x00, 'S', 't', 'a', 'n', 'd', 'a', 'r', 'd', ' ', 'J', 'e', 't', ' ', 'D', 'B'})
 	types.RegisterSignature(types.KindMicrosoftAnswerWizard, types.TypeNone, 0, []byte{0x8a, 0x01, 0x09, 0x00, 0x00, 0x00, 0xe1, 0x08})
 	types.RegisterSignature(types.KindMicrosoftCodePageTranslation, types.TypeNone, 0, []byte("[Windows"))
 	types.RegisterSignature(types.KindMicrosoftDeveloperStudioProject, types.TypeNone, 0, []byte("# Micros"))

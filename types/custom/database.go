@@ -1,6 +1,8 @@
 package custom
 
 import (
+	"bytes"
+	"encoding/binary"
 	"io"
 
 	"github.com/coalaura/wtf/types"
@@ -51,9 +53,29 @@ func DetectDatabaseHeaders(b types.Buffer) *types.Metadata {
 }
 
 func DetectHDF5(b types.Buffer) *types.Metadata {
-	for offset := 0; offset+8 <= b.Len(); {
-		if b.Has(offset, []byte{0x89, 'H', 'D', 'F', 13, 10, 26, 10}) {
+	return DetectHDF5ReaderAt(b, bytes.NewReader(b), int64(b.Len()))
+}
+
+func DetectHDF5ReaderAt(b types.Buffer, reader io.ReaderAt, size int64) *types.Metadata {
+	var header [96]byte
+
+	for offset := int64(0); offset <= size-48; {
+		length := min(int64(len(header)), size-offset)
+
+		var superblock []byte
+
+		if offset+length <= int64(b.Len()) {
+			superblock = b[offset : offset+length]
+		} else if readAtExactly(reader, header[:length], offset) {
+			superblock = header[:length]
+		}
+
+		if validHDF5Superblock(superblock, uint64(offset), uint64(size)) {
 			return &types.Metadata{Kind: types.KindHDF5Data}
+		}
+
+		if offset > (size-48)/2 {
+			break
 		}
 
 		if offset == 0 {
@@ -66,31 +88,70 @@ func DetectHDF5(b types.Buffer) *types.Metadata {
 	return nil
 }
 
-func DetectHDF5ReaderAt(b types.Buffer, reader io.ReaderAt, size int64) *types.Metadata {
-	meta := DetectHDF5(b)
-	if meta != nil {
-		return meta
+func validHDF5Superblock(header []byte, offset uint64, size uint64) bool {
+	if len(header) < 48 || string(header[:8]) != "\x89HDF\r\n\x1a\n" {
+		return false
 	}
 
-	var signature [8]byte
+	version := header[8]
+	addressStart := 12
+	width := int(header[9])
+	lengthWidth := int(header[10])
+	rootStart := 0
 
-	for offset := int64(512); offset <= size-8; {
-		if offset >= int64(b.Len()) && readAtExactly(reader, signature[:], offset) && bytesEqualHDF5(signature[:]) {
-			return &types.Metadata{Kind: types.KindHDF5Data}
+	switch version {
+	case 0, 1:
+		width = int(header[13])
+		lengthWidth = int(header[14])
+		addressStart = 24
+
+		if header[9] != 0 || header[10] != 0 || header[11] != 0 || header[12] != 0 || header[15] != 0 || binary.LittleEndian.Uint16(header[16:]) == 0 || binary.LittleEndian.Uint16(header[18:]) == 0 || binary.LittleEndian.Uint32(header[20:]) & ^uint32(3) != 0 {
+			return false
 		}
 
-		if offset > (size-8)/2 {
-			break
+		if version == 1 {
+			addressStart = 28
+
+			if binary.LittleEndian.Uint16(header[24:]) == 0 || header[26] != 0 || header[27] != 0 {
+				return false
+			}
 		}
 
-		offset *= 2
+		rootStart = addressStart + 4*width + lengthWidth
+	case 2, 3:
+		if header[11] & ^byte(5) != 0 {
+			return false
+		}
+
+		rootStart = addressStart + 3*width
+	default:
+		return false
 	}
 
-	return nil
+	if !validHDF5Width(width) || !validHDF5Width(lengthWidth) || rootStart+width > len(header) {
+		return false
+	}
+
+	base := hdf5Address(header[addressStart : addressStart+width])
+	endStart := addressStart + 2*width
+	end := hdf5Address(header[endStart : endStart+width])
+	root := hdf5Address(header[rootStart : rootStart+width])
+
+	return base == offset && end > offset+uint64(rootStart+width) && end <= size && root > 0 && root < end-base
 }
 
-func bytesEqualHDF5(signature []byte) bool {
-	return string(signature) == "\x89HDF\r\n\x1a\n"
+func validHDF5Width(width int) bool {
+	return width == 1 || width == 2 || width == 4 || width == 8
+}
+
+func hdf5Address(data []byte) uint64 {
+	var value uint64
+
+	for index, part := range data {
+		value |= uint64(part) << (index * 8)
+	}
+
+	return value
 }
 
 func berkeleyMagic(magic uint32) bool {

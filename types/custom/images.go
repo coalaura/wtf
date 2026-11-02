@@ -169,6 +169,10 @@ func DetectTrueType(b types.Buffer) *types.Metadata {
 }
 
 func DetectXBM(b types.Buffer) *types.Metadata {
+	if !isLikelyASCIIText(b) || !bytes.Contains(b, []byte("#define")) {
+		return nil
+	}
+
 	var (
 		name   string
 		width  bool

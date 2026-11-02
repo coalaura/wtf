@@ -2,6 +2,15 @@
 package types
 
 func detectOptimized(b Buffer) *Metadata {
+	meta := detectStrong(b)
+	if meta != nil {
+		return meta
+	}
+
+	return detectWeak(b)
+}
+
+func detectStrong(b Buffer) *Metadata {
 	if len(b) == 0 {
 		return nil
 	}
@@ -31,10 +40,6 @@ func detectOptimized(b Buffer) *Metadata {
 	}
 
 	if meta := DetectFLIC(b); meta != nil {
-		return meta
-	}
-
-	if meta := DetectHDF5(b); meta != nil {
 		return meta
 	}
 
@@ -103,10 +108,6 @@ func detectOptimized(b Buffer) *Metadata {
 	}
 
 	if meta := DetectTrueType(b); meta != nil {
-		return meta
-	}
-
-	if meta := DetectXBM(b); meta != nil {
 		return meta
 	}
 
@@ -233,8 +234,17 @@ func detectOptimized(b Buffer) *Metadata {
 										return &Metadata{Kind: KindMicrosoftMoney}
 									}
 								case 0x53:
-									if len(b) >= 19 && string(b[:19]) == "\x00\x01\x00\x00Standard ACE DB" {
-										return &Metadata{Kind: KindMicrosoftAccessDatabase}
+									if len(b) > 13 {
+										switch b[13] {
+										case 0x41:
+											if len(b) >= 19 && string(b[:19]) == "\x00\x01\x00\x00Standard ACE DB" {
+												return &Metadata{Kind: KindMicrosoftAccessDatabase}
+											}
+										case 0x4a:
+											if len(b) >= 19 && string(b[:19]) == "\x00\x01\x00\x00Standard Jet DB" {
+												return &Metadata{Kind: KindMicrosoftAccessDatabase}
+											}
+										}
 									}
 								}
 							}
@@ -6033,6 +6043,14 @@ func detectOptimized(b Buffer) *Metadata {
 		return &Metadata{Kind: KindBtrfsFilesystem}
 	}
 
+	return nil
+}
+
+func detectWeak(b Buffer) *Metadata {
+	if len(b) == 0 {
+		return nil
+	}
+
 	if meta := DetectAV1(b); meta != nil {
 		return meta
 	}
@@ -6066,6 +6084,10 @@ func detectOptimized(b Buffer) *Metadata {
 	}
 
 	if meta := DetectSpine(b); meta != nil {
+		return meta
+	}
+
+	if meta := DetectXBM(b); meta != nil {
 		return meta
 	}
 

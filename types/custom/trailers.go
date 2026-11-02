@@ -1,14 +1,24 @@
 package custom
 
-import "github.com/coalaura/wtf/types"
+import (
+	"bytes"
+	"encoding/binary"
+	"io"
+
+	"github.com/coalaura/wtf/types"
+)
 
 func DetectFileTrailer(buffer types.Buffer) *types.Metadata {
-	meta := DetectAppleDiskImage(buffer)
+	return detectFileTrailerSized(buffer, bytes.NewReader(buffer), int64(buffer.Len()))
+}
+
+func detectFileTrailerSized(buffer types.Buffer, reader io.ReaderAt, size int64) *types.Metadata {
+	meta := detectAppleDiskImageSized(buffer, reader, size)
 	if meta != nil {
 		return meta
 	}
 
-	if buffer.Len() >= 48 && buffer.Has(buffer.Len()-8, []byte{0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb}) {
+	if validLevelDBFooter(buffer, size) {
 		return &types.Metadata{Kind: types.KindLevelDB}
 	}
 
@@ -38,4 +48,40 @@ func DetectFileTrailer(buffer types.Buffer) *types.Metadata {
 	}
 
 	return &types.Metadata{Kind: types.KindVHDDiskImage}
+}
+
+func validLevelDBFooter(buffer types.Buffer, size int64) bool {
+	if buffer.Len() < 48 || size < 48 || !buffer.Has(buffer.Len()-8, []byte{0x57, 0xfb, 0x80, 0x8b, 0x24, 0x75, 0x47, 0xdb}) {
+		return false
+	}
+
+	footer := buffer[buffer.Len()-48 : buffer.Len()-8]
+	limit := uint64(size - 48)
+
+	var previousEnd uint64
+
+	for range 2 {
+		offset, count := binary.Uvarint(footer)
+		if count <= 0 {
+			return false
+		}
+
+		footer = footer[count:]
+
+		length, count := binary.Uvarint(footer)
+		if count <= 0 || offset < previousEnd || offset > limit || limit-offset < 5 || length == 0 || length > limit-offset-5 {
+			return false
+		}
+
+		footer = footer[count:]
+		previousEnd = offset + length + 5
+	}
+
+	for _, value := range footer {
+		if value != 0 {
+			return false
+		}
+	}
+
+	return true
 }
