@@ -79,6 +79,9 @@ func DetectReaderAt(name string, data []byte, r io.ReaderAt, size int64) (*Metad
 
 	if meta == nil {
 		meta = detectStrong(buffer)
+		if meta != nil && !validContentExtent(buffer, meta.Kind, uint64(size)) {
+			meta = nil
+		}
 	}
 
 	if meta == nil {

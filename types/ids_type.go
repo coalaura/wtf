@@ -31,6 +31,7 @@ const (
 	TypeAPPXPackage
 	TypeArchLinuxPackage
 	TypeASCII
+	TypeASCIIArmored
 	TypeAsciiDoc
 	TypeAtari800
 	TypeAudioDataTransportStream
@@ -381,6 +382,7 @@ var typeNames = [...]string{
 	TypeAPPXPackage:                        "APPX Package",
 	TypeArchLinuxPackage:                   "Arch Linux Package",
 	TypeASCII:                              "ASCII",
+	TypeASCIIArmored:                       "ASCII-Armored",
 	TypeAsciiDoc:                           "AsciiDoc",
 	TypeAtari800:                           "Atari 800",
 	TypeAudioDataTransportStream:           "Audio Data Transport Stream",

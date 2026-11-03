@@ -251,6 +251,20 @@ func TestTIFFCountOverflow(t *testing.T) {
 
 func TestDetectCollisions(t *testing.T) {
 	xbm := []byte("#define icon_width 8\n#define icon_height 1\nstatic unsigned char icon_bits[] = { 0xff };\n")
+	uf2 := make([]byte, 512)
+	copy(uf2, "UF2\n\x57\x51\x5d\x9e")
+	binary.LittleEndian.PutUint32(uf2[16:], 256)
+	binary.LittleEndian.PutUint32(uf2[24:], 1)
+
+	aseprite := make([]byte, 144)
+	binary.LittleEndian.PutUint32(aseprite, 144)
+	copy(aseprite[4:], "\xe0\xa5\x01\x00\x01\x00\x01\x00\x20\x00")
+	binary.LittleEndian.PutUint32(aseprite[128:], 16)
+
+	tile := make([]byte, 28)
+	copy(tile, "b3dm\x01\x00\x00\x00")
+	binary.LittleEndian.PutUint32(tile[8:], 4096)
+
 	payload := make([]byte, 2048)
 	copy(payload[1080-30-len("payload"):], []byte{0x53, 0xef})
 
@@ -323,6 +337,15 @@ func TestDetectCollisions(t *testing.T) {
 		{name: "xbm", data: xbm, kind: types.KindXBitMapImage},
 		{name: "png-xbm", data: collisionPNG(t, xbm), kind: types.KindPNGImage},
 		{name: "tagged-flac", data: []byte("ID3\x04\x00\x00\x00\x00\x00\x00fLaC"), kind: types.KindFLACAudio},
+		{name: "gcc-big-endian", data: []byte("gcnoB11*\x00\x00\x00\x00"), kind: types.KindGCCCoverageNotes, typ: types.TypeBigEndian},
+		{name: "btf-big-endian", data: []byte("\xeb\x9f\x01\x00\x00\x00\x00\x18\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00"), kind: types.KindBPFTypeFormat, typ: types.TypeBigEndian},
+		{name: "twobit-big-endian", data: []byte("\x1a\x41\x27\x43\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"), kind: types.KindUCSCTwoBit, typ: types.TypeBigEndian},
+		{name: "flatgeobuf-patch", data: []byte("fgb\x03fgb\x7f\x08\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00"), kind: types.KindFlatGeobuf},
+		{name: "armor-decoy", data: []byte("-----BEGIN AGE ENCRYPTED FILE-----\nVGhpcyBpcyBub3QgYW4gYWdlIGZpbGUu\n-----END AGE ENCRYPTED FILE-----\n"), forbidden: types.KindAgeEncryptedFile},
+		{name: "uf2-missing-end", data: uf2, forbidden: types.KindUF2Firmware},
+		{name: "aseprite-missing-frame", data: aseprite, forbidden: types.KindAsepriteSprite},
+		{name: "tile-truncated", data: tile, forbidden: types.KindBatched3DModel},
+		{name: "glb-not-tile", data: []byte("glTF\x02\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00JSON"), kind: types.KindGLTFBinaryModel},
 	}
 
 	for _, test := range cases {

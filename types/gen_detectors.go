@@ -4,6 +4,7 @@ package types
 import (
 	"bytes"
 	"compress/flate"
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/json"
 	"encoding/xml"
@@ -120,6 +121,31 @@ func isValidAV1OBUHeader(header, expectedType byte) bool {
 	obuType := (header >> 3) & 0x0F
 
 	return obuType == expectedType
+}
+
+func DetectContentHeaders(b Buffer) *Metadata {
+	if b.Len() < 4 {
+		return nil
+	}
+
+	switch string(b[:4]) {
+	case "MIDX", "REFT", "MTME", "gcno", "oncg", "gcda", "adcg":
+		return detectDevelopmentHeaders(b)
+	case "\xd0\x0d\xfe\xed", "\xd7\xb7\xab\x1e", "AVB0", "CrAU", "UF2\n", "\x9f\xeb\x01\x00", "\xeb\x9f\x01\x00":
+		return detectFirmwareHeaders(b)
+	case "b3dm", "i3dm", "pnts", "cmpt":
+		return detectTileHeader(b)
+	case "\x26\xfc\x8f\x88", "\x88\x8f\xfc\x26", "\xeb\xf2\x89\x87", "\x87\x89\xf2\xeb", "\x43\x27\x41\x1a", "\x1a\x41\x27\x43":
+		return detectUCSCHeader(b)
+	case "qoaf", "DRAC", "----":
+		return detectMediaHeaders(b)
+	}
+
+	if b.Has(4, []byte{0xe0, 0xa5}) {
+		return detectAsepriteHeader(b)
+	}
+
+	return nil
 }
 
 func DetectDatabaseHeaders(b Buffer) *Metadata {
@@ -341,6 +367,63 @@ func isKnownBinaryPattern(b Buffer) bool {
 	}
 
 	return false
+}
+
+func detectDevelopmentHeaders(b Buffer) *Metadata {
+	if b.Len() < 12 {
+		return nil
+	}
+
+	switch string(b[:4]) {
+	case "MIDX":
+		if (b[4] == 1 || b[4] == 2) && (b[5] == 1 || b[5] == 2) && b[6] >= 4 {
+			return &Metadata{Kind: KindGitMultiPackIndex}
+		}
+	case "REFT":
+		if b.Len() < 24 || binary.BigEndian.Uint64(b[8:]) > binary.BigEndian.Uint64(b[16:]) {
+			return nil
+		}
+
+		if b[4] == 1 || b[4] == 2 && (b.Has(24, []byte("sha1")) || b.Has(24, []byte("s256"))) {
+			return &Metadata{Kind: KindGitReftable}
+		}
+	case "MTME":
+		version := binary.BigEndian.Uint32(b[4:])
+		hash := binary.BigEndian.Uint32(b[8:])
+
+		if version == 1 && (hash == 1 || hash == 2) {
+			return &Metadata{Kind: KindGitCruftPackMtimes}
+		}
+	case "gcno":
+		if validGCCVersion(binary.BigEndian.Uint32(b[4:])) {
+			return &Metadata{Kind: KindGCCCoverageNotes, Type: TypeBigEndian}
+		}
+	case "oncg":
+		if validGCCVersion(binary.LittleEndian.Uint32(b[4:])) {
+			return &Metadata{Kind: KindGCCCoverageNotes, Type: TypeLittleEndian}
+		}
+	case "gcda":
+		if validGCCVersion(binary.BigEndian.Uint32(b[4:])) {
+			return &Metadata{Kind: KindGCCCoverageData, Type: TypeBigEndian}
+		}
+	case "adcg":
+		if validGCCVersion(binary.LittleEndian.Uint32(b[4:])) {
+			return &Metadata{Kind: KindGCCCoverageData, Type: TypeLittleEndian}
+		}
+	}
+
+	return nil
+}
+
+func validGCCVersion(version uint32) bool {
+	major := byte(version >> 24)
+	minor := byte(version >> 16)
+	patch := byte(version >> 8)
+	status := byte(version)
+	validMajor := major >= '3' && major <= '9' || major >= 'A' && major <= 'Z'
+	validStatus := status == '*' || status == 'e' || status == 'p' || status == 'r'
+
+	return validMajor && minor >= '0' && minor <= '9' && patch >= '0' && patch <= '9' && validStatus
 }
 
 func DetectAppleDiskImage(b Buffer) *Metadata {
@@ -951,6 +1034,128 @@ func DetectFAT(b Buffer) *Metadata {
 	}
 
 	return nil
+}
+
+func detectFirmwareHeaders(b Buffer) *Metadata {
+	switch string(b[:4]) {
+	case "\xd0\x0d\xfe\xed":
+		if validDevicetreeHeader(b) {
+			return &Metadata{Kind: KindFlattenedDevicetree}
+		}
+	case "\xd7\xb7\xab\x1e":
+		if validAndroidDTHeader(b) {
+			return &Metadata{Kind: KindAndroidDTTable}
+		}
+	case "AVB0":
+		if b.Len() >= 256 && binary.BigEndian.Uint32(b[4:]) == 1 {
+			authSize := binary.BigEndian.Uint64(b[12:])
+			auxSize := binary.BigEndian.Uint64(b[20:])
+
+			if authSize%64 == 0 && auxSize%64 == 0 {
+				return &Metadata{Kind: KindAndroidVBMeta}
+			}
+		}
+	case "CrAU":
+		if b.Len() >= 20 {
+			version := binary.BigEndian.Uint64(b[4:])
+			manifestSize := binary.BigEndian.Uint64(b[12:])
+
+			if manifestSize > 0 && (version == 1 || version == 2 && b.Len() >= 24) {
+				return &Metadata{Kind: KindUpdateEnginePayload}
+			}
+		}
+	case "UF2\n":
+		if b.Has(4, []byte{0x57, 0x51, 0x5d, 0x9e}) && b.Has(508, []byte{0x30, 0x6f, 0xb1, 0x0a}) {
+			payloadSize := binary.LittleEndian.Uint32(b[16:])
+			block := binary.LittleEndian.Uint32(b[20:])
+			blocks := binary.LittleEndian.Uint32(b[24:])
+
+			if payloadSize <= 476 && (blocks == 0 || block < blocks) {
+				return &Metadata{Kind: KindUF2Firmware}
+			}
+		}
+	case "\x9f\xeb\x01\x00":
+		if validBTFHeader(b, binary.LittleEndian) {
+			return &Metadata{Kind: KindBPFTypeFormat, Type: TypeLittleEndian}
+		}
+	case "\xeb\x9f\x01\x00":
+		if validBTFHeader(b, binary.BigEndian) {
+			return &Metadata{Kind: KindBPFTypeFormat, Type: TypeBigEndian}
+		}
+	}
+
+	return nil
+}
+
+func validDevicetreeHeader(b Buffer) bool {
+	if b.Len() < 28 {
+		return false
+	}
+
+	total := uint64(binary.BigEndian.Uint32(b[4:]))
+	structure := uint64(binary.BigEndian.Uint32(b[8:]))
+	strings := uint64(binary.BigEndian.Uint32(b[12:]))
+	reserve := uint64(binary.BigEndian.Uint32(b[16:]))
+	version := binary.BigEndian.Uint32(b[20:])
+	compatible := binary.BigEndian.Uint32(b[24:])
+	headerSize := uint64(28)
+
+	if version >= 17 {
+		headerSize = 40
+	} else if version >= 3 {
+		headerSize = 36
+	} else if version == 2 {
+		headerSize = 32
+	}
+
+	if version < 1 || version > 17 || compatible > version || uint64(b.Len()) < headerSize || total < headerSize {
+		return false
+	}
+
+	if structure < headerSize || structure >= total || structure%4 != 0 || strings < headerSize || strings > total || reserve < headerSize || reserve%8 != 0 || reserve+16 > total {
+		return false
+	}
+
+	if version >= 3 && strings+uint64(binary.BigEndian.Uint32(b[32:])) > total {
+		return false
+	}
+
+	return version < 17 || structure+uint64(binary.BigEndian.Uint32(b[36:])) <= total
+}
+
+func validAndroidDTHeader(b Buffer) bool {
+	if b.Len() < 32 {
+		return false
+	}
+
+	total := uint64(binary.BigEndian.Uint32(b[4:]))
+	headerSize := uint64(binary.BigEndian.Uint32(b[8:]))
+	entrySize := uint64(binary.BigEndian.Uint32(b[12:]))
+	count := uint64(binary.BigEndian.Uint32(b[16:]))
+	offset := uint64(binary.BigEndian.Uint32(b[20:]))
+	version := binary.BigEndian.Uint32(b[28:])
+
+	return version <= 1 && headerSize >= 32 && entrySize >= 32 && offset >= headerSize && offset <= total && count <= (total-offset)/entrySize
+}
+
+func validBTFHeader(b Buffer, order binary.ByteOrder) bool {
+	if b.Len() < 24 {
+		return false
+	}
+
+	headerSize := uint64(order.Uint32(b[4:]))
+	typeOffset := uint64(order.Uint32(b[8:]))
+	typeSize := uint64(order.Uint32(b[12:]))
+	stringOffset := uint64(order.Uint32(b[16:]))
+	stringSize := order.Uint32(b[20:])
+
+	if headerSize < 24 || headerSize%4 != 0 || typeOffset%4 != 0 || typeSize%4 != 0 || stringOffset < typeOffset+typeSize || stringSize == 0 {
+		return false
+	}
+
+	stringStart := headerSize + stringOffset
+
+	return stringStart >= uint64(b.Len()) || b[stringStart] == 0
 }
 
 func DetectH26x(b Buffer) *Metadata {
@@ -1841,6 +2046,109 @@ func isKnownMachOCPUType(cpuType uint32) bool {
 	default:
 		return false
 	}
+}
+
+const ageArmorHeader = "-----BEGIN AGE ENCRYPTED FILE-----"
+
+func detectMediaHeaders(b Buffer) *Metadata {
+	switch string(b[:4]) {
+	case "qoaf":
+		if b.Len() < 16 {
+			return nil
+		}
+
+		channels := uint32(b[8])
+		rate := binary.BigEndian.Uint32(b[8:]) & 0xffffff
+		samples := uint32(binary.BigEndian.Uint16(b[12:]))
+		frameSize := uint32(binary.BigEndian.Uint16(b[14:]))
+		expectedSize := 8 + 16*channels + 8*((samples+19)/20)*channels
+
+		if channels > 0 && channels <= 8 && rate > 0 && samples > 0 && samples <= 5120 && frameSize == expectedSize {
+			return &Metadata{Kind: KindQOAAudio}
+		}
+	case "DRAC":
+		if b.Len() >= 11 && b[4] == 'O' && b[7] <= 1 && b[8] <= 1 {
+			maxMinor := byte(3 - b[7])
+			if b[5] == 1 || b[5] == 2 && b[6] <= maxMinor {
+				return &Metadata{Kind: KindDracoGeometry}
+			}
+		}
+	case "----":
+		if validAgeArmorPrefix(b) {
+			return &Metadata{Kind: KindAgeEncryptedFile, Type: TypeASCIIArmored}
+		}
+	}
+
+	return nil
+}
+
+func detectAsepriteHeader(b Buffer) *Metadata {
+	if b.Len() < 144 || !b.Has(132, []byte{0xfa, 0xf1}) {
+		return nil
+	}
+
+	total := uint64(binary.LittleEndian.Uint32(b))
+	frames := binary.LittleEndian.Uint16(b[6:])
+	width := binary.LittleEndian.Uint16(b[8:])
+	height := binary.LittleEndian.Uint16(b[10:])
+	depth := binary.LittleEndian.Uint16(b[12:])
+	frameSize := uint64(binary.LittleEndian.Uint32(b[128:]))
+
+	if frames == 0 || width == 0 || height == 0 || depth != 8 && depth != 16 && depth != 32 || frameSize < 16 || 128+frameSize > total {
+		return nil
+	}
+
+	chunks := uint64(binary.LittleEndian.Uint32(b[140:]))
+	if chunks == 0 {
+		chunks = uint64(binary.LittleEndian.Uint16(b[134:]))
+	}
+
+	if chunks > (frameSize-16)/6 || uint64(frames)*16 > total-128 {
+		return nil
+	}
+
+	return &Metadata{Kind: KindAsepriteSprite}
+}
+
+func validAgeArmorPrefix(b Buffer) bool {
+	if !b.Has(0, []byte(ageArmorHeader)) {
+		return false
+	}
+
+	offset := len(ageArmorHeader)
+	if offset < b.Len() && b[offset] == '\r' {
+		offset++
+	}
+
+	if offset >= b.Len() || b[offset] != '\n' {
+		return false
+	}
+
+	var (
+		encoded [32]byte
+		decoded [24]byte
+	)
+
+	count := 0
+	limit := min(b.Len(), offset+128)
+
+	for offset++; offset < limit && count < len(encoded); offset++ {
+		character := b[offset]
+		if character == '\r' || character == '\n' {
+			continue
+		}
+
+		encoded[count] = character
+		count++
+	}
+
+	if count != len(encoded) {
+		return false
+	}
+
+	length, err := base64.StdEncoding.Strict().Decode(decoded[:], encoded[:])
+
+	return err == nil && bytes.HasPrefix(decoded[:length], []byte("age-encryption.org/v1\n"))
 }
 
 func DetectMP3(b Buffer) *Metadata {
@@ -4184,6 +4492,56 @@ func isTIFFHeader(b Buffer) bool {
 	return b.Has(0, []byte{'I', 'I', 42, 0}) || b.Has(0, []byte{'M', 'M', 0, 42})
 }
 
+func detectTileHeader(b Buffer) *Metadata {
+	if b.Len() < 16 || binary.LittleEndian.Uint32(b[4:]) != 1 {
+		return nil
+	}
+
+	total := uint64(binary.LittleEndian.Uint32(b[8:]))
+
+	if b.Has(0, []byte("cmpt")) {
+		count := uint64(binary.LittleEndian.Uint32(b[12:]))
+		if total >= 16 && count > 0 && count <= (total-16)/12 {
+			return &Metadata{Kind: KindCompositeTile}
+		}
+
+		return nil
+	}
+
+	headerSize := uint64(28)
+
+	if b.Has(0, []byte("i3dm")) {
+		headerSize = 32
+	}
+
+	if uint64(b.Len()) < headerSize || total < headerSize {
+		return nil
+	}
+
+	tablesSize := uint64(0)
+
+	for offset := 12; offset < 28; offset += 4 {
+		tablesSize += uint64(binary.LittleEndian.Uint32(b[offset:]))
+	}
+
+	if tablesSize > total-headerSize {
+		return nil
+	}
+
+	switch string(b[:4]) {
+	case "b3dm":
+		return &Metadata{Kind: KindBatched3DModel}
+	case "i3dm":
+		if binary.LittleEndian.Uint32(b[28:]) <= 1 {
+			return &Metadata{Kind: KindInstanced3DModel}
+		}
+	case "pnts":
+		return &Metadata{Kind: KindPointCloudTile}
+	}
+
+	return nil
+}
+
 func DetectTorrent(b Buffer) *Metadata {
 	if b.Len() < 32 || b[0] != 'd' {
 		return nil
@@ -4275,6 +4633,55 @@ func validLevelDBFooter(buffer Buffer, size int64) bool {
 	}
 
 	return true
+}
+
+func detectUCSCHeader(b Buffer) *Metadata {
+	switch string(b[:4]) {
+	case "\x26\xfc\x8f\x88":
+		if validBBIHeader(b, binary.LittleEndian) {
+			return &Metadata{Kind: KindUCSCBigWig, Type: TypeLittleEndian}
+		}
+	case "\x88\x8f\xfc\x26":
+		if validBBIHeader(b, binary.BigEndian) {
+			return &Metadata{Kind: KindUCSCBigWig, Type: TypeBigEndian}
+		}
+	case "\xeb\xf2\x89\x87":
+		if validBBIHeader(b, binary.LittleEndian) {
+			return &Metadata{Kind: KindUCSCBigBed, Type: TypeLittleEndian}
+		}
+	case "\x87\x89\xf2\xeb":
+		if validBBIHeader(b, binary.BigEndian) {
+			return &Metadata{Kind: KindUCSCBigBed, Type: TypeBigEndian}
+		}
+	case "\x43\x27\x41\x1a":
+		if validTwoBitHeader(b, binary.LittleEndian) {
+			return &Metadata{Kind: KindUCSCTwoBit, Type: TypeLittleEndian}
+		}
+	case "\x1a\x41\x27\x43":
+		if validTwoBitHeader(b, binary.BigEndian) {
+			return &Metadata{Kind: KindUCSCTwoBit, Type: TypeBigEndian}
+		}
+	}
+
+	return nil
+}
+
+func validBBIHeader(b Buffer, order binary.ByteOrder) bool {
+	if b.Len() < 64 {
+		return false
+	}
+
+	version := order.Uint16(b[4:])
+	headerSize := uint64(64) + uint64(order.Uint16(b[6:]))*24
+	treeOffset := order.Uint64(b[8:])
+	dataOffset := order.Uint64(b[16:])
+	indexOffset := order.Uint64(b[24:])
+
+	return version >= 1 && version <= 4 && treeOffset >= headerSize && dataOffset >= headerSize && indexOffset >= headerSize
+}
+
+func validTwoBitHeader(b Buffer, order binary.ByteOrder) bool {
+	return b.Len() >= 16 && order.Uint32(b[4:]) <= 1 && order.Uint32(b[12:]) == 0
 }
 
 func DetectXMLSubtypes(b Buffer) *Metadata {

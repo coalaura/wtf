@@ -23,6 +23,10 @@ func detectStrong(b Buffer) *Metadata {
 		return meta
 	}
 
+	if meta := DetectContentHeaders(b); meta != nil {
+		return meta
+	}
+
 	if meta := DetectDatabaseHeaders(b); meta != nil {
 		return meta
 	}
@@ -324,6 +328,19 @@ func detectStrong(b Buffer) *Metadata {
 				case 0x61:
 					if len(b) >= 4 && string(b[:4]) == "\x00asm" {
 						return &Metadata{Kind: KindWebAssemblyModule}
+					}
+				case 0x63:
+					if len(b) > 2 {
+						switch b[2] {
+						case 0x76:
+							if len(b) >= 8 && string(b[:8]) == "\x00cvm\x01\x00\x00\x00" {
+								return &Metadata{Kind: KindGoCoverageMetadata}
+							}
+						case 0x77:
+							if len(b) >= 8 && string(b[:8]) == "\x00cwm\x01\x00\x00\x00" {
+								return &Metadata{Kind: KindGoCoverageCounters}
+							}
+						}
 					}
 				case 0xba:
 					if len(b) >= 4 && string(b[:4]) == "\x00\xba\xb1\f" {
@@ -1580,8 +1597,17 @@ func detectStrong(b Buffer) *Metadata {
 						}
 					}
 				case 0x53:
-					if len(b) >= 4 && string(b[:4]) == "BSA\x00" {
-						return &Metadata{Kind: KindBethesdaArchive}
+					if len(b) > 2 {
+						switch b[2] {
+						case 0x41:
+							if len(b) >= 4 && string(b[:4]) == "BSA\x00" {
+								return &Metadata{Kind: KindBethesdaArchive}
+							}
+						case 0x44:
+							if len(b) >= 8 && string(b[:8]) == "BSDIFF40" {
+								return &Metadata{Kind: KindBSDIFFPatch}
+							}
+						}
 					}
 				case 0x54:
 					if len(b) > 2 {
@@ -4345,6 +4371,10 @@ func detectStrong(b Buffer) *Metadata {
 		case 0x61:
 			if len(b) > 1 {
 				switch b[1] {
+				case 0x67:
+					if len(b) >= 22 && string(b[:22]) == "age-encryption.org/v1\n" {
+						return &Metadata{Kind: KindAgeEncryptedFile}
+					}
 				case 0x6a:
 					if len(b) >= 4 && string(b[:4]) == "ajkg" {
 						return &Metadata{Kind: KindShortenAudio}
@@ -4381,8 +4411,30 @@ func detectStrong(b Buffer) *Metadata {
 						return &Metadata{Kind: KindNintendoBRRESResource}
 					}
 				case 0x74:
-					if len(b) >= 8 && string(b[:8]) == "btsnoop\x00" {
-						return &Metadata{Kind: KindBluetoothSnoopCapture}
+					if len(b) > 2 {
+						switch b[2] {
+						case 0x72:
+							if len(b) > 13 {
+								switch b[13] {
+								case 0x01:
+									if len(b) >= 17 && string(b[:17]) == "btrfs-stream\x00\x01\x00\x00\x00" {
+										return &Metadata{Kind: KindBtrfsSendStream}
+									}
+								case 0x02:
+									if len(b) >= 17 && string(b[:17]) == "btrfs-stream\x00\x02\x00\x00\x00" {
+										return &Metadata{Kind: KindBtrfsSendStream}
+									}
+								case 0x03:
+									if len(b) >= 17 && string(b[:17]) == "btrfs-stream\x00\x03\x00\x00\x00" {
+										return &Metadata{Kind: KindBtrfsSendStream}
+									}
+								}
+							}
+						case 0x73:
+							if len(b) >= 8 && string(b[:8]) == "btsnoop\x00" {
+								return &Metadata{Kind: KindBluetoothSnoopCapture}
+							}
+						}
 					}
 				case 0x76:
 					if len(b) >= 4 && string(b[:4]) == "bvx2" {
@@ -4512,6 +4564,10 @@ func detectStrong(b Buffer) *Metadata {
 					if len(b) >= 8 && string(b[:8]) == "farbfeld" {
 						return &Metadata{Kind: KindFarbfeldImage}
 					}
+				case 0x67:
+					if b.HasMask(0, "fgb\x03fgb\x00", "\xff\xff\xff\xff\xff\xff\xff\x00") {
+						return &Metadata{Kind: KindFlatGeobuf}
+					}
 				}
 			}
 		case 0x67:
@@ -4532,6 +4588,61 @@ func detectStrong(b Buffer) *Metadata {
 				case 0x6c:
 					if len(b) >= 4 && string(b[:4]) == "glTF" {
 						return &Metadata{Kind: KindGLTFBinaryModel}
+					}
+				case 0x6f:
+					if len(b) > 5 {
+						switch b[5] {
+						case 0x31:
+							if len(b) > 6 {
+								switch b[6] {
+								case 0x31:
+									if len(b) >= 16 && string(b[:16]) == "go 1.11 trace\x00\x00\x00" {
+										return &Metadata{Kind: KindGoExecutionTrace}
+									}
+								case 0x39:
+									if len(b) >= 16 && string(b[:16]) == "go 1.19 trace\x00\x00\x00" {
+										return &Metadata{Kind: KindGoExecutionTrace}
+									}
+								}
+							}
+						case 0x32:
+							if len(b) > 6 {
+								switch b[6] {
+								case 0x31:
+									if len(b) >= 16 && string(b[:16]) == "go 1.21 trace\x00\x00\x00" {
+										return &Metadata{Kind: KindGoExecutionTrace}
+									}
+								case 0x32:
+									if len(b) >= 16 && string(b[:16]) == "go 1.22 trace\x00\x00\x00" {
+										return &Metadata{Kind: KindGoExecutionTrace}
+									}
+								case 0x33:
+									if len(b) >= 16 && string(b[:16]) == "go 1.23 trace\x00\x00\x00" {
+										return &Metadata{Kind: KindGoExecutionTrace}
+									}
+								case 0x35:
+									if len(b) >= 16 && string(b[:16]) == "go 1.25 trace\x00\x00\x00" {
+										return &Metadata{Kind: KindGoExecutionTrace}
+									}
+								case 0x36:
+									if len(b) >= 16 && string(b[:16]) == "go 1.26 trace\x00\x00\x00" {
+										return &Metadata{Kind: KindGoExecutionTrace}
+									}
+								}
+							}
+						case 0x35:
+							if len(b) >= 15 && string(b[:15]) == "go 1.5 trace\x00\x00\x00" {
+								return &Metadata{Kind: KindGoExecutionTrace}
+							}
+						case 0x37:
+							if len(b) >= 15 && string(b[:15]) == "go 1.7 trace\x00\x00\x00" {
+								return &Metadata{Kind: KindGoExecutionTrace}
+							}
+						case 0x39:
+							if len(b) >= 15 && string(b[:15]) == "go 1.9 trace\x00\x00\x00" {
+								return &Metadata{Kind: KindGoExecutionTrace}
+							}
+						}
 					}
 				}
 			}
@@ -4891,6 +5002,14 @@ func detectStrong(b Buffer) *Metadata {
 					if len(b) >= 8 && string(b[:8]) == "\x812\x84\xc1\x85\x05\xd0\x11" {
 						return &Metadata{Kind: KindOutlookExpressAddressBook}
 					}
+				case 0x52:
+					if len(b) >= 8 && string(b[:8]) == "\x81Rforpl\xff" {
+						return &Metadata{Kind: KindLLVMRawProfile, Type: Type32BitLittleEndian}
+					}
+				case 0x72:
+					if len(b) >= 8 && string(b[:8]) == "\x81rforpl\xff" {
+						return &Metadata{Kind: KindLLVMRawProfile, Type: Type64BitLittleEndian}
+					}
 				case 0xcd:
 					if len(b) >= 3 && string(b[:3]) == "\x81ͫ" {
 						return &Metadata{Kind: KindWordPerfectTextDocument}
@@ -5177,13 +5296,35 @@ func detectStrong(b Buffer) *Metadata {
 					}
 				}
 			}
+		case 0xd6:
+			if len(b) > 3 {
+				switch b[3] {
+				case 0x00:
+					if b.HasMask(0, "\xd6\xc3\xc4\x00\x00", "\xff\xff\xff\xff\xf8") {
+						return &Metadata{Kind: KindVCDIFFDelta}
+					}
+				case 0x53:
+					if b.HasMask(0, "\xd6\xc3\xc4S\x00", "\xff\xff\xff\xff\xf8") {
+						return &Metadata{Kind: KindVCDIFFDelta}
+					}
+				}
+			}
 		case 0xd7:
 			if len(b) >= 4 && string(b[:4]) == "\xd7\xcdƚ" {
 				return &Metadata{Kind: KindMetafileImage, Type: TypeWindowsMetafile}
 			}
 		case 0xd9:
-			if len(b) >= 3 && string(b[:3]) == "\xd9\xd9\xf7" {
-				return &Metadata{Kind: KindCBORData}
+			if len(b) > 1 {
+				switch b[1] {
+				case 0xd5:
+					if len(b) >= 8 && string(b[:8]) == "\xd9\xd5\x05\xf9 \xa1c\xd7" {
+						return &Metadata{Kind: KindSQLiteRollbackJournal}
+					}
+				case 0xd9:
+					if len(b) >= 3 && string(b[:3]) == "\xd9\xd9\xf7" {
+						return &Metadata{Kind: KindCBORData}
+					}
+				}
 			}
 		case 0xdb:
 			if len(b) >= 4 && string(b[:4]) == "ۥ-\x00" {
@@ -5350,6 +5491,23 @@ func detectStrong(b Buffer) *Metadata {
 				case 0x57:
 					if len(b) >= 4 && string(b[:4]) == "\xffWPC" {
 						return &Metadata{Kind: KindWordPerfectGraphicsImage}
+					}
+				case 0x6c:
+					if len(b) > 6 {
+						switch b[6] {
+						case 0x52:
+							if len(b) >= 8 && string(b[:8]) == "\xfflprofR\x81" {
+								return &Metadata{Kind: KindLLVMRawProfile, Type: Type32BitBigEndian}
+							}
+						case 0x69:
+							if len(b) >= 8 && string(b[:8]) == "\xfflprofi\x81" {
+								return &Metadata{Kind: KindLLVMIndexedProfile}
+							}
+						case 0x72:
+							if len(b) >= 8 && string(b[:8]) == "\xfflprofr\x81" {
+								return &Metadata{Kind: KindLLVMRawProfile, Type: Type64BitBigEndian}
+							}
+						}
 					}
 				case 0x74:
 					if len(b) >= 4 && string(b[:4]) == "\xfftOc" {

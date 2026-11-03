@@ -95,6 +95,6 @@ func main() {
 
 ## Coverage
 
-**wtf** lists **1261 detection entries**: format families plus their listed subtypes, including CLI filesystem-entry types. This is the number of entries in `--list`, not a count of distinct file formats. Coverage includes archives, packages, filesystems, disk images, documents, databases, audio, video, images, fonts, executables, forensic artifacts and text/source files.
+**wtf** lists **1310 detection entries**: format families plus their listed subtypes, including CLI filesystem-entry types. This is the number of entries in `--list`, not a count of distinct file formats. Coverage includes archives, packages, filesystems, disk images, documents, databases, audio, video, images, fonts, executables, forensic artifacts and text/source files.
 
 The project intentionally does **not** maintain a giant hand-written format list in the README. Coverage changes frequently and the detector set keeps growing. The goal is broad, precise detection with minimal false positives, using fixed signatures wherever possible and custom structural detection only when a format cannot be represented cleanly otherwise.

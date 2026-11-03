@@ -20,6 +20,7 @@ const (
 	KindAdobeInDesignDocument
 	KindAdobeSwatchExchange
 	KindAdvancedForensicFormat
+	KindAgeEncryptedFile
 	KindAINArchive
 	KindAlembicModel
 	KindAllegroPackfile
@@ -41,9 +42,11 @@ const (
 	KindAndroidBinaryXML
 	KindAndroidBootImage
 	KindAndroidCompiledResources
+	KindAndroidDTTable
 	KindAndroidOAT
 	KindAndroidODEX
 	KindAndroidSparseImage
+	KindAndroidVBMeta
 	KindAndroidVDEX
 	KindAntennaData
 	KindAOLARTImage
@@ -76,6 +79,7 @@ const (
 	KindARCArchive
 	KindARJArchive
 	KindARRIRAWImage
+	KindAsepriteSprite
 	KindASFContainer
 	KindASTCTextureImage
 	KindAsylumMusicFormat
@@ -101,6 +105,7 @@ const (
 	KindBAMData
 	KindBase85
 	KindBasisUniversalImage
+	KindBatched3DModel
 	KindBcachefsFilesystem
 	KindBCFData
 	KindBeFSFilesystem
@@ -125,10 +130,13 @@ const (
 	KindBochsDiskImage
 	KindBoltDB
 	KindBouncyCastleKeystore
+	KindBPFTypeFormat
 	KindBPGImage
 	KindBroadbandEBookDocument
 	KindBrotherEmbroidery
+	KindBSDIFFPatch
 	KindBtrfsFilesystem
+	KindBtrfsSendStream
 	KindBUFR
 	KindBzip2Archive
 	KindBzip3Archive
@@ -156,6 +164,7 @@ const (
 	KindCommodoreSIDAudio
 	KindCompiledTerminfo
 	KindCOMPlusCatalog
+	KindCompositeTile
 	KindCompressedSquareWave
 	KindCorelBinaryMetafile
 	KindCorelColorPalette
@@ -190,6 +199,7 @@ const (
 	KindDolphinRVZImage
 	KindDOSExecutable
 	KindDPXImage
+	KindDracoGeometry
 	KindDreamcastAudio
 	KindDSDIFFAudio
 	KindDSFAudio
@@ -240,6 +250,8 @@ const (
 	KindFITActivity
 	KindFITSAstronomicalImage
 	KindFLACAudio
+	KindFlatGeobuf
+	KindFlattenedDevicetree
 	KindFLICAnimation
 	KindFLIFImage
 	KindFlightSimulatorConfig
@@ -258,6 +270,8 @@ const (
 	KindGameCubeROM
 	KindGameMakerData
 	KindGameMakerStudioProject
+	KindGCCCoverageData
+	KindGCCCoverageNotes
 	KindGDBMDatabase
 	KindGDSIIICLayout
 	KindGEMRasterImage
@@ -274,18 +288,24 @@ const (
 	KindGIMPXCFImage
 	KindGitBundle
 	KindGitCommitGraph
+	KindGitCruftPackMtimes
 	KindGitIndex
+	KindGitMultiPackIndex
 	KindGitPack
 	KindGitPackBitmap
 	KindGitPackIndex
 	KindGitPackReverseIndex
+	KindGitReftable
 	KindGlibcLocale
 	KindGLTFBinaryModel
 	KindGlyphBitmapDistributionFormat
 	KindGNOMEKeyring
 	KindGNUGettextMachineCatalog
 	KindGnuPGKeybox
+	KindGoCoverageCounters
+	KindGoCoverageMetadata
 	KindGodotPackage
+	KindGoExecutionTrace
 	KindGoogleChromeDictionary
 	KindGoogleDriveDrawing
 	KindGoogleEarthPlacemark
@@ -327,6 +347,7 @@ const (
 	KindInnoSetupLog
 	KindInstallShieldCabinet
 	KindInstallShieldScript
+	KindInstanced3DModel
 	KindIntellivisionROM
 	KindInterplayMVEVideo
 	KindISO9660DiskImage
@@ -370,6 +391,8 @@ const (
 	KindLinuxPerfData
 	KindLinuxSwapSpace
 	KindLLVMBitcode
+	KindLLVMIndexedProfile
+	KindLLVMRawProfile
 	KindLogicalFileEvidence
 	KindLottieAnimation
 	KindLotus123Spreadsheet
@@ -582,6 +605,7 @@ const (
 	KindPMarcArchive
 	KindPMTiles
 	KindPNGImage
+	KindPointCloudTile
 	KindPolyTrackerModule
 	KindPortableExecutable
 	KindPortableFontResource
@@ -606,6 +630,7 @@ const (
 	KindQimageFilter
 	KindQNX4Filesystem
 	KindQNX6Filesystem
+	KindQOAAudio
 	KindQOIImage
 	KindQuakePakArchive
 	KindQuarkExpressDocument
@@ -702,6 +727,7 @@ const (
 	KindSQLite3SharedMemory
 	KindSQLite3WriteAheadLog
 	KindSQLiteDatabase
+	KindSQLiteRollbackJournal
 	KindSquashFSFilesystem
 	KindSQXArchive
 	KindSSHPublicKey
@@ -746,6 +772,10 @@ const (
 	KindU3DModel
 	KindUBIFSFilesystem
 	KindUBootImage
+	KindUCSCBigBed
+	KindUCSCBigWig
+	KindUCSCTwoBit
+	KindUF2Firmware
 	KindUFAArchive
 	KindUFSFilesystem
 	KindUHAArchive
@@ -757,11 +787,13 @@ const (
 	KindUniversalSceneDescription
 	KindUnixCompressArchive
 	KindUnrealEnginePackage
+	KindUpdateEnginePayload
 	KindUUencodedArchive
 	KindValvePAKArchive
 	KindValveTextureFormatImage
 	KindVBScriptEncodedScript
 	KindVCardContact
+	KindVCDIFFDelta
 	KindVectrexROM
 	KindVeeamBackup
 	KindVHDDiskImage
@@ -894,6 +926,7 @@ var kindNames = [...]string{
 	KindAdobeInDesignDocument:               "Adobe InDesign Document",
 	KindAdobeSwatchExchange:                 "Adobe Swatch Exchange",
 	KindAdvancedForensicFormat:              "Advanced Forensic Format",
+	KindAgeEncryptedFile:                    "age v1 Encrypted File",
 	KindAINArchive:                          "AIN Archive",
 	KindAlembicModel:                        "Alembic 3D Model",
 	KindAllegroPackfile:                     "Allegro Packfile",
@@ -915,9 +948,11 @@ var kindNames = [...]string{
 	KindAndroidBinaryXML:                    "Android Binary XML",
 	KindAndroidBootImage:                    "Android Boot Image",
 	KindAndroidCompiledResources:            "Android Compiled Resources",
+	KindAndroidDTTable:                      "Android DT Table Image",
 	KindAndroidOAT:                          "Android OAT",
 	KindAndroidODEX:                         "Android ODEX",
 	KindAndroidSparseImage:                  "Android Sparse Image",
+	KindAndroidVBMeta:                       "Android Verified Boot Metadata",
 	KindAndroidVDEX:                         "Android VDEX",
 	KindAntennaData:                         "Antenna Data",
 	KindAOLARTImage:                         "AOL ART Image",
@@ -950,6 +985,7 @@ var kindNames = [...]string{
 	KindARCArchive:                          "ARC Archive",
 	KindARJArchive:                          "ARJ Archive",
 	KindARRIRAWImage:                        "ARRI RAW Image",
+	KindAsepriteSprite:                      "Aseprite Sprite",
 	KindASFContainer:                        "ASF Container",
 	KindASTCTextureImage:                    "ASTC Texture Image",
 	KindAsylumMusicFormat:                   "Asylum Music Format",
@@ -975,6 +1011,7 @@ var kindNames = [...]string{
 	KindBAMData:                             "BAM Data",
 	KindBase85:                              "BASE85",
 	KindBasisUniversalImage:                 "Basis Universal Image",
+	KindBatched3DModel:                      "OGC Batched 3D Model Tile",
 	KindBcachefsFilesystem:                  "Bcachefs Filesystem",
 	KindBCFData:                             "Binary Call Format",
 	KindBeFSFilesystem:                      "BeOS Filesystem",
@@ -999,10 +1036,13 @@ var kindNames = [...]string{
 	KindBochsDiskImage:                      "Bochs Disk Image",
 	KindBoltDB:                              "BoltDB Database",
 	KindBouncyCastleKeystore:                "BouncyCastle Keystore",
+	KindBPFTypeFormat:                       "BPF Type Format",
 	KindBPGImage:                            "BPG Image",
 	KindBroadbandEBookDocument:              "Broadband eBook Document",
 	KindBrotherEmbroidery:                   "Brother Embroidery",
+	KindBSDIFFPatch:                         "BSDIFF40 Patch",
 	KindBtrfsFilesystem:                     "Btrfs Filesystem",
+	KindBtrfsSendStream:                     "Btrfs Send Stream",
 	KindBUFR:                                "BUFR Data",
 	KindBzip2Archive:                        "Bzip2 Archive",
 	KindBzip3Archive:                        "Bzip3 Archive",
@@ -1030,6 +1070,7 @@ var kindNames = [...]string{
 	KindCommodoreSIDAudio:                   "Commodore SID Audio",
 	KindCompiledTerminfo:                    "Compiled Terminfo",
 	KindCOMPlusCatalog:                      "COM+ Catalog",
+	KindCompositeTile:                       "OGC Composite Tile",
 	KindCompressedSquareWave:                "Compressed Square Wave",
 	KindCorelBinaryMetafile:                 "Corel Binary Metafile",
 	KindCorelColorPalette:                   "Corel Color Palette",
@@ -1064,6 +1105,7 @@ var kindNames = [...]string{
 	KindDolphinRVZImage:                     "Dolphin RVZ Image",
 	KindDOSExecutable:                       "DOS Executable",
 	KindDPXImage:                            "DPX Image",
+	KindDracoGeometry:                       "Draco Compressed Geometry",
 	KindDreamcastAudio:                      "Dreamcast Audio",
 	KindDSDIFFAudio:                         "DSDIFF Audio",
 	KindDSFAudio:                            "DSF Audio",
@@ -1114,6 +1156,8 @@ var kindNames = [...]string{
 	KindFITActivity:                         "FIT Activity",
 	KindFITSAstronomicalImage:               "FITS Astronomical Image",
 	KindFLACAudio:                           "FLAC Audio",
+	KindFlatGeobuf:                          "FlatGeobuf",
+	KindFlattenedDevicetree:                 "Flattened Devicetree Blob",
 	KindFLICAnimation:                       "FLIC Animation",
 	KindFLIFImage:                           "FLIF Image",
 	KindFlightSimulatorConfig:               "Flight Simulator Config",
@@ -1132,6 +1176,8 @@ var kindNames = [...]string{
 	KindGameCubeROM:                         "GameCube ROM",
 	KindGameMakerData:                       "GameMaker Data",
 	KindGameMakerStudioProject:              "GameMaker Studio Project",
+	KindGCCCoverageData:                     "GCC Coverage Data",
+	KindGCCCoverageNotes:                    "GCC Coverage Notes",
 	KindGDBMDatabase:                        "GDBM Database",
 	KindGDSIIICLayout:                       "GDSII IC Layout",
 	KindGEMRasterImage:                      "GEM Raster Image",
@@ -1148,18 +1194,24 @@ var kindNames = [...]string{
 	KindGIMPXCFImage:                        "GIMP XCF Image",
 	KindGitBundle:                           "Git Bundle",
 	KindGitCommitGraph:                      "Git Commit Graph",
+	KindGitCruftPackMtimes:                  "Git Cruft-Pack Modification Times",
 	KindGitIndex:                            "Git Index",
+	KindGitMultiPackIndex:                   "Git Multi-Pack Index",
 	KindGitPack:                             "Git Pack",
 	KindGitPackBitmap:                       "Git Pack Bitmap",
 	KindGitPackIndex:                        "Git Pack Index",
 	KindGitPackReverseIndex:                 "Git Pack Reverse Index",
+	KindGitReftable:                         "Git Reftable",
 	KindGlibcLocale:                         "Glibc Locale",
 	KindGLTFBinaryModel:                     "glTF Binary Model",
 	KindGlyphBitmapDistributionFormat:       "Glyph Bitmap Distribution Format",
 	KindGNOMEKeyring:                        "GNOME Keyring",
 	KindGNUGettextMachineCatalog:            "GNU Gettext Machine Catalog",
 	KindGnuPGKeybox:                         "GnuPG Keybox",
+	KindGoCoverageCounters:                  "Go Binary Coverage Counters",
+	KindGoCoverageMetadata:                  "Go Binary Coverage Metadata",
 	KindGodotPackage:                        "Godot Engine Package",
+	KindGoExecutionTrace:                    "Go Runtime Execution Trace",
 	KindGoogleChromeDictionary:              "Google Chrome Dictionary",
 	KindGoogleDriveDrawing:                  "Google Drive Drawing",
 	KindGoogleEarthPlacemark:                "Google Earth Placemark",
@@ -1201,6 +1253,7 @@ var kindNames = [...]string{
 	KindInnoSetupLog:                        "Inno Setup Log",
 	KindInstallShieldCabinet:                "InstallShield Cabinet",
 	KindInstallShieldScript:                 "InstallShield Script",
+	KindInstanced3DModel:                    "OGC Instanced 3D Model Tile",
 	KindIntellivisionROM:                    "Intellivision ROM",
 	KindInterplayMVEVideo:                   "Interplay MVE Video",
 	KindISO9660DiskImage:                    "ISO 9660 Disk Image",
@@ -1244,6 +1297,8 @@ var kindNames = [...]string{
 	KindLinuxPerfData:                       "Linux perf.data",
 	KindLinuxSwapSpace:                      "Linux Swap Space",
 	KindLLVMBitcode:                         "LLVM Bitcode",
+	KindLLVMIndexedProfile:                  "LLVM Indexed Instrumentation Profile",
+	KindLLVMRawProfile:                      "LLVM Raw Instrumentation Profile",
 	KindLogicalFileEvidence:                 "Logical File Evidence",
 	KindLottieAnimation:                     "Lottie Animation",
 	KindLotus123Spreadsheet:                 "Lotus 1-2-3 Spreadsheet",
@@ -1456,6 +1511,7 @@ var kindNames = [...]string{
 	KindPMarcArchive:                        "PMarc Archive",
 	KindPMTiles:                             "PMTiles",
 	KindPNGImage:                            "PNG Image",
+	KindPointCloudTile:                      "OGC Point Cloud Tile",
 	KindPolyTrackerModule:                   "PolyTracker Module",
 	KindPortableExecutable:                  "Portable Executable",
 	KindPortableFontResource:                "Portable Font Resource",
@@ -1480,6 +1536,7 @@ var kindNames = [...]string{
 	KindQimageFilter:                        "Qimage Filter",
 	KindQNX4Filesystem:                      "QNX4 Filesystem",
 	KindQNX6Filesystem:                      "QNX6 Filesystem",
+	KindQOAAudio:                            "Quite OK Audio",
 	KindQOIImage:                            "QOI Image",
 	KindQuakePakArchive:                     "Quake PAK Archive",
 	KindQuarkExpressDocument:                "Quark Express Document",
@@ -1576,6 +1633,7 @@ var kindNames = [...]string{
 	KindSQLite3SharedMemory:                 "SQLite Shared Memory",
 	KindSQLite3WriteAheadLog:                "SQLite Write-Ahead Log",
 	KindSQLiteDatabase:                      "SQLite Database",
+	KindSQLiteRollbackJournal:               "SQLite Rollback Journal",
 	KindSquashFSFilesystem:                  "SquashFS Filesystem",
 	KindSQXArchive:                          "SQX Archive",
 	KindSSHPublicKey:                        "SSH Public Key",
@@ -1620,6 +1678,10 @@ var kindNames = [...]string{
 	KindU3DModel:                            "U3D Model",
 	KindUBIFSFilesystem:                     "UBIFS Filesystem",
 	KindUBootImage:                          "U-Boot Image",
+	KindUCSCBigBed:                          "UCSC bigBed",
+	KindUCSCBigWig:                          "UCSC bigWig",
+	KindUCSCTwoBit:                          "UCSC twoBit",
+	KindUF2Firmware:                         "Microsoft UF2 Firmware",
 	KindUFAArchive:                          "UFA Archive",
 	KindUFSFilesystem:                       "UFS Filesystem",
 	KindUHAArchive:                          "UHA Archive",
@@ -1631,11 +1693,13 @@ var kindNames = [...]string{
 	KindUniversalSceneDescription:           "Universal Scene Description",
 	KindUnixCompressArchive:                 "Unix Compress Archive",
 	KindUnrealEnginePackage:                 "Unreal Engine Package",
+	KindUpdateEnginePayload:                 "ChromeOS/Android Update-Engine Payload",
 	KindUUencodedArchive:                    "UUencoded Archive",
 	KindValvePAKArchive:                     "Valve PAK Archive",
 	KindValveTextureFormatImage:             "Valve Texture Format Image",
 	KindVBScriptEncodedScript:               "VBScript Encoded Script",
 	KindVCardContact:                        "vCard Contact",
+	KindVCDIFFDelta:                         "VCDIFF Delta",
 	KindVectrexROM:                          "Vectrex ROM",
 	KindVeeamBackup:                         "Veeam Backup",
 	KindVHDDiskImage:                        "VHD Disk Image",
