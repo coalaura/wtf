@@ -3,6 +3,9 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
+	types.RegisterSignature(types.KindAndroidCompactDEX, types.TypeNone, 0, []byte("cdex001\x00"))
+	types.RegisterSignature(types.KindClangSerializedAST, types.TypeNone, 0, []byte("CPCH"))
+	types.RegisterSignature(types.KindClangSerializedDiagnostics, types.TypeNone, 0, []byte("DIAG"))
 	types.RegisterSignature(types.KindGoCoverageCounters, types.TypeNone, 0, []byte("\x00cwm\x01\x00\x00\x00"))
 	types.RegisterSignature(types.KindGoCoverageMetadata, types.TypeNone, 0, []byte("\x00cvm\x01\x00\x00\x00"))
 	types.RegisterSignature(types.KindGoExecutionTrace, types.TypeNone, 0, []byte("go 1.11 trace\x00\x00\x00"))
@@ -15,9 +18,19 @@ func init() {
 	types.RegisterSignature(types.KindGoExecutionTrace, types.TypeNone, 0, []byte("go 1.5 trace\x00\x00\x00"))
 	types.RegisterSignature(types.KindGoExecutionTrace, types.TypeNone, 0, []byte("go 1.7 trace\x00\x00\x00"))
 	types.RegisterSignature(types.KindGoExecutionTrace, types.TypeNone, 0, []byte("go 1.9 trace\x00\x00\x00"))
+	types.RegisterSignature(types.KindJavaModuleImage, types.TypeVersion10, 0, []byte("\xca\xfe\xda\xda\x00\x01\x00\x00"))
+	types.RegisterSignature(types.KindJavaModuleImage, types.TypeVersion10, 0, []byte("\xda\xda\xfe\xca\x00\x00\x01\x00"))
+	types.RegisterSignature(types.KindJavaModuleImage, types.TypeVersion11, 0, []byte("\xca\xfe\xda\xda\x00\x01\x00\x01"))
+	types.RegisterSignature(types.KindJavaModuleImage, types.TypeVersion11, 0, []byte("\xda\xda\xfe\xca\x01\x00\x01\x00"))
 	types.RegisterSignature(types.KindLLVMIndexedProfile, types.TypeNone, 0, []byte("\xfflprofi\x81"))
 	types.RegisterSignature(types.KindLLVMRawProfile, types.Type32BitBigEndian, 0, []byte("\xfflprofR\x81"))
 	types.RegisterSignature(types.KindLLVMRawProfile, types.Type32BitLittleEndian, 0, []byte("\x81Rforpl\xff"))
 	types.RegisterSignature(types.KindLLVMRawProfile, types.Type64BitBigEndian, 0, []byte("\xfflprofr\x81"))
 	types.RegisterSignature(types.KindLLVMRawProfile, types.Type64BitLittleEndian, 0, []byte("\x81rforpl\xff"))
+	types.RegisterSignature(types.KindNETBinaryResources, types.TypeNone, 0, []byte("\xce\xca\xef\xbe\x01\x00\x00\x00"))
+	types.RegisterSignature(types.KindQtQMLCompiledUnit, types.TypeNone, 0, []byte("qv4cdata"))
+	types.RegisterSignature(types.KindQtResource, types.TypeVersion1, 0, []byte("qres\x00\x00\x00\x01"))
+	types.RegisterSignature(types.KindQtResource, types.TypeVersion2, 0, []byte("qres\x00\x00\x00\x02"))
+	types.RegisterSignature(types.KindQtResource, types.TypeVersion3, 0, []byte("qres\x00\x00\x00\x03"))
+	types.RegisterSignature(types.KindQtTranslation, types.TypeNone, 0, []byte("\x3c\xb8\x64\x18\xca\xef\x9c\x95\xcd\x21\x1c\xbf\x60\xa1\xbd\xdd"))
 }

@@ -5,6 +5,7 @@ type TypeID uint16
 
 const (
 	TypeNone TypeID = iota
+	Type16SVAudio
 	Type32Bit
 	Type32BitBigEndian
 	Type32BitLittleEndian
@@ -14,7 +15,10 @@ const (
 	Type64Bit
 	Type64BitBigEndian
 	Type64BitLittleEndian
+	Type8SVXAudio
 	TypeAC3Audio
+	TypeAC3DVersionB
+	TypeAC3DVersionC
 	TypeAdobeDNG
 	TypeAfterEffectsProject
 	TypeAIFCAudio
@@ -53,9 +57,15 @@ const (
 	TypeCanonRAW2
 	TypeCanonRAW3Image
 	TypeCatalog
+	TypeCCKD370
+	TypeCCKD64
 	TypeCDAAudio
 	TypeCeltx
 	TypeCharacterDevice
+	TypeCKD370
+	TypeCKD64
+	TypeCKDShadow370
+	TypeCKDShadow64
 	TypeClojureScript
 	TypeCMakeScript
 	TypeCodestream
@@ -84,6 +94,8 @@ const (
 	TypeDownloadableSounds
 	TypeDSA
 	TypeDSIKModule
+	TypeDVDVideoManager
+	TypeDVDVideoTitleSet
 	TypeDXBC
 	TypeDXIL
 	TypeEAC3Audio
@@ -115,6 +127,9 @@ const (
 	TypeGIF89a
 	TypeGitConfig
 	TypeGitDiff
+	TypeGodotCompressed2D
+	TypeGodotCompressedLayered
+	TypeGodotStreamTexture
 	TypeGoSource
 	TypeGoTemplate
 	TypeGraphQL
@@ -153,6 +168,9 @@ const (
 	TypeLatin1
 	TypeLeanSource
 	TypeLegacy
+	TypeLightWaveLWO2
+	TypeLightWaveLWO3
+	TypeLightWaveLWOB
 	TypeList
 	TypeLittleEndian
 	TypeLogData
@@ -164,6 +182,7 @@ const (
 	TypeMakefile
 	TypeMarkdownDocument
 	TypeMatroskaVideo
+	TypeMAUDAudio
 	TypeMBTiles
 	TypeMicrosoftExcelAddIn
 	TypeMicrosoftExcelMacroEnabledTemplate
@@ -189,6 +208,7 @@ const (
 	TypeMicrosoftWordTemplate
 	TypeMIDIAudio
 	TypeMinecraftResourcePack
+	TypeModoLXO
 	TypeMotionJPEG2000Video
 	TypeMP3ID3Tagged
 	TypeMP4Video
@@ -201,6 +221,9 @@ const (
 	TypeNamedPipe
 	TypeNanosecondBigEndian
 	TypeNanosecondLittleEndian
+	TypeNanoVDBFile
+	TypeNanoVDBGrid
+	TypeNanoVDBLegacy
 	TypeNewASCII
 	TypeNewASCIIWithCRC
 	TypeNginxLog
@@ -247,6 +270,8 @@ const (
 	TypePentaxRAW
 	TypePerlScript
 	TypePES
+	TypePFAFont
+	TypePFBFont
 	TypePGMASCII
 	TypePGMBinary
 	TypePHPScript
@@ -263,6 +288,8 @@ const (
 	TypePythonWheel
 	TypePyTorchModel
 	TypeQCPAudio
+	TypeQuickTake100
+	TypeQuickTake150
 	TypeQuickTimeMovie
 	TypeReactComponent
 	TypeReStructuredText
@@ -276,6 +303,7 @@ const (
 	TypeShellcheckDirective
 	TypeSkinnableFrame
 	TypeSlackwarePackage
+	TypeSMUSScore
 	TypeSocket
 	TypeSoliditySource
 	TypeSonyRAW
@@ -313,6 +341,12 @@ const (
 	TypeVagrantBox
 	TypeVerilogSource
 	TypeVersion0
+	TypeVersion0100
+	TypeVersion012
+	TypeVersion013
+	TypeVersion0200
+	TypeVersion0240
+	TypeVersion0300
 	TypeVersion035
 	TypeVersion036
 	TypeVersion037
@@ -321,6 +355,10 @@ const (
 	TypeVersion040
 	TypeVersion041
 	TypeVersion1
+	TypeVersion10
+	TypeVersion104
+	TypeVersion11
+	TypeVersion12
 	TypeVersion2
 	TypeVersion3
 	TypeVersion4
@@ -350,6 +388,7 @@ const (
 	TypeXMLPaperSpecification
 	TypeXSLTStylesheet
 	TypeYAMLConfiguration
+	TypeYM3b
 	TypeZigSource
 	TypeZlibCompressed
 	TypeZshScript
@@ -358,6 +397,7 @@ const (
 
 var typeNames = [...]string{
 	TypeNone:                               "",
+	Type16SVAudio:                          "16SV Audio",
 	Type32Bit:                              "32-bit",
 	Type32BitBigEndian:                     "32-bit Big-Endian",
 	Type32BitLittleEndian:                  "32-bit Little-Endian",
@@ -367,7 +407,10 @@ var typeNames = [...]string{
 	Type64Bit:                              "64-bit",
 	Type64BitBigEndian:                     "64-bit Big-Endian",
 	Type64BitLittleEndian:                  "64-bit Little-Endian",
+	Type8SVXAudio:                          "8SVX Audio",
 	TypeAC3Audio:                           "AC-3 Audio",
+	TypeAC3DVersionB:                       "Version b (11)",
+	TypeAC3DVersionC:                       "Version c (12)",
 	TypeAdobeDNG:                           "Adobe DNG",
 	TypeAfterEffectsProject:                "After Effects Project",
 	TypeAIFCAudio:                          "AIFC Audio",
@@ -406,9 +449,15 @@ var typeNames = [...]string{
 	TypeCanonRAW2:                          "CR2",
 	TypeCanonRAW3Image:                     "Canon RAW 3 Image",
 	TypeCatalog:                            "Catalog",
+	TypeCCKD370:                            "Compressed CKD 32-bit",
+	TypeCCKD64:                             "Compressed CKD 64-bit",
 	TypeCDAAudio:                           "CD Audio",
 	TypeCeltx:                              "Celtx Project",
 	TypeCharacterDevice:                    "Character Device",
+	TypeCKD370:                             "CKD 32-bit",
+	TypeCKD64:                              "CKD 64-bit",
+	TypeCKDShadow370:                       "CKD Shadow 32-bit",
+	TypeCKDShadow64:                        "CKD Shadow 64-bit",
 	TypeClojureScript:                      "Clojure Script",
 	TypeCMakeScript:                        "CMake Script",
 	TypeCodestream:                         "Codestream",
@@ -437,6 +486,8 @@ var typeNames = [...]string{
 	TypeDownloadableSounds:                 "Downloadable Sounds",
 	TypeDSA:                                "DSA",
 	TypeDSIKModule:                         "DSIK Module",
+	TypeDVDVideoManager:                    "Video Manager",
+	TypeDVDVideoTitleSet:                   "Video Title Set",
 	TypeDXBC:                               "DXBC",
 	TypeDXIL:                               "DXIL",
 	TypeEAC3Audio:                          "E-AC-3 Audio",
@@ -468,6 +519,9 @@ var typeNames = [...]string{
 	TypeGIF89a:                             "GIF89a",
 	TypeGitConfig:                          "Git Configuration",
 	TypeGitDiff:                            "Git Diff",
+	TypeGodotCompressed2D:                  "Godot 4 Compressed 2D Texture",
+	TypeGodotCompressedLayered:             "Godot 4 Compressed Layered/3D Texture",
+	TypeGodotStreamTexture:                 "Godot 3 Stream Texture",
 	TypeGoSource:                           "Go Source",
 	TypeGoTemplate:                         "Go Template",
 	TypeGraphQL:                            "GraphQL",
@@ -506,6 +560,9 @@ var typeNames = [...]string{
 	TypeLatin1:                             "Latin-1",
 	TypeLeanSource:                         "Lean Source",
 	TypeLegacy:                             "Legacy",
+	TypeLightWaveLWO2:                      "LightWave LWO2 Object",
+	TypeLightWaveLWO3:                      "LightWave LWO3 Object",
+	TypeLightWaveLWOB:                      "LightWave LWOB Object",
 	TypeList:                               "List",
 	TypeLittleEndian:                       "Little-Endian",
 	TypeLogData:                            "Log Data",
@@ -517,6 +574,7 @@ var typeNames = [...]string{
 	TypeMakefile:                           "Makefile",
 	TypeMarkdownDocument:                   "Markdown Document",
 	TypeMatroskaVideo:                      "Matroska Video",
+	TypeMAUDAudio:                          "MAUD Audio",
 	TypeMBTiles:                            "MBTiles",
 	TypeMicrosoftExcelAddIn:                "Microsoft Excel Add-In",
 	TypeMicrosoftExcelMacroEnabledTemplate: "Microsoft Excel Macro-Enabled Template",
@@ -542,6 +600,7 @@ var typeNames = [...]string{
 	TypeMicrosoftWordTemplate:                       "Microsoft Word Template",
 	TypeMIDIAudio:                                   "MIDI Audio",
 	TypeMinecraftResourcePack:                       "Minecraft Resource Pack",
+	TypeModoLXO:                                     "Modo LXO Scene",
 	TypeMotionJPEG2000Video:                         "Motion JPEG 2000 Video",
 	TypeMP3ID3Tagged:                                "MP3 (ID3 Tagged)",
 	TypeMP4Video:                                    "MP4 Video",
@@ -554,6 +613,9 @@ var typeNames = [...]string{
 	TypeNamedPipe:                                   "Named Pipe",
 	TypeNanosecondBigEndian:                         "Nanosecond Big-Endian",
 	TypeNanosecondLittleEndian:                      "Nanosecond Little-Endian",
+	TypeNanoVDBFile:                                 "File",
+	TypeNanoVDBGrid:                                 "Grid",
+	TypeNanoVDBLegacy:                               "Legacy Grid/File",
 	TypeNewASCII:                                    "New ASCII",
 	TypeNewASCIIWithCRC:                             "New ASCII with CRC",
 	TypeNginxLog:                                    "Nginx Log",
@@ -600,6 +662,8 @@ var typeNames = [...]string{
 	TypePentaxRAW:                                   "Pentax RAW",
 	TypePerlScript:                                  "Perl Script",
 	TypePES:                                         "PES",
+	TypePFAFont:                                     "PFA (ASCII)",
+	TypePFBFont:                                     "PFB (Binary)",
 	TypePGMASCII:                                    "PGM ASCII",
 	TypePGMBinary:                                   "PGM binary",
 	TypePHPScript:                                   "PHP Script",
@@ -616,6 +680,8 @@ var typeNames = [...]string{
 	TypePythonWheel:                                 "Python Wheel",
 	TypePyTorchModel:                                "PyTorch Model",
 	TypeQCPAudio:                                    "QCP Audio",
+	TypeQuickTake100:                                "QuickTake 100",
+	TypeQuickTake150:                                "QuickTake 150",
 	TypeQuickTimeMovie:                              "QuickTime Movie",
 	TypeReactComponent:                              "React Component",
 	TypeReStructuredText:                            "reStructuredText",
@@ -629,6 +695,7 @@ var typeNames = [...]string{
 	TypeShellcheckDirective:                         "Shellcheck Directive",
 	TypeSkinnableFrame:                              "Skippable Frame",
 	TypeSlackwarePackage:                            "Slackware Package",
+	TypeSMUSScore:                                   "SMUS Score",
 	TypeSocket:                                      "Socket",
 	TypeSoliditySource:                              "Solidity Source",
 	TypeSonyRAW:                                     "Sony RAW",
@@ -666,6 +733,12 @@ var typeNames = [...]string{
 	TypeVagrantBox:                                  "Vagrant Box",
 	TypeVerilogSource:                               "Verilog Source",
 	TypeVersion0:                                    "Version 0",
+	TypeVersion0100:                                 "Version 0100",
+	TypeVersion012:                                  "Version 0.12",
+	TypeVersion013:                                  "Version 0.13",
+	TypeVersion0200:                                 "Version 0200",
+	TypeVersion0240:                                 "Version 0240",
+	TypeVersion0300:                                 "Version 0300",
 	TypeVersion035:                                  "Version 035",
 	TypeVersion036:                                  "Version 036",
 	TypeVersion037:                                  "Version 037",
@@ -674,6 +747,10 @@ var typeNames = [...]string{
 	TypeVersion040:                                  "Version 040",
 	TypeVersion041:                                  "Version 041",
 	TypeVersion1:                                    "Version 1",
+	TypeVersion10:                                   "Version 1.0",
+	TypeVersion104:                                  "Version 1.0.4",
+	TypeVersion11:                                   "Version 1.1",
+	TypeVersion12:                                   "Version 1.2",
 	TypeVersion2:                                    "Version 2",
 	TypeVersion3:                                    "Version 3",
 	TypeVersion4:                                    "Version 4",
@@ -703,6 +780,7 @@ var typeNames = [...]string{
 	TypeXMLPaperSpecification:                       "XML Paper Specification",
 	TypeXSLTStylesheet:                              "XSLT Stylesheet",
 	TypeYAMLConfiguration:                           "YAML Configuration",
+	TypeYM3b:                                        "YM3b",
 	TypeZigSource:                                   "Zig Source",
 	TypeZlibCompressed:                              "Zlib Compressed",
 	TypeZshScript:                                   "Zsh Script",

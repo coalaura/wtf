@@ -3777,7 +3777,6 @@ func tensorJSONObject(data []byte) (map[string]json.RawMessage, bool) {
 	}
 
 	token, err = decoder.Token()
-
 	return fields, errors.Is(err, io.EOF) && token == nil
 }
 

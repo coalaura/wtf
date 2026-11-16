@@ -3,6 +3,8 @@ package internal
 import "github.com/coalaura/wtf/types"
 
 func init() {
+	types.RegisterSignature(types.KindAcrossLitePuzzle, types.TypeNone, 2, []byte("ACROSS&DOWN\x00"))
+	types.RegisterSignature(types.KindADFDatabase, types.TypeNone, 0, []byte("@(#)ADF Database Version "))
 	types.RegisterSignature(types.KindAntennaData, types.TypeNone, 0, []byte("REVNUM:,"))
 	types.RegisterSignature(types.KindAOLData, types.TypeNone, 0, []byte("AOL Feed"))
 	types.RegisterSignature(types.KindAOLData, types.TypeNone, 0, []byte("AOLDB"))
@@ -17,7 +19,11 @@ func init() {
 	types.RegisterSignature(types.KindBCFData, types.TypeNone, 0, []byte("BCF\x02"))
 	types.RegisterSignature(types.KindBGBlitzDatabase, types.TypeNone, 0, []byte{0xac, 0xed, 0x00, 0x05, 0x73, 0x72, 0x00, 0x12})
 	types.RegisterSignature(types.KindBitcoinWallet, types.TypeNone, 8, []byte{0x62, 0x31, 0x05, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+	types.RegisterSignature(types.KindBRIXMap, types.TypeNone, 0, []byte(":-) origin"))
 	types.RegisterSignature(types.KindBUFR, types.TypeNone, 0, []byte("BUFR"))
+	types.RegisterSignature(types.KindCasioFXInterface, types.TypeNone, 0, []byte("20\xf8\xa1\xbf\xca\xae\xa9\xb3\xa2\xb5\xa1\xa6\xa4\xa2\xc7\xca\xc7\xbe\xa2\xab\xab\xa8\xb0\xc7\xa4\xa8\xaa\xb7\xb2\xb3\xae\xa9\xa0"))
+	types.RegisterSignature(types.KindCasioStandardContainer, types.TypeNone, 0, []byte("\xaa\xac\xbd\xaf\x90\x88\x9a\x8d\xd3\xff\xfe\xff\xfe\xff"))
+	types.RegisterSignature(types.KindCasioStandardContainer, types.TypeNone, 0, []byte("\xb3\x86\xc8\xca\xca\xdf\xdf\xdf\xd3\xff\xfe\xff\xfe\xff"))
 	types.RegisterSignature(types.KindClamAVDatabase, types.TypeNone, 0, []byte("ClamAV-VDB:"))
 	types.RegisterSignature(types.KindDB2Conversion, types.TypeNone, 0, []byte("SQLOCONV"))
 	types.RegisterSignature(types.KindDuckDBDatabase, types.TypeNone, 8, []byte("DUCK"))
@@ -63,6 +69,7 @@ func init() {
 	types.RegisterSignature(types.KindMicrosoftMoney, types.TypeNone, 0, []byte{0x00, 0x01, 0x00, 0x00, 'M', 'S', 'I', 'S', 'A', 'M', ' ', 'D', 'a', 't', 'a', 'b', 'a', 's', 'e'})
 	types.RegisterSignature(types.KindMicrosoftSQLServerDatabase, types.TypeNone, 0, []byte{0x01, 0x0f, 0x00, 0x00, 0x08, 0x02, 0x00, 0x00})
 	types.RegisterSignature(types.KindMoneroWallet, types.TypeNone, 0, []byte{0x12, 0x30, 0xf1, 0x71, 0x61, 0x04, 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xa1, 0xa1, 0x10})
+	types.RegisterSignature(types.KindMTZReflections, types.TypeNone, 0, []byte("MTZ "))
 	types.RegisterSignature(types.KindMultiBitBlockchain, types.TypeNone, 0, []byte("SPVB"))
 	types.RegisterSignature(types.KindMultiBitInfo, types.TypeNone, 0, []byte("multiBit.info"))
 	types.RegisterSignature(types.KindMultiBitWallet, types.TypeNone, 0, []byte{0x0a, 0x16, 0x6f, 0x72, 0x67, 0x2e, 0x62, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x2e, 0x70, 0x72})
@@ -106,10 +113,12 @@ func init() {
 	types.RegisterSignature(types.KindTensorFlowLiteModel, types.TypeNone, 4, []byte("TFL3"))
 	types.RegisterSignature(types.KindTheBatIndex, types.TypeNone, 0, []byte{0x01, 0x01, 0x47, 0x19, 0xa4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
 	types.RegisterSignature(types.KindTokyoCabinetDatabase, types.TypeNone, 0, []byte("ToCa"))
+	types.RegisterSignature(types.KindVICARImage, types.TypeNone, 0, []byte("LBLSIZE="))
 	types.RegisterSignature(types.KindWhereIsItCatalogDatabase, types.TypeNone, 0, []byte("Catalog "))
 	types.RegisterSignature(types.KindWiredTigerDatabase, types.TypeNone, 0, []byte("WiredTiger\x00"))
 	types.RegisterSignature(types.KindXilinxBitstream, types.TypeNone, 0, []byte{0x00, 0x09, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x00, 0x00, 0x01, 0x61})
 
+	types.RegisterMaskedSignature(types.KindCasioStandardContainer, types.TypeNone, 0, []byte("\xaa\xac\xbd\xaf\x90\x88\x9a\x8d\x00\xff\xef\xff\xef\xff"), []byte("\xff\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff"))
 	types.RegisterMaskedSignature(types.KindSQLiteDatabase, types.TypeMBTiles, 0, []byte("SQLite format 3\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00MBTI"), []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff})
 
 	types.RegisterWeakSignature(types.KindAOLData, types.TypeNone, 0, []byte("AOL"))
