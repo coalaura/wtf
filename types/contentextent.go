@@ -5,6 +5,51 @@ import "encoding/binary"
 // Header offsets refer to the whole file, not the bounded detection prefix.
 func validContentExtent(b Buffer, kind KindID, size uint64) bool {
 	switch kind {
+	case KindSafeTensors:
+		return detectSafeTensorsSized(b, int64(size)) != nil
+	case KindDirectXShaderContainer:
+		return uint64(binary.LittleEndian.Uint32(b[24:])) <= size
+	case KindUEFIFirmwareVolume:
+		return binary.LittleEndian.Uint64(b[32:]) <= size
+	case KindJavaFlightRecorder:
+		return b.Len() >= 68 && (binary.BigEndian.Uint16(b[4:]) == 1 || binary.BigEndian.Uint16(b[4:]) == 2)
+	case KindJavaHeapDump:
+		return b.Len() >= 31 && (binary.BigEndian.Uint32(b[19:]) == 4 || binary.BigEndian.Uint32(b[19:]) == 8)
+	case KindOpenZIMArchive:
+		return b.Len() >= 80 && binary.LittleEndian.Uint16(b[4:]) >= 5 && binary.LittleEndian.Uint16(b[4:]) <= 6
+	case KindDwarFSImage:
+		return b.Len() >= 8
+	case KindPAR2Recovery:
+		if b.Len() < 64 {
+			return false
+		}
+
+		length := binary.LittleEndian.Uint64(b[8:])
+
+		return length >= 64 && length%4 == 0 && length <= size
+	case KindPostgreSQLBinaryCopy:
+		return b.Len() >= 19 && contentExtentFits(19, uint64(binary.BigEndian.Uint32(b[15:])), size)
+	case KindStandardFlowgram:
+		if b.Len() < 31 || b[30] != 1 {
+			return false
+		}
+
+		headerSize := uint64(binary.BigEndian.Uint16(b[24:]))
+		expected := (31 + uint64(binary.BigEndian.Uint16(b[26:])) + uint64(binary.BigEndian.Uint16(b[28:])) + 7) &^ 7
+
+		return headerSize == expected && headerSize <= size
+	case KindBAMIndex:
+		return b.Len() >= 8 && uint64(binary.LittleEndian.Uint32(b[4:])) <= (size-8)/8
+	case KindUBIImage:
+		return b.Len() >= 64
+	case KindMRCImage:
+		var order binary.ByteOrder = binary.LittleEndian
+
+		if b[212] == 0x11 {
+			order = binary.BigEndian
+		}
+
+		return contentExtentFits(1024, uint64(order.Uint32(b[92:])), size)
 	case KindGitMultiPackIndex:
 		hashSize := uint64(20)
 

@@ -12,6 +12,7 @@ import (
 	"hash/crc32"
 	"io"
 	"math"
+	"math/bits"
 	"path"
 	"slices"
 	"sort"
@@ -420,10 +421,71 @@ func validGCCVersion(version uint32) bool {
 	minor := byte(version >> 16)
 	patch := byte(version >> 8)
 	status := byte(version)
+
 	validMajor := major >= '3' && major <= '9' || major >= 'A' && major <= 'Z'
 	validStatus := status == '*' || status == 'e' || status == 'p' || status == 'r'
 
 	return validMajor && minor >= '0' && minor <= '9' && patch >= '0' && patch <= '9' && validStatus
+}
+
+func DetectDirectX(buffer Buffer) *Metadata {
+	if buffer.Len() < 32 || !buffer.Has(0, []byte("DXBC")) || binary.LittleEndian.Uint16(buffer[20:]) != 1 {
+		return nil
+	}
+
+	size := uint64(binary.LittleEndian.Uint32(buffer[24:]))
+	count := uint64(binary.LittleEndian.Uint32(buffer[28:]))
+	tableEnd := 32 + count*4
+
+	if count > 256 || tableEnd > uint64(buffer.Len()) || tableEnd > size {
+		return nil
+	}
+
+	shader := TypeNone
+	complete := true
+	next := tableEnd
+	previous := tableEnd - 8
+
+	for index := range count {
+		offset := uint64(binary.LittleEndian.Uint32(buffer[32+index*4:]))
+		if offset < tableEnd || offset > size || size-offset < 8 {
+			return nil
+		}
+
+		if offset < previous+8 || complete && offset != next {
+			return nil
+		}
+
+		previous = offset
+
+		if offset+8 > uint64(buffer.Len()) {
+			complete = false
+
+			continue
+		}
+
+		length := uint64(binary.LittleEndian.Uint32(buffer[offset+4:]))
+		if length > size-offset-8 {
+			return nil
+		}
+
+		next = offset + 8 + length
+
+		part := string(buffer[offset : offset+4])
+		if part == "DXIL" {
+			shader = TypeDXIL
+		} else if (part == "SHDR" || part == "SHEX") && shader == TypeNone {
+			shader = TypeDXBC
+		}
+	}
+
+	if !complete {
+		shader = TypeNone
+	} else if next != size {
+		return nil
+	}
+
+	return &Metadata{Kind: KindDirectXShaderContainer, Type: shader}
 }
 
 func DetectAppleDiskImage(b Buffer) *Metadata {
@@ -1851,6 +1913,126 @@ func DetectJSON(b Buffer) *Metadata {
 	return &Metadata{Kind: KindJSONDocument}
 }
 
+func DetectKiCad(buffer Buffer) *Metadata {
+	position := 0
+	input := buffer[:min(buffer.Len(), 4096)]
+
+	if !kicadSkipSpace(input, &position) || input[position] != '(' {
+		return nil
+	}
+
+	position++
+
+	document := kicadToken(input, &position)
+	if document != "kicad_pcb" && document != "kicad_sch" {
+		return nil
+	}
+
+	if kicadToken(input, &position) != "(" || kicadToken(input, &position) != "version" {
+		return nil
+	}
+
+	version, err := strconv.ParseUint(kicadToken(input, &position), 10, 32)
+	if err != nil || version == 0 || kicadToken(input, &position) != ")" || kicadToken(input, &position) != "(" {
+		return nil
+	}
+
+	field := kicadToken(input, &position)
+	if field != "generator" && (field != "host" || document != "kicad_pcb") {
+		return nil
+	}
+
+	if !kicadHeaderValue(kicadToken(input, &position)) {
+		return nil
+	}
+
+	if field == "host" && !kicadHeaderValue(kicadToken(input, &position)) {
+		return nil
+	}
+
+	if kicadToken(input, &position) != ")" {
+		return nil
+	}
+
+	if document == "kicad_pcb" {
+		return &Metadata{Kind: KindKiCadPCB}
+	}
+
+	return &Metadata{Kind: KindKiCadSchematic}
+}
+
+func kicadSkipSpace(input []byte, position *int) bool {
+	for *position < len(input) {
+		value := input[*position]
+		if value == ' ' || value == '\t' || value == '\n' || value == '\r' || value == 0 {
+			*position++
+
+			continue
+		}
+
+		if value == '#' {
+			end := bytes.IndexByte(input[*position:], '\n')
+			if end < 0 {
+				return false
+			}
+
+			*position += end + 1
+
+			continue
+		}
+
+		break
+	}
+
+	return *position < len(input)
+}
+
+func kicadToken(input []byte, position *int) string {
+	if !kicadSkipSpace(input, position) {
+		return ""
+	}
+
+	start := *position
+	value := input[start]
+	*position++
+
+	if value == '(' || value == ')' {
+		return string(input[start:*position])
+	}
+
+	if value == '"' {
+		for *position < len(input) {
+			value = input[*position]
+			*position++
+
+			if value == '"' {
+				return string(input[start:*position])
+			}
+
+			if value == '\\' && *position < len(input) {
+				*position++
+			}
+		}
+
+		return ""
+	}
+
+	for *position < len(input) {
+		value = input[*position]
+		if value == '(' || value == ')' || value == ' ' || value == '\t' || value == '\r' || value == '\n' || value == 0 {
+			return string(input[start:*position])
+		}
+
+		*position++
+	}
+
+	return ""
+}
+
+func kicadHeaderValue(value string) bool {
+	return value != "" && value != "(" && value != ")"
+}
+
 const maxScanSize = 128 * 1024
 
 func DetectLZMA(b Buffer) *Metadata {
@@ -3259,6 +3441,103 @@ func asn1Header(buffer Buffer, offset int, tag byte, limit int64) (int, int64, b
 	return start, int64(start) + length, true
 }
 
+type pdbStream struct {
+	name   string
+	offset uint64
+	size   uint64
+}
+
+func DetectPortablePDB(buffer Buffer) *Metadata {
+	return detectPortablePDBSized(buffer, int64(buffer.Len()))
+}
+
+func detectPortablePDBSized(buffer Buffer, size int64) *Metadata {
+	if buffer.Len() < 24 || !buffer.Has(0, []byte("BSJB")) || !buffer.Has(4, []byte{1, 0, 1, 0}) {
+		return nil
+	}
+
+	versionSize := uint64(binary.LittleEndian.Uint32(buffer[12:]))
+	if versionSize == 0 || versionSize > 256 || versionSize%4 != 0 || 20+versionSize > uint64(buffer.Len()) {
+		return nil
+	}
+
+	position := 16 + versionSize
+
+	count := int(binary.LittleEndian.Uint16(buffer[position+2:]))
+	if count < 2 || count > 16 {
+		return nil
+	}
+
+	position += 4
+
+	var streams [16]pdbStream
+
+	for index := range count {
+		if position+12 > uint64(buffer.Len()) {
+			return nil
+		}
+
+		stream := &streams[index]
+		stream.offset = uint64(binary.LittleEndian.Uint32(buffer[position:]))
+		stream.size = uint64(binary.LittleEndian.Uint32(buffer[position+4:]))
+		position += 8
+		nameLimit := min(position+32, uint64(buffer.Len()))
+
+		nameLength := bytes.IndexByte(buffer[position:nameLimit], 0)
+		if nameLength < 0 {
+			return nil
+		}
+
+		stream.name = string(buffer[position : position+uint64(nameLength)])
+		position += (uint64(nameLength) + 4) &^ 3
+	}
+
+	var (
+		debug  bool
+		tables bool
+	)
+
+	for index := range count {
+		stream := &streams[index]
+		if stream.offset < position || stream.offset%4 != 0 || stream.offset+stream.size > uint64(size) {
+			return nil
+		}
+
+		for previous := range index {
+			other := &streams[previous]
+			overlap := stream.offset < other.offset+other.size && other.offset < stream.offset+stream.size
+
+			if stream.name == other.name || overlap {
+				return nil
+			}
+		}
+
+		switch stream.name {
+		case "#Pdb":
+			if stream.size < 32 || stream.offset+32 > uint64(buffer.Len()) {
+				return nil
+			}
+
+			mask := binary.LittleEndian.Uint64(buffer[stream.offset+24:])
+			debug = stream.size == 32+4*uint64(bits.OnesCount64(mask))
+		case "#~":
+			if stream.size < 24 || stream.offset+24 > uint64(buffer.Len()) {
+				return nil
+			}
+
+			header := buffer[stream.offset:]
+			mask := binary.LittleEndian.Uint64(header[8:])
+			tables = header[4] == 2 && header[5] == 0 && stream.size >= 24+4*uint64(bits.OnesCount64(mask))
+		}
+	}
+
+	if !debug || !tables {
+		return nil
+	}
+
+	return &Metadata{Kind: KindPortablePDB}
+}
+
 var pycMagic = map[uint16]struct{}{
 	20121: {}, 50428: {}, 50823: {}, 60202: {}, 60717: {}, 62011: {},
 	62021: {}, 62041: {}, 62051: {}, 62061: {}, 62071: {}, 62081: {},
@@ -3329,6 +3608,290 @@ func DetectQNX4(b Buffer) *Metadata {
 	}
 
 	return nil
+}
+
+type tensorExtent struct {
+	start uint64
+	end   uint64
+}
+
+func DetectSafeTensors(buffer Buffer) *Metadata {
+	return detectSafeTensorsSized(buffer, int64(buffer.Len()))
+}
+
+func detectSafeTensorsSized(buffer Buffer, size int64) *Metadata {
+	if buffer.Len() < 10 || buffer[8] != '{' {
+		return nil
+	}
+
+	headerSize := binary.LittleEndian.Uint64(buffer)
+	if headerSize < 2 || headerSize > maxScanSize-8 || headerSize > uint64(buffer.Len()-8) || uint64(size) < 8+headerSize {
+		return nil
+	}
+
+	header := buffer[8 : 8+headerSize]
+	if !utf8.Valid(header) {
+		return nil
+	}
+
+	fields, ok := tensorJSONObject(header)
+	if !ok {
+		return nil
+	}
+
+	extents := make([]tensorExtent, 0, len(fields))
+
+	for name, raw := range fields {
+		if name == "__metadata__" {
+			metadata, valid := tensorJSONObject(raw)
+			if !valid {
+				return nil
+			}
+
+			for _, value := range metadata {
+				var text string
+
+				err := json.Unmarshal(value, &text)
+				if err != nil || len(value) == 0 || value[0] != '"' {
+					return nil
+				}
+			}
+
+			continue
+		}
+
+		descriptor, valid := tensorJSONObject(raw)
+		if !valid {
+			return nil
+		}
+
+		var (
+			dtype   string
+			shape   []uint64
+			offsets []uint64
+		)
+
+		err := json.Unmarshal(descriptor["dtype"], &dtype)
+		if err != nil {
+			return nil
+		}
+
+		err = json.Unmarshal(descriptor["shape"], &shape)
+		if err != nil || shape == nil || bytes.Contains(descriptor["shape"], []byte("null")) {
+			return nil
+		}
+
+		err = json.Unmarshal(descriptor["data_offsets"], &offsets)
+		if err != nil || len(offsets) != 2 || bytes.Contains(descriptor["data_offsets"], []byte("null")) || offsets[1] < offsets[0] {
+			return nil
+		}
+
+		bits := tensorDtypeBits(dtype)
+		if bits == 0 {
+			return nil
+		}
+
+		empty := false
+
+		for _, dimension := range shape {
+			if dimension == 0 {
+				empty = true
+
+				continue
+			}
+
+			if dimension > ^uint64(0)/bits {
+				return nil
+			}
+
+			bits *= dimension
+		}
+
+		if empty {
+			bits = 0
+		}
+
+		if bits%8 != 0 || bits/8 != offsets[1]-offsets[0] {
+			return nil
+		}
+
+		extents = append(extents, tensorExtent{start: offsets[0], end: offsets[1]})
+	}
+
+	slices.SortFunc(extents, compareTensorExtents)
+	end := uint64(0)
+
+	for _, extent := range extents {
+		if extent.start != end {
+			return nil
+		}
+
+		end = extent.end
+	}
+
+	if end != uint64(size)-8-headerSize {
+		return nil
+	}
+
+	return &Metadata{Kind: KindSafeTensors}
+}
+
+func tensorJSONObject(data []byte) (map[string]json.RawMessage, bool) {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+
+	token, err := decoder.Token()
+	if err != nil || token != json.Delim('{') {
+		return nil, false
+	}
+
+	fields := make(map[string]json.RawMessage)
+
+	for decoder.More() {
+		token, err = decoder.Token()
+		if err != nil {
+			return nil, false
+		}
+
+		name, ok := token.(string)
+		if !ok {
+			return nil, false
+		}
+
+		if _, exists := fields[name]; exists {
+			return nil, false
+		}
+
+		var value json.RawMessage
+
+		err = decoder.Decode(&value)
+		if err != nil {
+			return nil, false
+		}
+
+		fields[name] = value
+	}
+
+	token, err = decoder.Token()
+	if err != nil || token != json.Delim('}') {
+		return nil, false
+	}
+
+	token, err = decoder.Token()
+
+	return fields, errors.Is(err, io.EOF) && token == nil
+}
+
+func tensorDtypeBits(dtype string) uint64 {
+	switch dtype {
+	case "F4":
+		return 4
+	case "F6_E3M2", "F6_E2M3":
+		return 6
+	case "BOOL", "U8", "I8", "F8_E5M2", "F8_E4M3", "F8_E8M0", "F8_E4M3FNUZ", "F8_E5M2FNUZ":
+		return 8
+	case "I16", "U16", "F16", "BF16":
+		return 16
+	case "I32", "U32", "F32":
+		return 32
+	case "I64", "U64", "F64", "C64":
+		return 64
+	}
+
+	return 0
+}
+
+func compareTensorExtents(left, right tensorExtent) int {
+	if left.start < right.start || left.start == right.start && left.end < right.end {
+		return -1
+	}
+
+	if left == right {
+		return 0
+	}
+
+	return 1
+}
+
+func DetectScientificHeaders(buffer Buffer) *Metadata {
+	if buffer.Len() >= 24 && buffer.Has(0, []byte("RRD\x00")) && buffer.Has(4, []byte("000")) && buffer[7] >= '1' && buffer[7] <= '5' && buffer[8] == 0 {
+		cookie := math.Float64bits(8.642135e130)
+
+		for offset := 12; offset <= 16; offset += 4 {
+			if binary.LittleEndian.Uint64(buffer[offset:]) == cookie {
+				return &Metadata{Kind: KindRRDtoolDatabase, Type: TypeLittleEndian}
+			}
+
+			if binary.BigEndian.Uint64(buffer[offset:]) == cookie {
+				return &Metadata{Kind: KindRRDtoolDatabase, Type: TypeBigEndian}
+			}
+		}
+	}
+
+	if buffer.Len() >= 7 && buffer.Has(0, []byte("#ASDF")) && (buffer[5] == ' ' || buffer[5] == '\t') {
+		end := bytes.IndexByte(buffer[:min(buffer.Len(), 64)], '\n')
+		if end < 0 {
+			return nil
+		}
+
+		version := bytes.TrimSpace(buffer[6:end])
+
+		var (
+			components int
+			digits     int
+		)
+
+		for _, value := range version {
+			if value >= '0' && value <= '9' {
+				digits++
+			} else if value == '.' && digits > 0 {
+				components++
+				digits = 0
+			} else {
+				return nil
+			}
+		}
+
+		if components == 2 && digits > 0 {
+			return &Metadata{Kind: KindASDFDocument}
+		}
+	}
+
+	if buffer.Len() < 1024 || !buffer.Has(208, []byte("MAP ")) {
+		return nil
+	}
+
+	var (
+		order   binary.ByteOrder
+		subtype TypeID
+	)
+
+	if buffer.Has(212, []byte{0x44, 0x44}) || buffer.Has(212, []byte{0x44, 0x41}) {
+		order = binary.LittleEndian
+		subtype = TypeLittleEndian
+	} else if buffer.Has(212, []byte{0x11, 0x11}) {
+		order = binary.BigEndian
+		subtype = TypeBigEndian
+	} else {
+		return nil
+	}
+
+	for offset := 0; offset < 12; offset += 4 {
+		dimension := order.Uint32(buffer[offset:])
+		if dimension == 0 || dimension > math.MaxInt32 {
+			return nil
+		}
+	}
+
+	mode := order.Uint32(buffer[12:])
+
+	validMode := mode <= 4 || mode == 6 || mode == 12 || mode == 101
+	version := order.Uint32(buffer[108:])
+
+	if !validMode || version != 20140 && version != 20141 || order.Uint32(buffer[92:]) > math.MaxInt32 {
+		return nil
+	}
+
+	return &Metadata{Kind: KindMRCImage, Type: subtype}
 }
 
 func DetectSkippableFrames(b Buffer) *Metadata {
@@ -4682,6 +5245,53 @@ func validBBIHeader(b Buffer, order binary.ByteOrder) bool {
 
 func validTwoBitHeader(b Buffer, order binary.ByteOrder) bool {
 	return b.Len() >= 16 && order.Uint32(b[4:]) <= 1 && order.Uint32(b[12:]) == 0
+}
+
+func DetectUEFIVolume(buffer Buffer) *Metadata {
+	if buffer.Len() < 64 || !buffer.Has(40, []byte("_FVH")) || buffer[54] != 0 || buffer[55] != 2 {
+		return nil
+	}
+
+	length := binary.LittleEndian.Uint64(buffer[32:])
+	headerSize := int(binary.LittleEndian.Uint16(buffer[48:]))
+	extension := int(binary.LittleEndian.Uint16(buffer[52:]))
+
+	if headerSize < 64 || headerSize%8 != 0 || headerSize > buffer.Len() || uint64(headerSize) > length || extension != 0 && (extension < 64 || uint64(extension)+20 > length) {
+		return nil
+	}
+
+	checksum := uint16(0)
+
+	for offset := 0; offset < headerSize; offset += 2 {
+		checksum += binary.LittleEndian.Uint16(buffer[offset:])
+	}
+
+	if checksum != 0 {
+		return nil
+	}
+
+	blocks := uint64(0)
+
+	for offset := 56; offset+8 <= headerSize; offset += 8 {
+		count := uint64(binary.LittleEndian.Uint32(buffer[offset:]))
+		blockSize := uint64(binary.LittleEndian.Uint32(buffer[offset+4:]))
+
+		if count == 0 && blockSize == 0 {
+			if blocks == length {
+				return &Metadata{Kind: KindUEFIFirmwareVolume}
+			}
+
+			return nil
+		}
+
+		if count == 0 || blockSize == 0 || count*blockSize > length-blocks {
+			return nil
+		}
+
+		blocks += count * blockSize
+	}
+
+	return nil
 }
 
 func DetectXMLSubtypes(b Buffer) *Metadata {

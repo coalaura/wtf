@@ -12,6 +12,7 @@ import (
 	"go/token"
 	"hash/crc32"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -293,7 +294,68 @@ func TestDetectCollisions(t *testing.T) {
 	zip64Oversized := bytes.Clone(zip64Template)
 	binary.LittleEndian.PutUint64(zip64Oversized[extraOffset+4:], ^uint64(0))
 
+	directXOutside := collisionDirectX("DXIL")
+	binary.LittleEndian.PutUint32(directXOutside[32:], 0xfffffff0)
+	directXOverlap := collisionDirectX("SHDR", "DXIL")
+	binary.LittleEndian.PutUint32(directXOverlap[36:], 40)
+	metadataOnly := collisionPortablePDB()
+	copy(metadataOnly[32:], "#Foo")
+	missingTables := collisionPortablePDB()
+	copy(missingTables[48:], "#X")
+	volume := collisionFirmwareVolume()
+	badChecksum := bytes.Clone(volume)
+	badChecksum[50] ^= 1
+
+	largeTensor := collisionSafeTensors(`{"weights":{"dtype":"U8","shape":[131072],"data_offsets":[0,131072]}}`, 128*1024)
+	oversizedHeader := collisionSafeTensors(`{}`+strings.Repeat(" ", 128*1024), 0)
+	tensorPrefix := collisionSafeTensors(`{"weights":{"dtype":"U8","shape":[1],"data_offsets":[0,1]}}`, 1)
+	trailingTensor := append(bytes.Clone(tensorPrefix), 0)
+
 	cases := []collisionCase{
+		{name: "wasm-core", data: []byte("\x00asm\x01\x00\x00\x00"), kind: types.KindWebAssemblyModule},
+		{name: "wasm-component", data: []byte("\x00asm\x0d\x00\x01\x00"), kind: types.KindWebAssemblyComponent},
+		{name: "wasm-wrong-layer", data: []byte("\x00asm\x0d\x00\x00\x00"), forbidden: types.KindWebAssemblyModule},
+		{name: "wasm-short", data: []byte("\x00asm"), forbidden: types.KindWebAssemblyModule},
+		{name: "directx-dxbc", data: collisionDirectX("SHDR"), kind: types.KindDirectXShaderContainer, typ: types.TypeDXBC},
+		{name: "directx-dxil", data: collisionDirectX("DXIL"), kind: types.KindDirectXShaderContainer, typ: types.TypeDXIL},
+		{name: "directx-decoy-payload", data: collisionDirectX("TEST"), kind: types.KindDirectXShaderContainer},
+		{name: "directx-outside-table", data: directXOutside, forbidden: types.KindDirectXShaderContainer},
+		{name: "directx-overlap", data: directXOverlap, forbidden: types.KindDirectXShaderContainer},
+		{name: "directx-truncated", data: collisionDirectX("DXIL")[:36], forbidden: types.KindDirectXShaderContainer},
+		{name: "portable-pdb", data: collisionPortablePDB(), kind: types.KindPortablePDB},
+		{name: "metadata-not-pdb", data: metadataOnly, forbidden: types.KindPortablePDB},
+		{name: "pdb-missing-tables", data: missingTables, forbidden: types.KindPortablePDB},
+		{name: "pdb-truncated-directory", data: collisionPortablePDB()[:50], forbidden: types.KindPortablePDB},
+		{name: "tensor-scalar", data: collisionSafeTensors(`{"scalar":{"dtype":"F32","shape":[],"data_offsets":[0,4]}}`, 4), kind: types.KindSafeTensors},
+		{name: "tensor-empty", data: collisionSafeTensors(`{"empty":{"dtype":"F32","shape":[0,3],"data_offsets":[0,0]},"__metadata__":{"author":"upstream"}}`, 0), kind: types.KindSafeTensors},
+		{name: "tensor-metadata-only", data: collisionSafeTensors(`{"__metadata__":{}}`, 0), kind: types.KindSafeTensors},
+		{name: "tensor-large-data", data: largeTensor, kind: types.KindSafeTensors},
+		{name: "tensor-header-budget", data: oversizedHeader, forbidden: types.KindSafeTensors},
+		{name: "tensor-truncated-header", data: tensorPrefix[:16], forbidden: types.KindSafeTensors},
+		{name: "tensor-truncated-data", data: tensorPrefix[:len(tensorPrefix)-1], forbidden: types.KindSafeTensors},
+		{name: "tensor-trailing-data", data: trailingTensor, forbidden: types.KindSafeTensors},
+		{name: "tensor-hole", data: collisionSafeTensors(`{"x":{"dtype":"U8","shape":[1],"data_offsets":[1,2]}}`, 2), forbidden: types.KindSafeTensors},
+		{name: "tensor-overlap", data: collisionSafeTensors(`{"x":{"dtype":"U8","shape":[1],"data_offsets":[0,1]},"y":{"dtype":"U8","shape":[1],"data_offsets":[0,1]}}`, 1), forbidden: types.KindSafeTensors},
+		{name: "tensor-null-dimension", data: collisionSafeTensors(`{"x":{"dtype":"U8","shape":[null],"data_offsets":[0,0]}}`, 0), forbidden: types.KindSafeTensors},
+		{name: "tensor-invalid-metadata", data: collisionSafeTensors(`{"__metadata__":{"author":null}}`, 0), forbidden: types.KindSafeTensors},
+		{name: "tensor-overflow", data: collisionSafeTensors(`{"x":{"dtype":"F64","shape":[18446744073709551615,0],"data_offsets":[0,0]}}`, 0), forbidden: types.KindSafeTensors},
+		{name: "tensor-duplicate-field", data: collisionSafeTensors(`{"x":{"dtype":"F32","dtype":"U8","shape":[1],"data_offsets":[0,1]}}`, 1), forbidden: types.KindSafeTensors},
+		{name: "rrd-big-endian", data: collisionRRD(binary.BigEndian, 16), kind: types.KindRRDtoolDatabase, typ: types.TypeBigEndian},
+		{name: "rrd-32-bit-alignment", data: collisionRRD(binary.LittleEndian, 12), kind: types.KindRRDtoolDatabase, typ: types.TypeLittleEndian},
+		{name: "mrc-big-endian", data: collisionMRC(binary.BigEndian), kind: types.KindMRCImage, typ: types.TypeBigEndian},
+		{name: "mrc-short", data: collisionMRC(binary.LittleEndian)[:216], forbidden: types.KindMRCImage},
+		{name: "netcdf-not-nasa", data: []byte("CDF\x01"), kind: types.KindNetCDFData},
+		{name: "ubifs-not-ubi", data: []byte("\x31\x18\x10\x06"), kind: types.KindUBIFSFilesystem},
+		{name: "dwarfs-wrong-boundary", data: []byte("prefixDWARFS\x02\x05"), forbidden: types.KindDwarFSImage},
+		{name: "firmware-volume", data: volume, kind: types.KindUEFIFirmwareVolume},
+		{name: "firmware-bad-checksum", data: badChecksum, forbidden: types.KindUEFIFirmwareVolume},
+		{name: "firmware-wrong-boundary", data: append([]byte("prefix"), volume...), forbidden: types.KindUEFIFirmwareVolume},
+		{name: "firmware-truncated", data: volume[:72], forbidden: types.KindUEFIFirmwareVolume},
+		{name: "kicad-old-host", data: []byte(" \t(kicad_pcb (version 4) (host pcbnew 4.0.7))"), kind: types.KindKiCadPCB},
+		{name: "kicad-whitespace", data: []byte("# comment\r\n(kicad_sch\x00(version\t20250114)\r\n(generator \"eeschema\"))"), kind: types.KindKiCadSchematic},
+		{name: "kicad-in-prose", data: []byte("example: (kicad_pcb (version 20240108) (generator pcbnew))"), forbidden: types.KindKiCadPCB},
+		{name: "kicad-incomplete-header", data: []byte("(kicad_sch (version 20250114) (generator \"eeschema"), forbidden: types.KindKiCadSchematic},
+		{name: "asdf-block-index", data: []byte("#ASDF BLOCK INDEX\n"), forbidden: types.KindASDFDocument},
 		{name: "zip-ext", data: zipPayload, kind: types.KindZIPArchive},
 		{name: "zip-leveldb", data: footerZIP, kind: types.KindZIPArchive},
 		{name: "png-hdf5", data: collisionPNG(t, hdfText), kind: types.KindPNGImage},
@@ -563,6 +625,95 @@ func collisionZIP64(t *testing.T, data []byte) []byte {
 	}
 
 	return output.Bytes()
+}
+
+func collisionSafeTensors(header string, size int) []byte {
+	data := make([]byte, 8+len(header)+size)
+	binary.LittleEndian.PutUint64(data, uint64(len(header)))
+	copy(data[8:], header)
+
+	return data
+}
+
+func collisionDirectX(parts ...string) []byte {
+	data := make([]byte, 32+16*len(parts))
+	copy(data, "DXBC")
+	binary.LittleEndian.PutUint16(data[20:], 1)
+	binary.LittleEndian.PutUint32(data[24:], uint32(len(data)))
+	binary.LittleEndian.PutUint32(data[28:], uint32(len(parts)))
+
+	for index, part := range parts {
+		offset := 32 + 4*len(parts) + index*12
+		binary.LittleEndian.PutUint32(data[32+index*4:], uint32(offset))
+		copy(data[offset:], part)
+		binary.LittleEndian.PutUint32(data[offset+4:], 4)
+		copy(data[offset+8:], "DXIL")
+	}
+
+	return data
+}
+
+func collisionPortablePDB() []byte {
+	data := make([]byte, 112)
+	copy(data, "BSJB\x01\x00\x01\x00")
+	binary.LittleEndian.PutUint32(data[12:], 4)
+	copy(data[16:], "v1\x00\x00")
+	binary.LittleEndian.PutUint16(data[22:], 2)
+	binary.LittleEndian.PutUint32(data[24:], 56)
+	binary.LittleEndian.PutUint32(data[28:], 32)
+	copy(data[32:], "#Pdb")
+	binary.LittleEndian.PutUint32(data[40:], 88)
+	binary.LittleEndian.PutUint32(data[44:], 24)
+	copy(data[48:], "#~")
+	data[92] = 2
+	data[95] = 1
+
+	return data
+}
+
+func collisionRRD(order binary.ByteOrder, offset int) []byte {
+	data := make([]byte, 32)
+	copy(data, "RRD\x000003\x00")
+	order.PutUint64(data[offset:], math.Float64bits(8.642135e130))
+
+	return data
+}
+
+func collisionMRC(order binary.ByteOrder) []byte {
+	data := make([]byte, 1028)
+	order.PutUint32(data, 1)
+	order.PutUint32(data[4:], 1)
+	order.PutUint32(data[8:], 1)
+	order.PutUint32(data[12:], 2)
+	order.PutUint32(data[108:], 20141)
+	copy(data[208:], "MAP ")
+	copy(data[212:], []byte{0x44, 0x44})
+
+	if order == binary.BigEndian {
+		copy(data[212:], []byte{0x11, 0x11})
+	}
+
+	return data
+}
+
+func collisionFirmwareVolume() []byte {
+	data := make([]byte, 512)
+	copy(data[16:], []byte{0x78, 0xe5, 0x8c, 0x8c, 0x3d, 0x8a, 0x1c, 0x4f, 0x99, 0x35, 0x89, 0x61, 0x85, 0xc3, 0x2d, 0xd3})
+	binary.LittleEndian.PutUint64(data[32:], uint64(len(data)))
+	copy(data[40:], "_FVH")
+	binary.LittleEndian.PutUint16(data[48:], 72)
+	data[55] = 2
+	binary.LittleEndian.PutUint32(data[56:], 1)
+	binary.LittleEndian.PutUint32(data[60:], uint32(len(data)))
+	checksum := uint16(0)
+
+	for offset := 0; offset < 72; offset += 2 {
+		checksum += binary.LittleEndian.Uint16(data[offset:])
+	}
+
+	binary.LittleEndian.PutUint16(data[50:], -checksum)
+
+	return data
 }
 
 func getIdentifiers(t *testing.T, filename, prefix string) []string {

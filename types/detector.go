@@ -70,6 +70,14 @@ func DetectReaderAt(name string, data []byte, r io.ReaderAt, size int64) (*Metad
 	}
 
 	if meta == nil {
+		meta = detectSafeTensorsSized(buffer, size)
+	}
+
+	if meta == nil {
+		meta = detectPortablePDBSized(buffer, size)
+	}
+
+	if meta == nil {
 		meta = DetectTIFFReaderAt(buffer, r, size)
 	}
 

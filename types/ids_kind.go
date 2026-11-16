@@ -79,6 +79,7 @@ const (
 	KindARCArchive
 	KindARJArchive
 	KindARRIRAWImage
+	KindASDFDocument
 	KindAsepriteSprite
 	KindASFContainer
 	KindASTCTextureImage
@@ -103,6 +104,7 @@ const (
 	KindB1Archive
 	KindBadgerDB
 	KindBAMData
+	KindBAMIndex
 	KindBase85
 	KindBasisUniversalImage
 	KindBatched3DModel
@@ -195,6 +197,7 @@ const (
 	KindDigitalSpeechStandard
 	KindDigitalWatchdogAudio
 	KindDiracVideo
+	KindDirectXShaderContainer
 	KindDjVuDocument
 	KindDolphinRVZImage
 	KindDOSExecutable
@@ -208,6 +211,7 @@ const (
 	KindDTSHDAudio
 	KindDuckDBDatabase
 	KindDVRMSVideo
+	KindDwarFSImage
 	KindEasyStreetDrawDrawing
 	KindEBMLContainer
 	KindECWImage
@@ -357,6 +361,8 @@ const (
 	KindJARCSArchive
 	KindJavaClassBytecode
 	KindJavaCryptographyExtensionKeyStore
+	KindJavaFlightRecorder
+	KindJavaHeapDump
 	KindJavaKeyStore
 	KindJavaModule
 	KindJavaPack200Archive
@@ -378,6 +384,8 @@ const (
 	KindKeyholeMarkupLanguage
 	KindKeyholeMarkupLanguageOverlay
 	KindKGBArchive
+	KindKiCadPCB
+	KindKiCadSchematic
 	KindKodakPhotoCD
 	KindKorgAudio
 	KindKSSAudio
@@ -392,6 +400,7 @@ const (
 	KindLinuxSwapSpace
 	KindLLVMBitcode
 	KindLLVMIndexedProfile
+	KindLLVMOptimizationRemarks
 	KindLLVMRawProfile
 	KindLogicalFileEvidence
 	KindLottieAnimation
@@ -402,6 +411,7 @@ const (
 	KindLotusWordProDocument
 	KindLrzipArchive
 	KindLuaBytecode
+	KindLuaJITBytecode
 	KindLuceneIndex
 	KindLUKS2DiskEncryption
 	KindLUKSDiskEncryption
@@ -485,6 +495,7 @@ const (
 	KindMPEGProgramStream
 	KindMPEGTransportStream
 	KindMPEGVideo
+	KindMRCImage
 	KindMrSIDImage
 	KindMSDOSCOFFObject
 	KindMSXCartridge
@@ -497,6 +508,7 @@ const (
 	KindMusepackAudio
 	KindMySQLBinlog
 	KindMySQLMyISAMDatabase
+	KindNASACDF
 	KindNASASPICEKernel
 	KindNationalImageryTransmissionFormat
 	KindNationalTransferFormatData
@@ -533,6 +545,7 @@ const (
 	KindNintendoYay0Archive
 	KindNintendoYaz0Archive
 	KindNISTSPHEREAudio
+	KindNixArchive
 	KindNOAARasterChart
 	KindNokiaPhoneBackup
 	KindNovellLANalyzerCapture
@@ -551,6 +564,7 @@ const (
 	KindOpenStreetMapPBFData
 	KindOpenTypeFont
 	KindOpenVDBModel
+	KindOpenZIMArchive
 	KindOptimFROGAudio
 	KindORCColumnarData
 	KindOutlookAddress
@@ -563,6 +577,7 @@ const (
 	KindPalmData
 	KindPalmOSApplication
 	KindPanasonic3DOROM
+	KindPAR2Recovery
 	KindParallelsDiskImage
 	KindParrotVideoEncapsulation
 	KindPasswordSafeDatabase
@@ -609,6 +624,8 @@ const (
 	KindPolyTrackerModule
 	KindPortableExecutable
 	KindPortableFontResource
+	KindPortablePDB
+	KindPostgreSQLBinaryCopy
 	KindPostgreSQLCustomDump
 	KindPostScriptDocument
 	KindPowerBASICDebugger
@@ -643,6 +660,7 @@ const (
 	KindRagTimeDocument
 	KindRARArchive
 	KindRData
+	KindRDFHDTDataset
 	KindRealMediaContainer
 	KindRealMediaMetafile
 	KindRealPlayerVideo
@@ -670,11 +688,13 @@ const (
 	KindRPGVXProject
 	KindRPGXPProject
 	KindRPMPackage
+	KindRRDtoolDatabase
 	KindRSSFeed
 	KindRubyGemPackage
 	KindRubyMarshalData
 	KindRuntimeSoftwareDiskImage
 	KindRzipArchive
+	KindSafeTensors
 	KindSASData
 	KindScreamTrackerModule
 	KindSeattleFilmWorksImage
@@ -731,6 +751,7 @@ const (
 	KindSquashFSFilesystem
 	KindSQXArchive
 	KindSSHPublicKey
+	KindStandardFlowgram
 	KindStataData
 	KindSteganosVirtualDrive
 	KindSTEP3DModel
@@ -771,10 +792,12 @@ const (
 	KindTwinVQAudio
 	KindU3DModel
 	KindUBIFSFilesystem
+	KindUBIImage
 	KindUBootImage
 	KindUCSCBigBed
 	KindUCSCBigWig
 	KindUCSCTwoBit
+	KindUEFIFirmwareVolume
 	KindUF2Firmware
 	KindUFAArchive
 	KindUFSFilesystem
@@ -822,6 +845,7 @@ const (
 	KindWarcraftIIIReplay
 	KindWavPackAudio
 	KindWavPackCorrection
+	KindWebAssemblyComponent
 	KindWebAssemblyModule
 	KindWebexARFVideo
 	KindWebVTT
@@ -985,6 +1009,7 @@ var kindNames = [...]string{
 	KindARCArchive:                          "ARC Archive",
 	KindARJArchive:                          "ARJ Archive",
 	KindARRIRAWImage:                        "ARRI RAW Image",
+	KindASDFDocument:                        "Advanced Scientific Data Format",
 	KindAsepriteSprite:                      "Aseprite Sprite",
 	KindASFContainer:                        "ASF Container",
 	KindASTCTextureImage:                    "ASTC Texture Image",
@@ -1009,6 +1034,7 @@ var kindNames = [...]string{
 	KindB1Archive:                           "B1 Archive",
 	KindBadgerDB:                            "BadgerDB Database",
 	KindBAMData:                             "BAM Data",
+	KindBAMIndex:                            "BAM Index",
 	KindBase85:                              "BASE85",
 	KindBasisUniversalImage:                 "Basis Universal Image",
 	KindBatched3DModel:                      "OGC Batched 3D Model Tile",
@@ -1101,6 +1127,7 @@ var kindNames = [...]string{
 	KindDigitalSpeechStandard:               "Digital Speech Standard",
 	KindDigitalWatchdogAudio:                "Digital Watchdog Audio",
 	KindDiracVideo:                          "Dirac Video",
+	KindDirectXShaderContainer:              "DirectX Shader Container",
 	KindDjVuDocument:                        "DjVu Document",
 	KindDolphinRVZImage:                     "Dolphin RVZ Image",
 	KindDOSExecutable:                       "DOS Executable",
@@ -1114,6 +1141,7 @@ var kindNames = [...]string{
 	KindDTSHDAudio:                          "DTS-HD Audio",
 	KindDuckDBDatabase:                      "DuckDB Database",
 	KindDVRMSVideo:                          "DVR-MS Video",
+	KindDwarFSImage:                         "DwarFS Filesystem Image",
 	KindEasyStreetDrawDrawing:               "Easy Street Draw Drawing",
 	KindEBMLContainer:                       "EBML Container",
 	KindECWImage:                            "ECW Image",
@@ -1263,6 +1291,8 @@ var kindNames = [...]string{
 	KindJARCSArchive:                        "JARCS Archive",
 	KindJavaClassBytecode:                   "Java Class Bytecode",
 	KindJavaCryptographyExtensionKeyStore:   "JCE KeyStore",
+	KindJavaFlightRecorder:                  "Java Flight Recorder Recording",
+	KindJavaHeapDump:                        "Java HPROF Binary Heap Dump",
 	KindJavaKeyStore:                        "Java KeyStore",
 	KindJavaModule:                          "Java Module",
 	KindJavaPack200Archive:                  "Java Pack200 Archive",
@@ -1284,6 +1314,8 @@ var kindNames = [...]string{
 	KindKeyholeMarkupLanguage:               "Keyhole Markup Language",
 	KindKeyholeMarkupLanguageOverlay:        "Keyhole Markup Language Overlay",
 	KindKGBArchive:                          "KGB Archive",
+	KindKiCadPCB:                            "KiCad PCB Document",
+	KindKiCadSchematic:                      "KiCad Schematic Document",
 	KindKodakPhotoCD:                        "Kodak PhotoCD",
 	KindKorgAudio:                           "Korg Audio",
 	KindKSSAudio:                            "KSS Audio",
@@ -1298,6 +1330,7 @@ var kindNames = [...]string{
 	KindLinuxSwapSpace:                      "Linux Swap Space",
 	KindLLVMBitcode:                         "LLVM Bitcode",
 	KindLLVMIndexedProfile:                  "LLVM Indexed Instrumentation Profile",
+	KindLLVMOptimizationRemarks:             "LLVM Bitstream Optimization Remarks",
 	KindLLVMRawProfile:                      "LLVM Raw Instrumentation Profile",
 	KindLogicalFileEvidence:                 "Logical File Evidence",
 	KindLottieAnimation:                     "Lottie Animation",
@@ -1308,6 +1341,7 @@ var kindNames = [...]string{
 	KindLotusWordProDocument:                "Lotus WordPro Document",
 	KindLrzipArchive:                        "Long Range ZIP Archive",
 	KindLuaBytecode:                         "Lua Bytecode",
+	KindLuaJITBytecode:                      "LuaJIT Bytecode",
 	KindLuceneIndex:                         "Lucene Index",
 	KindLUKS2DiskEncryption:                 "LUKS2 Disk Encryption",
 	KindLUKSDiskEncryption:                  "LUKS Disk Encryption",
@@ -1391,6 +1425,7 @@ var kindNames = [...]string{
 	KindMPEGProgramStream:                   "MPEG Program Stream",
 	KindMPEGTransportStream:                 "MPEG Transport Stream",
 	KindMPEGVideo:                           "MPEG Video",
+	KindMRCImage:                            "MRC2014 Image/Volume",
 	KindMrSIDImage:                          "MrSID Image",
 	KindMSDOSCOFFObject:                     "MS-DOS COFF Object",
 	KindMSXCartridge:                        "MSX Cartridge",
@@ -1403,6 +1438,7 @@ var kindNames = [...]string{
 	KindMusepackAudio:                       "Musepack Audio",
 	KindMySQLBinlog:                         "MySQL Binary Log",
 	KindMySQLMyISAMDatabase:                 "MySQL MyISAM Database",
+	KindNASACDF:                             "NASA Common Data Format",
 	KindNASASPICEKernel:                     "NASA SPICE Kernel",
 	KindNationalImageryTransmissionFormat:   "National Imagery Transmission Format",
 	KindNationalTransferFormatData:          "National Transfer Format Data",
@@ -1439,6 +1475,7 @@ var kindNames = [...]string{
 	KindNintendoYay0Archive:                 "Nintendo Yay0 Archive",
 	KindNintendoYaz0Archive:                 "Nintendo Yaz0 Archive",
 	KindNISTSPHEREAudio:                     "NIST SPHERE Audio",
+	KindNixArchive:                          "Nix Archive",
 	KindNOAARasterChart:                     "NOAA Raster Chart",
 	KindNokiaPhoneBackup:                    "Nokia Phone Backup",
 	KindNovellLANalyzerCapture:              "Novell LANalyzer Capture",
@@ -1457,6 +1494,7 @@ var kindNames = [...]string{
 	KindOpenStreetMapPBFData:                "OpenStreetMap PBF Data",
 	KindOpenTypeFont:                        "OpenType Font",
 	KindOpenVDBModel:                        "OpenVDB Model",
+	KindOpenZIMArchive:                      "OpenZIM Archive",
 	KindOptimFROGAudio:                      "OptimFROG Audio",
 	KindORCColumnarData:                     "ORC Columnar Data",
 	KindOutlookAddress:                      "Outlook Address",
@@ -1469,6 +1507,7 @@ var kindNames = [...]string{
 	KindPalmData:                            "Palm Data",
 	KindPalmOSApplication:                   "Palm OS Application",
 	KindPanasonic3DOROM:                     "Panasonic 3DO ROM",
+	KindPAR2Recovery:                        "PAR2 Recovery File",
 	KindParallelsDiskImage:                  "Parallels Disk Image",
 	KindParrotVideoEncapsulation:            "Parrot Video Encapsulation",
 	KindPasswordSafeDatabase:                "Password Safe Database",
@@ -1515,6 +1554,8 @@ var kindNames = [...]string{
 	KindPolyTrackerModule:                   "PolyTracker Module",
 	KindPortableExecutable:                  "Portable Executable",
 	KindPortableFontResource:                "Portable Font Resource",
+	KindPortablePDB:                         ".NET Portable PDB",
+	KindPostgreSQLBinaryCopy:                "PostgreSQL Binary COPY",
 	KindPostgreSQLCustomDump:                "PostgreSQL Custom Dump",
 	KindPostScriptDocument:                  "PostScript Document",
 	KindPowerBASICDebugger:                  "PowerBASIC Debugger",
@@ -1549,6 +1590,7 @@ var kindNames = [...]string{
 	KindRagTimeDocument:                     "RagTime Document",
 	KindRARArchive:                          "RAR Archive",
 	KindRData:                               "RData",
+	KindRDFHDTDataset:                       "RDF HDT Dataset",
 	KindRealMediaContainer:                  "RealMedia Container",
 	KindRealMediaMetafile:                   "RealMedia Metafile",
 	KindRealPlayerVideo:                     "RealPlayer Video",
@@ -1576,11 +1618,13 @@ var kindNames = [...]string{
 	KindRPGVXProject:                        "RPG Maker VX Project",
 	KindRPGXPProject:                        "RPG Maker XP Project",
 	KindRPMPackage:                          "RPM Package",
+	KindRRDtoolDatabase:                     "RRDtool Database",
 	KindRSSFeed:                             "RSS Feed",
 	KindRubyGemPackage:                      "RubyGem Package",
 	KindRubyMarshalData:                     "Ruby Marshal Data",
 	KindRuntimeSoftwareDiskImage:            "Runtime Software Disk Image",
 	KindRzipArchive:                         "rzip Archive",
+	KindSafeTensors:                         "SafeTensors Model",
 	KindSASData:                             "SAS Data",
 	KindScreamTrackerModule:                 "Scream Tracker Module",
 	KindSeattleFilmWorksImage:               "Seattle FilmWorks Image",
@@ -1637,6 +1681,7 @@ var kindNames = [...]string{
 	KindSquashFSFilesystem:                  "SquashFS Filesystem",
 	KindSQXArchive:                          "SQX Archive",
 	KindSSHPublicKey:                        "SSH Public Key",
+	KindStandardFlowgram:                    "Standard Flowgram Format",
 	KindStataData:                           "Stata Data",
 	KindSteganosVirtualDrive:                "Steganos Virtual Drive",
 	KindSTEP3DModel:                         "STEP 3D Model",
@@ -1677,10 +1722,12 @@ var kindNames = [...]string{
 	KindTwinVQAudio:                         "TwinVQ Audio",
 	KindU3DModel:                            "U3D Model",
 	KindUBIFSFilesystem:                     "UBIFS Filesystem",
+	KindUBIImage:                            "UBI Flash Image",
 	KindUBootImage:                          "U-Boot Image",
 	KindUCSCBigBed:                          "UCSC bigBed",
 	KindUCSCBigWig:                          "UCSC bigWig",
 	KindUCSCTwoBit:                          "UCSC twoBit",
+	KindUEFIFirmwareVolume:                  "UEFI Firmware Volume",
 	KindUF2Firmware:                         "Microsoft UF2 Firmware",
 	KindUFAArchive:                          "UFA Archive",
 	KindUFSFilesystem:                       "UFS Filesystem",
@@ -1728,6 +1775,7 @@ var kindNames = [...]string{
 	KindWarcraftIIIReplay:                   "Warcraft III Replay",
 	KindWavPackAudio:                        "WavPack Audio",
 	KindWavPackCorrection:                   "WavPack Correction",
+	KindWebAssemblyComponent:                "WebAssembly Component",
 	KindWebAssemblyModule:                   "WebAssembly Module",
 	KindWebexARFVideo:                       "Webex ARF",
 	KindWebVTT:                              "WebVTT",

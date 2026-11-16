@@ -84,6 +84,8 @@ const (
 	TypeDownloadableSounds
 	TypeDSA
 	TypeDSIKModule
+	TypeDXBC
+	TypeDXIL
 	TypeEAC3Audio
 	TypeEC
 	TypeElixirScript
@@ -435,6 +437,8 @@ var typeNames = [...]string{
 	TypeDownloadableSounds:                 "Downloadable Sounds",
 	TypeDSA:                                "DSA",
 	TypeDSIKModule:                         "DSIK Module",
+	TypeDXBC:                               "DXBC",
+	TypeDXIL:                               "DXIL",
 	TypeEAC3Audio:                          "E-AC-3 Audio",
 	TypeEC:                                 "EC",
 	TypeElixirScript:                       "Elixir Script",

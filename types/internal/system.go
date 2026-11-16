@@ -139,7 +139,7 @@ func init() {
 	types.RegisterSignature(types.KindVulkanSPIRV, types.TypeLittleEndian, 0, []byte{0x03, 0x02, 0x23, 0x07})
 	types.RegisterSignature(types.KindWebAssemblyModule, types.TypeASCII, 0, []byte("(module "))
 	types.RegisterSignature(types.KindWebAssemblyModule, types.TypeASCII, 0, []byte("(module\n"))
-	types.RegisterSignature(types.KindWebAssemblyModule, types.TypeNone, 0, []byte{0x00, 0x61, 0x73, 0x6d})
+	types.RegisterSignature(types.KindWebAssemblyModule, types.TypeNone, 0, []byte{0x00, 0x61, 0x73, 0x6d, 1, 0, 0, 0})
 	types.RegisterSignature(types.KindWiiBackupFileSystem, types.TypeNone, 0, []byte("WBFS"))
 	types.RegisterSignature(types.KindWiiROM, types.TypeNone, 0x18, []byte{0x5d, 0x1c, 0x9e, 0xa3})
 	types.RegisterSignature(types.KindWin95Password, types.TypeNone, 0, []byte{0xb0, 0x4d, 0x46, 0x43})
